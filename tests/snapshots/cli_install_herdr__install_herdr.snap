@@ -1,0 +1,13 @@
+---
+source: tests/cli_install_herdr.rs
+expression: s.redact(&text)
+---
+# brain-swap: open the board in a popup (change the key if it collides)
+[[keys.command]]
+key = "prefix+shift+b"
+type = "popup"
+command = "env HERDR_ENV=1 HERDR_BIN_PATH=<fake herdr> <brain-swap>"
+width = "90%"
+height = "90%"
+
+then run: herdr server reload-config
