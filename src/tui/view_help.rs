@@ -1,4 +1,4 @@
-//! Help: every action with its current keys, then all warnings (TECHSPEC 7.2, 11, FR-32).
+//! Help: every action with its current keys, then all warnings.
 
 use ratatui::Frame;
 use ratatui::layout::Rect;

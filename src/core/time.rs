@@ -1,4 +1,4 @@
-//! Stamps: parsing and writing (TECHSPEC 3, 4.4).
+//! Stamps: parsing and writing.
 
 use jiff::civil::DateTime;
 use jiff::fmt::temporal::Pieces;
@@ -42,7 +42,7 @@ fn rfc3339(text: &str) -> bool {
         && (off.eq_ignore_ascii_case("Z") || shaped(off, "+99:99") && &off[1..3] < "24")
 }
 
-/// The exact accepted shapes of 4.4: `9` is an ASCII digit, `+` is `+` or `-`.
+/// The exact accepted shapes: `9` is an ASCII digit, `+` is `+` or `-`.
 fn shaped(text: &str, shape: &str) -> bool {
     text.len() == shape.len()
         && text.bytes().zip(shape.bytes()).all(|(t, s)| match s {
@@ -52,7 +52,7 @@ fn shaped(text: &str, shape: &str) -> bool {
         })
 }
 
-/// `stamp` without its sub-second part, as stamps are written to the second (3).
+/// `stamp` without its sub-second part, as stamps are written to the second.
 pub fn whole_second(stamp: Stamp) -> Stamp {
     stamp.with().subsec_nanosecond(0).build().unwrap_or(stamp)
 }
@@ -62,7 +62,7 @@ pub fn format_stamp(stamp: &Stamp) -> String {
     stamp.strftime("%Y-%m-%dT%H:%M:%S%:z").to_string()
 }
 
-/// How long ago a stamp was (TECHSPEC 7.3).
+/// How long ago a stamp was.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Age {
     Now,
@@ -203,52 +203,52 @@ mod tests {
     }
 
     #[test]
-    fn fr21_under_60_seconds_is_now() {
+    fn under_60_seconds_is_now() {
         assert_eq!(shown(59), "now");
     }
 
     #[test]
-    fn fr21_future_stamp_is_now() {
+    fn future_stamp_is_now() {
         assert_eq!(shown(-5 * 60), "now");
     }
 
     #[test]
-    fn fr21_60_seconds_is_1_min() {
+    fn age_60_seconds_is_1_min() {
         assert_eq!(shown(60), "1 min");
     }
 
     #[test]
-    fn fr21_59_min_59_s_is_59_min() {
+    fn age_59_min_59_s_is_59_min() {
         assert_eq!(shown(59 * 60 + 59), "59 min");
     }
 
     #[test]
-    fn fr21_60_min_is_1_h() {
+    fn age_60_min_is_1_h() {
         assert_eq!(shown(60 * 60), "1 h");
     }
 
     #[test]
-    fn fr21_23_h_59_min_is_23_h() {
+    fn age_23_h_59_min_is_23_h() {
         assert_eq!(shown(23 * 3600 + 59 * 60), "23 h");
     }
 
     #[test]
-    fn fr21_24_h_is_1_d() {
+    fn age_24_h_is_1_d() {
         assert_eq!(shown(24 * 3600), "1 d");
     }
 
     #[test]
-    fn fr21_42_h_47_min_is_1_d() {
+    fn age_42_h_47_min_is_1_d() {
         assert_eq!(shown(42 * 3600 + 47 * 60), "1 d");
     }
 
     #[test]
-    fn fr21_missing_stamp_is_question_mark() {
+    fn missing_stamp_is_question_mark() {
         assert_eq!(age(None, &now()).to_string(), "?");
     }
 
     #[test]
-    fn fr21_age_compares_instants_across_offsets() {
+    fn age_compares_instants_across_offsets() {
         let at = parse_stamp("2026-10-08T10:31:05+03:00", &TimeZone::UTC).unwrap();
         let now = parse_stamp("2026-10-08T08:10:05+00:00", &TimeZone::UTC).unwrap();
         assert_eq!(age(Some(&at), &now).to_string(), "39 min");

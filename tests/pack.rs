@@ -1,4 +1,4 @@
-//! TECHSPEC 8.1, 8.5, 12.1 Pack: static checks of the skill files; nothing is spawned.
+//! Static checks of the skill files; nothing is spawned.
 
 mod common;
 
@@ -27,7 +27,7 @@ fn ts8_1_bs_link_frontmatter_names_and_version() {
 }
 
 #[test]
-fn fr46_bs_link_user_only_and_cli_only() {
+fn bs_link_user_only_and_cli_only() {
     let fm = frontmatter(&read_skill("bs-link"));
     assert_eq!(fm["disable-model-invocation"], Value::Text("true".into()));
     assert_eq!(
@@ -88,7 +88,7 @@ fn ts8_1_bs_link_session_passed_quoted() {
 }
 
 #[test]
-fn fr47_bs_link_ends_with_move_line() {
+fn bs_link_ends_with_move_line() {
     let text = read_skill("bs-link");
     let last = text.lines().rev().find(|l| !l.trim().is_empty());
     assert_eq!(
@@ -108,7 +108,7 @@ fn bs_link_command(prefix: &str) -> String {
 }
 
 #[test]
-fn fr54_bs_link_command_links_and_prints_latest_note() {
+fn bs_link_command_links_and_prints_latest_note() {
     let env = PackEnv::new().with_w12();
     let cmd = substitute(&bs_link_command("brain-swap link "), SESSION_A);
     let (code, out, err) = env.run_sh(&cmd, "");
@@ -129,7 +129,7 @@ fn fr54_bs_link_command_links_and_prints_latest_note() {
 }
 
 #[test]
-fn fr54_bs_link_unknown_id_prints_one_error_line_and_changes_nothing() {
+fn bs_link_unknown_id_prints_one_error_line_and_changes_nothing() {
     let env = PackEnv::new().with_w12();
     let cmd = substitute(&bs_link_command("brain-swap link "), SESSION_A).replace("W-12", "W-99");
     let (code, out, err) = env.run_sh(&cmd, "");
@@ -142,7 +142,7 @@ fn fr54_bs_link_unknown_id_prints_one_error_line_and_changes_nothing() {
 }
 
 #[test]
-fn fr55_bs_link_without_id_lists_open_cards_by_best_guess() {
+fn bs_link_without_id_lists_open_cards_by_best_guess() {
     let env = PackEnv::new().with_w12();
     let (code, out, err) = env.run_sh(&bs_link_command("brain-swap ls "), "");
     assert_eq!(code, 0, "{err}");
@@ -160,7 +160,7 @@ fn fr55_bs_link_without_id_lists_open_cards_by_best_guess() {
 }
 
 #[test]
-fn fr55_bs_link_other_board_lists_that_board() {
+fn bs_link_other_board_lists_that_board() {
     let env = PackEnv::new().with_w12();
     let cmd = format!("{} --board home", bs_link_command("brain-swap ls "));
     let (code, out, err) = env.run_sh(&cmd, "");
@@ -196,7 +196,7 @@ fn ts8_1_bs_park_frontmatter_names_and_version() {
 }
 
 #[test]
-fn fr46_bs_park_user_only_and_cli_only() {
+fn bs_park_user_only_and_cli_only() {
     let fm = frontmatter(&read_skill("bs-park"));
     assert_eq!(fm["disable-model-invocation"], Value::Text("true".into()));
     assert_eq!(
@@ -273,7 +273,7 @@ fn ts8_1_bs_park_session_passed_quoted_and_card_named() {
 }
 
 #[test]
-fn fr47_bs_park_ends_with_move_line() {
+fn bs_park_ends_with_move_line() {
     let text = read_skill("bs-park");
     let last = text.lines().rev().find(|l| !l.trim().is_empty());
     assert_eq!(
@@ -337,7 +337,7 @@ fn ts8_3_bs_park_inline_context_error_line_has_hint() {
 }
 
 #[test]
-fn fr56_bs_park_no_reference_context_prints_picker() {
+fn bs_park_no_reference_context_prints_picker() {
     let (_, out, _) = park_inline(ContextState::NoReference);
     let lines: Vec<&str> = out.lines().collect();
     assert!(lines.contains(&"reference: none"), "{out}");
@@ -373,7 +373,7 @@ fn w12_notes(env: &PackEnv) -> Vec<(String, Vec<String>)> {
 }
 
 #[test]
-fn fr49_bs_park_heredoc_parks_to_referenced_card() {
+fn bs_park_heredoc_parks_to_referenced_card() {
     let (env, _) = PackEnv::for_state(ContextState::WithNote);
     let cmd = park_heredoc("switched repo to v13", "rerun migration test", "timeout");
     let (code, out, err) = env.run_sh(&cmd, "");
@@ -396,7 +396,7 @@ fn fr49_bs_park_heredoc_parks_to_referenced_card() {
 }
 
 #[test]
-fn fr50_bs_park_heredoc_without_auto_writes_plain_note() {
+fn bs_park_heredoc_without_auto_writes_plain_note() {
     let (env, _) = PackEnv::for_state(ContextState::WithNote);
     let cmd = park_heredoc("switched repo to v13", "rerun migration test", "timeout")
         .replace(" --auto", "");
@@ -419,7 +419,7 @@ fn ts8_6_bs_park_heredoc_keeps_text_literal() {
     assert_eq!(notes.last().unwrap().1[0], format!("- Doing: {doing}"));
 }
 
-// bs-back (TECHSPEC 8.4)
+// bs-back
 
 #[test]
 fn ts8_1_bs_back_frontmatter_names_and_version() {
@@ -437,7 +437,7 @@ fn ts8_1_bs_back_frontmatter_names_and_version() {
 }
 
 #[test]
-fn fr46_bs_back_user_only_and_cli_only() {
+fn bs_back_user_only_and_cli_only() {
     let fm = frontmatter(&read_skill("bs-back"));
     assert_eq!(fm["disable-model-invocation"], Value::Text("true".into()));
     assert_eq!(
@@ -574,7 +574,7 @@ fn ts12_1_bs_back_inline_context_exits_0_in_every_state() {
 }
 
 #[test]
-fn fr51_bs_back_context_carries_the_printed_fields() {
+fn bs_back_context_carries_the_printed_fields() {
     let (env, session) = PackEnv::for_state(ContextState::WithNote);
     let (_, out, _) = back_inline(&env, session);
     let lines: Vec<&str> = out.lines().collect();
@@ -595,14 +595,14 @@ fn fr51_bs_back_context_carries_the_printed_fields() {
 }
 
 #[test]
-fn fr52_bs_back_context_without_note_reads_none() {
+fn bs_back_context_without_note_reads_none() {
     let (env, session) = PackEnv::for_state(ContextState::WithoutNote);
     let (_, out, _) = back_inline(&env, session);
     assert!(out.lines().any(|l| l == "latest note: none"), "{out}");
 }
 
 #[test]
-fn fr53_bs_back_context_names_the_note_author() {
+fn bs_back_context_names_the_note_author() {
     let env = PackEnv::new().with_w12();
     env.link("W-12", SESSION_A);
     env.link("W-12", SESSION_B);
@@ -619,7 +619,7 @@ fn fr53_bs_back_context_names_the_note_author() {
 }
 
 #[test]
-fn fr56_bs_back_link_after_pick_sets_reference() {
+fn bs_back_link_after_pick_sets_reference() {
     let env = PackEnv::new().with_w12();
     let (code, out, err) = env.run_sh(&bs_back_command("brain-swap link ", SESSION_C), "");
     assert_eq!(code, 0, "{err}");
@@ -650,7 +650,7 @@ fn ts8_4_bs_back_show_fallback_when_no_session_resolves() {
 }
 
 #[test]
-fn fr52_bs_back_catch_up_heredoc_saves_auto_note() {
+fn bs_back_catch_up_heredoc_saves_auto_note() {
     let (env, _) = PackEnv::for_state(ContextState::WithNote);
     let blocks = heredoc_commands(&read_skill("bs-back"));
     assert_eq!(blocks.len(), 1, "{blocks:?}");
@@ -669,20 +669,20 @@ fn fr52_bs_back_catch_up_heredoc_saves_auto_note() {
 }
 
 #[test]
-fn fr51_bs_back_names_the_just_now_form() {
+fn bs_back_names_the_just_now_form() {
     let text = read_skill("bs-back");
     assert!(text.contains("an age of `now` gives `(note just now)`"));
     assert!(text.contains("an age of `now` gives `no note since just now on <ID>`"));
 }
 
 #[test]
-fn fr52_bs_back_first_line_is_verbatim() {
+fn bs_back_first_line_is_verbatim() {
     let text = read_skill("bs-back");
     assert!(text.contains("Write the first line exactly in the given form, never paraphrased"));
 }
 
 #[test]
-fn fr51_bs_back_prints_plain_lines() {
+fn bs_back_prints_plain_lines() {
     let text = read_skill("bs-back");
     assert!(text.contains("as plain text and not in a code block"));
 }
@@ -708,7 +708,7 @@ fn ts8_1_bs_card_frontmatter_names_and_version() {
 }
 
 #[test]
-fn fr46_bs_card_user_only_and_cli_only() {
+fn bs_card_user_only_and_cli_only() {
     let fm = frontmatter(&read_skill("bs-card"));
     assert_eq!(fm["disable-model-invocation"], Value::Text("true".into()));
     assert_eq!(
@@ -840,7 +840,7 @@ fn create_card(env: &PackEnv, cmd: &str) -> String {
 }
 
 #[test]
-fn fr48_bs_card_heredoc_creates_card_and_links_session() {
+fn bs_card_heredoc_creates_card_and_links_session() {
     let env = PackEnv::new();
     let out = create_card(&env, &card_heredoc());
     assert_eq!(out, format!("created W-12: {CARD_TITLE} (Todo, work)\n"));
@@ -869,7 +869,7 @@ fn fr48_bs_card_heredoc_creates_card_and_links_session() {
 }
 
 #[test]
-fn fr48_bs_card_named_board_creates_on_that_board() {
+fn bs_card_named_board_creates_on_that_board() {
     let env = PackEnv::new();
     let (_, before, _) = env.run_sh("ls boards/work", "");
     let cmd = card_heredoc().replacen(" <<'BS_EOF'", " --board home <<'BS_EOF'", 1);
@@ -889,7 +889,7 @@ fn ts8_6_bs_card_heredoc_keeps_body_literal() {
 }
 
 #[test]
-fn fr47_move_line_command_moves_the_card() {
+fn move_line_command_moves_the_card() {
     let env = PackEnv::new();
     create_card(&env, &card_heredoc());
     let (_, before, _) = env.run_sh("cat boards/work/W-12.md", "");
@@ -913,7 +913,7 @@ fn fr47_move_line_command_moves_the_card() {
 // ---- verbatim, plain replies ----
 
 #[test]
-fn fr48_bs_card_reply_is_the_output_line_verbatim() {
+fn bs_card_reply_is_the_output_line_verbatim() {
     let text = read_skill("bs-card");
     assert!(text.contains(
         "Reply with its output line only, exactly as printed and never re-cased or reworded"
@@ -921,7 +921,7 @@ fn fr48_bs_card_reply_is_the_output_line_verbatim() {
 }
 
 #[test]
-fn fr54_bs_link_prints_plain_output() {
+fn bs_link_prints_plain_output() {
     let text = read_skill("bs-link");
     assert!(
         text.contains("print its output exactly as printed, as plain text and not in a code block")
@@ -929,7 +929,7 @@ fn fr54_bs_link_prints_plain_output() {
 }
 
 #[test]
-fn fr56_pickers_show_the_list_from_its_heading() {
+fn pickers_show_the_list_from_its_heading() {
     for name in ["bs-park", "bs-back", "bs-link"] {
         let text = read_skill(name);
         assert!(
@@ -941,7 +941,7 @@ fn fr56_pickers_show_the_list_from_its_heading() {
     }
 }
 
-// ---- AS-1, AS-2, AS-3 command replay ----
+// ---- Start, park, return, catch-up and lost-reference command replay ----
 
 const P9: (&str, &str, &str) = ("w4V:p9", "w4V:t1", "w4V");
 const P11: (&str, &str, &str) = ("w4V:p11", "w4V:t1", "w4V");
@@ -985,7 +985,7 @@ fn a_linked_in_p9() -> PackEnv {
 }
 
 #[test]
-fn as1_park_records_the_pane_place() {
+fn park_records_the_pane_place() {
     let env = a_linked_in_p9();
     let out = run_ok(&env, &park_block(SESSION_A, "W-12"));
     assert_eq!(out, "parked to W-12: migrate invoices to v13\n");
@@ -1011,7 +1011,7 @@ fn as1_park_records_the_pane_place() {
 }
 
 #[test]
-fn as1_link_in_a_second_session_keeps_the_first_reference() {
+fn link_in_a_second_session_keeps_the_first_reference() {
     let env = pane(a_linked_in_p9(), P11);
     let cmd = substitute(&bs_link_command("brain-swap link "), SESSION_B).replace("W-12", "W-7");
     let out = run_ok(&env, &cmd);
@@ -1025,7 +1025,7 @@ fn as1_link_in_a_second_session_keeps_the_first_reference() {
 }
 
 #[test]
-fn as2_back_context_reports_a_40_min_old_note() {
+fn back_context_reports_a_40_min_old_note() {
     let env = PackEnv::new().with_w12();
     env.link("W-12", SESSION_A);
     let inline = inline_commands(&read_skill("bs-back"));
@@ -1039,7 +1039,7 @@ fn as2_back_context_reports_a_40_min_old_note() {
 }
 
 #[test]
-fn as3_after_clear_the_picker_puts_linked_here_first() {
+fn after_clear_the_picker_puts_linked_here_first() {
     let env = pane(a_linked_in_p9(), P11);
     run_ok(&env, &park_block(SESSION_B, "W-7"));
     let env = pane(env, P9);
@@ -1060,7 +1060,7 @@ fn as3_after_clear_the_picker_puts_linked_here_first() {
 }
 
 #[test]
-fn as3_a_pick_restores_the_reference_for_the_next_park() {
+fn a_pick_restores_the_reference_for_the_next_park() {
     let env = pane(PackEnv::new().with_w12(), P9);
     let out = run_ok(&env, &park_block(SESSION_C, "W-12"));
     assert_eq!(out, "parked to W-12: migrate invoices to v13\n");
@@ -1069,7 +1069,7 @@ fn as3_a_pick_restores_the_reference_for_the_next_park() {
 }
 
 #[test]
-fn as3_other_board_pick_sets_a_home_reference() {
+fn other_board_pick_sets_a_home_reference() {
     let env = PackEnv::new().with_w12();
     let ls = commands(&read_skill("bs-park"))
         .into_iter()

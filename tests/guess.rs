@@ -1,4 +1,4 @@
-//! TECHSPEC 6.6 and FR-38: the best guess over a board's open cards.
+//! The best guess over a board's open cards.
 
 mod common;
 
@@ -57,7 +57,7 @@ fn board_1() -> Board {
 }
 
 #[test]
-fn fr38_middle_column_card_comes_before_the_rest() {
+fn middle_column_card_comes_before_the_rest() {
     assert_eq!(
         guess(&board_1()),
         vec![
@@ -68,7 +68,7 @@ fn fr38_middle_column_card_comes_before_the_rest() {
 }
 
 #[test]
-fn fr38_closed_cards_are_never_candidates() {
+fn closed_cards_are_never_candidates() {
     let mut b = board_1();
     b.cards.push(mem_card(
         "W-9",
@@ -198,7 +198,7 @@ fn ts6_6_reason_and_label_per_tier() {
 
 #[test]
 fn ts4_9_work_board_guess_order() {
-    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/boards/work_4_9");
+    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/boards/work_example");
     let tmp = tempfile::tempdir().unwrap();
     let b = load(
         "work",
@@ -235,7 +235,7 @@ fn tier_of(input: &GuessInput, notes: Vec<brain_swap::core::model::Note>) -> Tie
 }
 
 #[test]
-fn fr38_same_pane_card_comes_first() {
+fn same_pane_card_comes_first() {
     let b = mem_board(
         TDD,
         vec![
@@ -293,7 +293,7 @@ fn ts6_6_no_current_pane_means_no_same_pane() {
 }
 
 #[test]
-fn fr38_same_folder_equal_cwd() {
+fn same_folder_equal_cwd() {
     let t = tier_of(
         &at(None, "/work/billing", "/home/u"),
         vec![mem_note("09:00", None, Some("/work/billing"))],
@@ -475,8 +475,8 @@ fn hinted(pane: Option<&str>, hint: Option<&str>) -> GuessInput {
     }
 }
 
-fn work_4_9(env: &Env) -> Board {
-    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/boards/work_4_9");
+fn work_example(env: &Env) -> Board {
+    let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/boards/work_example");
     load("work", &dir, env).unwrap()
 }
 
@@ -498,7 +498,7 @@ fn linked_env(home: &Path) -> Env {
 }
 
 #[test]
-fn fr38_hint_card_is_linked_here_and_first() {
+fn hint_card_is_linked_here_and_first() {
     let b = mem_board(
         TDD,
         vec![
@@ -523,7 +523,7 @@ fn fr38_hint_card_is_linked_here_and_first() {
 #[test]
 fn ts6_6_hint_to_card_not_open_here_gives_no_tier_0() {
     let tmp = tempfile::tempdir().unwrap();
-    let b = work_4_9(&core_env(tmp.path(), "2026-10-08T11:52:00+03:00"));
+    let b = work_example(&core_env(tmp.path(), "2026-10-08T11:52:00+03:00"));
     let plain = guess_at(&b, &hinted(None, None));
     for h in ["W-9", "H-3", "W-99"] {
         assert_eq!(guess_at(&b, &hinted(None, Some(h))), plain, "hint {h}");
@@ -568,13 +568,13 @@ fn ts6_6_from_env_without_hint_file() {
 }
 
 #[test]
-fn as3_new_session_finds_previous_card_linked_here() {
+fn new_session_finds_previous_card_linked_here() {
     let tmp = tempfile::tempdir().unwrap();
     let mut env = core_env(tmp.path(), "2026-10-08T11:52:00+03:00");
     env.herdr_env = Some("1".to_string());
     env.herdr_pane_id = Some("w4V:p11".to_string());
     env.cwd = PathBuf::from("/elsewhere");
-    let b = work_4_9(&env);
+    let b = work_example(&env);
     let r = SessionRef {
         card: CardId::parse("W-11").unwrap(),
         board: "work".to_string(),

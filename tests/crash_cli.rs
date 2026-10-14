@@ -1,4 +1,4 @@
-//! TECHSPEC 12.1 (crash, process level), 4.6, I1 to I4: `new` and `park` abort at a failpoint.
+//! Crash at process level: `new` and `park` abort at a failpoint.
 #![cfg(feature = "failpoints")]
 
 mod common;

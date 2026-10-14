@@ -1,4 +1,4 @@
-//! TECHSPEC 6.2, 6.3, 7.1, 10 and 11: the bare invocation's gate and start-up (FR-19, FR-44, FR-45).
+//! The bare invocation's gate and start-up.
 
 mod common;
 
@@ -11,8 +11,8 @@ use common::tui::{TuiFixture, press, render, rows, write_card};
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
 
-fn work_4_9() -> TuiFixture {
-    TuiFixture::new(Some("work_4_9"))
+fn work_example() -> TuiFixture {
+    TuiFixture::new(Some("work_example"))
 }
 
 fn loaded(fx: &TuiFixture) -> Loaded {
@@ -57,15 +57,15 @@ fn help_warnings(app: &mut App) -> Vec<String> {
 }
 
 #[test]
-fn fr19_opens_default_board() {
-    let mut fx = work_4_9();
+fn opens_default_board() {
+    let mut fx = work_example();
     let l = loaded(&fx);
     assert_eq!(prep(&mut fx, l, None).app.board.name, "work");
 }
 
 #[test]
-fn fr19_opens_board_named_by_flag() {
-    let mut fx = work_4_9();
+fn opens_board_named_by_flag() {
+    let mut fx = work_example();
     let dir = fx.home.join(".local/share/brain-swap/home");
     write_card(&dir, "H-1", "Todo", "2026-10-08T09:00:00+03:00", &[]);
     let l = loaded(&fx);
@@ -75,7 +75,7 @@ fn fr19_opens_board_named_by_flag() {
 }
 
 #[test]
-fn fr45_broken_config_starts_in_config_error() {
+fn broken_config_starts_in_config_error() {
     let mut fx = TuiFixture::new(None);
     let e = Error::Config {
         path: fx.env.config_file(),
@@ -95,8 +95,8 @@ fn fr45_broken_config_starts_in_config_error() {
 }
 
 #[test]
-fn as9_first_run_notice_in_status_line() {
-    let mut fx = TuiFixture::without_config(Some("work_4_9"));
+fn first_run_notice_in_status_line() {
+    let mut fx = TuiFixture::without_config(Some("work_example"));
     let l = loaded(&fx);
     let path = l.created.clone().unwrap();
     let app = prep(&mut fx, l, None).app;
@@ -107,8 +107,8 @@ fn as9_first_run_notice_in_status_line() {
 }
 
 #[test]
-fn fr44_bad_binding_warns_and_keeps_default() {
-    let mut fx = work_4_9();
+fn bad_binding_warns_and_keeps_default() {
+    let mut fx = work_example();
     edit_config(&fx, "help = \"?\"", "help = \"foo\"");
     let l = loaded(&fx);
     let mut app = prep(&mut fx, l, None).app;
@@ -121,8 +121,8 @@ fn fr44_bad_binding_warns_and_keeps_default() {
 }
 
 #[test]
-fn fr44_conflicting_binding_reverts_and_warns() {
-    let mut fx = work_4_9();
+fn conflicting_binding_reverts_and_warns() {
+    let mut fx = work_example();
     edit_config(&fx, "help = \"?\"", "help = \"j\"");
     let l = loaded(&fx);
     let mut app = prep(&mut fx, l, None).app;
@@ -133,8 +133,8 @@ fn fr44_conflicting_binding_reverts_and_warns() {
 }
 
 #[test]
-fn fr44_help_lists_all_start_warnings() {
-    let mut fx = work_4_9();
+fn help_lists_all_start_warnings() {
+    let mut fx = work_example();
     edit_config(&fx, "help = \"?\"", "help = \"foo\"");
     let mut l = loaded(&fx);
     l.warnings = vec!["config: unknown key 'colour'".into()];
@@ -150,7 +150,7 @@ fn fr44_help_lists_all_start_warnings() {
 
 #[test]
 fn ts11_log_inside_board_folder_is_dropped_with_warning() {
-    let mut fx = work_4_9();
+    let mut fx = work_example();
     fx.env.log = Some(fx.board_dir.join("bs.log"));
     let l = loaded(&fx);
     let app = prep(&mut fx, l, None).app;
@@ -165,7 +165,7 @@ fn ts11_log_inside_board_folder_is_dropped_with_warning() {
 
 #[test]
 fn ts11_first_load_warning_in_status_line() {
-    let mut fx = TuiFixture::new(Some("as7"));
+    let mut fx = TuiFixture::new(Some("hand_edit"));
     let l = loaded(&fx);
     let app = prep(&mut fx, l, None).app;
     assert_eq!(app.status.as_deref(), Some("W-13: unknown column 'Doign'"));
@@ -173,7 +173,7 @@ fn ts11_first_load_warning_in_status_line() {
 
 #[test]
 fn ts11_notice_wins_over_warnings() {
-    let mut fx = work_4_9();
+    let mut fx = work_example();
     edit_config(&fx, "help = \"?\"", "help = \"foo\"");
     let mut l = loaded(&fx);
     let path = fx.env.config_file();
@@ -190,8 +190,8 @@ fn ts11_notice_wins_over_warnings() {
 }
 
 #[test]
-fn fr19_unlistable_board_folder_fails_before_screen() {
-    let mut fx = work_4_9();
+fn unlistable_board_folder_fails_before_screen() {
+    let mut fx = work_example();
     let dir = fx.board_dir.clone();
     fs::set_permissions(&dir, fs::Permissions::from_mode(0o000)).unwrap();
     if fs::read_dir(&dir).is_ok() {
@@ -214,7 +214,7 @@ fn fr19_unlistable_board_folder_fails_before_screen() {
 
 #[test]
 fn ts6_3_gate_passes_with_terminal() {
-    let fx = work_4_9();
+    let fx = work_example();
     let start = gate(&fx.env, Some("HOME"), true).unwrap();
     assert!(start.config.is_ok());
     assert_eq!(start.board.as_deref(), Some("home"));
@@ -228,7 +228,7 @@ fn ts6_3_gate_passes_with_terminal() {
 
 #[test]
 fn ts11_loader_warnings_reach_help() {
-    let mut fx = work_4_9();
+    let mut fx = work_example();
     edit_config(&fx, "default_board", "colour = \"red\"\ndefault_board");
     let start = gate(&fx.env, None, true).unwrap();
     let app = prepare(&mut fx.env, start).unwrap().app;
@@ -240,7 +240,7 @@ fn ts11_loader_warnings_reach_help() {
 
 #[test]
 fn ts6_2_tui_unknown_board_exits_3_before_screen() {
-    let fx = work_4_9();
+    let fx = work_example();
     let e = gate(&fx.env, Some("work2"), false).unwrap_err();
     assert!(matches!(e, Error::NotFound(_)), "{e:?}");
     assert_eq!(e.exit_code(), 3);
@@ -253,7 +253,7 @@ fn ts6_2_tui_unknown_board_exits_3_before_screen() {
 
 #[test]
 fn ts6_3_bare_without_terminal_exits_2() {
-    let fx = work_4_9();
+    let fx = work_example();
     let e = gate(&fx.env, None, false).unwrap_err();
     assert!(matches!(e, Error::Usage(_)), "{e:?}");
     assert_eq!(e.exit_code(), 2);
@@ -263,7 +263,7 @@ fn ts6_3_bare_without_terminal_exits_2() {
 
 #[test]
 fn ts6_3_broken_config_without_terminal_exits_2() {
-    let fx = work_4_9();
+    let fx = work_example();
     break_config(&fx);
     let e = gate(&fx.env, Some("work2"), false).unwrap_err();
     assert_eq!(e.exit_code(), 2);

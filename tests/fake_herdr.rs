@@ -1,4 +1,4 @@
-//! TECHSPEC 12.1: the fake herdr script answers canned JSON per `FAKE_HERDR_SCENARIO`
+//! The fake herdr script answers canned JSON per `FAKE_HERDR_SCENARIO`
 //! and logs argv to `$HOME/fake-herdr.log`.
 
 mod common;

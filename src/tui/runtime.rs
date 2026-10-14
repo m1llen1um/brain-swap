@@ -1,5 +1,5 @@
-//! The TUI loop (TECHSPEC 7.1, 7.5): draws, polls keys, runs effects; terminal, input and
-//! clock are injected so tests need no tty (12.1).
+//! The TUI loop: draws, polls keys, runs effects; terminal, input and
+//! clock are injected so tests need no tty.
 
 use std::fs;
 use std::io;
@@ -42,7 +42,7 @@ pub trait Clock {
     fn now(&self) -> Stamp;
 }
 
-/// Raw mode and the alternate screen; the only code that enters them (7.5).
+/// Raw mode and the alternate screen; the only code that enters them.
 pub struct CrosstermGuard;
 
 impl TerminalGuard for CrosstermGuard {
@@ -90,7 +90,7 @@ pub struct Parts {
     pub runner: Box<dyn Runner>,
 }
 
-/// Locates `card.notes[note]` and focuses its pane within one budget (7.7, 9.3).
+/// Locates `card.notes[note]` and focuses its pane within one budget.
 pub fn run_jump(env: &Env, card: &Card, note: usize, runner: &dyn Runner) -> Outcome {
     let place = &card.notes[note].place;
     let cwd = place.cwd.clone();
@@ -105,7 +105,7 @@ pub fn run_jump(env: &Env, card: &Card, note: usize, runner: &dyn Runner) -> Out
     }
 }
 
-/// The sorted `(name, mtime, length)` of `board.md` and the card files of one letter (7.4).
+/// The sorted `(name, mtime, length)` of `board.md` and the card files of one letter.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Fingerprint(Vec<(String, Option<SystemTime>, u64)>);
 
@@ -168,7 +168,7 @@ impl<B: Backend> Runtime<B> {
 
     /// Runs `update`, then its effects in order; the exit code once quitting.
     pub fn dispatch(&mut self, input: Input) -> Option<i32> {
-        // The store stamps from `env.now` (6), so it follows the clock, not the launch time.
+        // The store stamps from `env.now`, so it follows the clock, not the launch time.
         self.env.now = whole_second(self.parts.clock.now());
         for effect in update(&mut self.app, input) {
             match effect {
@@ -197,7 +197,7 @@ impl<B: Backend> Runtime<B> {
                         &mut *self.parts.launcher,
                         &mut *self.parts.guard,
                     );
-                    // After `guard.enter()`: the editor drew over the screen, repaint it fully (7.5).
+                    // After `guard.enter()`: the editor drew over the screen, repaint it fully.
                     let _ = self.terminal.clear();
                     // Reload before `Done`; a failed load keeps the board.
                     if matches!(outcome, Outcome::Edited(_))
@@ -249,13 +249,13 @@ impl<B: Backend> Runtime<B> {
                     self.dispatch(input);
                 }
                 Effect::Jump(id, note) => {
-                    // One frame first, so `jumping...` shows while herdr answers (7.7).
+                    // One frame first, so `jumping...` shows while herdr answers.
                     let _ = self.draw();
                     let Some(card) = self.app.board.card(id) else {
                         continue;
                     };
                     let outcome = run_jump(&self.env, card, note, &*self.parts.runner);
-                    // Focus first, then exit (7.7): `Jumped` quits through the quit path,
+                    // Focus first, then exit: `Jumped` quits through the quit path,
                     // and `run` restores once on the way to exit 0; any other outcome never restores.
                     if let Some(code) = self.dispatch(Input::Done(outcome)) {
                         return Some(code);
@@ -266,7 +266,7 @@ impl<B: Backend> Runtime<B> {
         None
     }
 
-    /// One scan of the board folder; a change reloads the board (7.4). Then `Tick`.
+    /// One scan of the board folder; a change reloads the board. Then `Tick`.
     pub fn tick(&mut self) -> Option<i32> {
         self.scans += 1;
         self.last_scan = self.parts.clock.now();

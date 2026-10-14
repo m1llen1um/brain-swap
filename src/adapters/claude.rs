@@ -1,4 +1,4 @@
-//! The Claude Code pack embedded in the binary and its install (TECHSPEC 8.8).
+//! The Claude Code pack embedded in the binary and its install.
 
 use crate::core::env::Env;
 use crate::core::error::Error;
@@ -27,7 +27,7 @@ pub const SKILLS: [Skill; 4] = [
     skill!("bs-link"),
 ];
 
-/// `brain-swap install claude` options (8.8).
+/// `brain-swap install claude` options.
 #[derive(Debug, Default)]
 pub struct InstallOpts {
     pub link: Option<PathBuf>,
@@ -35,7 +35,7 @@ pub struct InstallOpts {
     pub exe: Option<PathBuf>,
 }
 
-/// What `install` or `remove` did: `notices` are the 8.8 hints, printed after the paths.
+/// What `install` or `remove` did: `notices` are the hints, printed after the paths.
 #[derive(Debug, Default)]
 pub struct InstallReport {
     pub linked: Vec<PathBuf>,
@@ -45,7 +45,7 @@ pub struct InstallReport {
 }
 
 /// Claude Code's skills folder: `$CLAUDE_CONFIG_DIR/skills` when set and non-empty
-/// else `$HOME/.claude/skills` (8.8).
+/// else `$HOME/.claude/skills`.
 pub fn skills_dir(env: &Env) -> PathBuf {
     match &env.claude_config_dir {
         Some(dir) if !dir.as_os_str().is_empty() => dir.join("skills"),
@@ -54,7 +54,7 @@ pub fn skills_dir(env: &Env) -> PathBuf {
 }
 
 /// True when the frontmatter of `skill_md` holds `metadata:` with an indented
-/// `pack: brain-swap` (8.8 ours rule).
+/// `pack: brain-swap`.
 pub fn is_ours(skill_md: &str) -> bool {
     let mut lines = skill_md.lines();
     if lines.next() != Some("---") {
@@ -124,7 +124,7 @@ pub fn install(env: &Env, opts: &InstallOpts) -> Result<InstallReport, Error> {
     Ok(report)
 }
 
-/// Deletes each `<skills>/<name>` that is ours (8.8), never following a symlink; anything
+/// Deletes each `<skills>/<name>` that is ours, never following a symlink; anything
 /// else there is left alone.
 pub fn remove(env: &Env) -> Result<InstallReport, Error> {
     let mut report = InstallReport::default();
@@ -145,8 +145,7 @@ fn is_our_folder(f: &Path) -> bool {
 }
 
 /// `body` with `brain-swap ` at each command position (start of a code span, inline
-/// command included, or of a fenced line) and the `allowed-tools` value naming `exe`
-/// (8.8).
+/// command included, or of a fenced line) and the `allowed-tools` value naming `exe`.
 fn with_exe(body: &str, exe: &str) -> String {
     let mut fenced = false;
     let mut out = String::new();
@@ -168,7 +167,7 @@ fn io(path: &Path, e: std::io::Error) -> Error {
     Error::Io(format!("{}: {e}", path.display()))
 }
 
-/// The 8.8 foreign check: refuses the first of `folders` that exists and is not ours (a
+/// The foreign check: refuses the first of `folders` that exists and is not ours (a
 /// folder without our `SKILL.md`, a file, any symlink) unless `force`, which deletes them
 /// all and returns them; on refusal nothing is touched.
 fn clear_foreign(folders: &[PathBuf], force: bool) -> Result<Vec<PathBuf>, Error> {

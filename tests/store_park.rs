@@ -1,4 +1,4 @@
-//! TECHSPEC 4.7, 4.8 R3, R7 and FR-16: parking a switch note through the store.
+//! Parking a switch note through the store.
 
 mod common;
 
@@ -18,7 +18,7 @@ use jiff::tz::TimeZone;
 const NOW: &str = "2026-10-08T11:52:00+03:00";
 const WORK_4_9: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/tests/fixtures/boards/work_4_9"
+    "/tests/fixtures/boards/work_example"
 );
 const CARDS: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/cards");
 const READ_ONLY: [&str; 3] = [
@@ -27,7 +27,7 @@ const READ_ONLY: [&str; 3] = [
     "non_utf8.md",
 ];
 
-/// A temp home holding a copy of `work_4_9` at `<home>/work`, its env and its board.
+/// A temp home holding a copy of `work_example` at `<home>/work`, its env and its board.
 fn copy() -> (tempfile::TempDir, Env, Board) {
     let tmp = tempfile::tempdir().unwrap();
     let dir = tmp.path().join("work");
@@ -74,7 +74,7 @@ fn card(bytes: &[u8]) -> Card {
 }
 
 #[test]
-fn fr16_park_appends_only_to_timeline() {
+fn park_appends_only_to_timeline() {
     let (_tmp, env, board) = copy();
     let p = path(&board, "W-12");
     let before = fs::read(&p).unwrap();
@@ -92,7 +92,7 @@ fn fr16_park_appends_only_to_timeline() {
 }
 
 #[test]
-fn fr16_park_never_moves_card() {
+fn park_never_moves_card() {
     let (_tmp, env, board) = copy();
     let parked = park(&env, &board, id("W-11"), &note("a")).unwrap();
     assert_eq!(parked.card.column, "Todo");
@@ -115,7 +115,7 @@ fn ts4_7_park_readds_missing_timeline() {
 }
 
 #[test]
-fn fr18_park_with_empty_note_writes_nothing() {
+fn park_with_empty_note_writes_nothing() {
     let (_tmp, env, board) = copy();
     let p = path(&board, "W-12");
     let before = fs::read(&p).unwrap();
@@ -151,7 +151,7 @@ fn ts4_7_park_on_read_only_card_is_unreadable() {
 }
 
 #[test]
-fn nfr08_two_parks_on_one_card_append_both() {
+fn two_parks_on_one_card_append_both() {
     let (_tmp, env, board) = copy();
     let before = card(&fs::read(path(&board, "W-12")).unwrap());
     park(&env, &board, id("W-12"), &note("first")).unwrap();
@@ -176,7 +176,7 @@ fn nfr08_two_parks_on_one_card_append_both() {
 }
 
 #[test]
-fn r7_verify_park_accepts_every_writable_fixture() {
+fn verify_park_accepts_every_writable_fixture() {
     let mut names: Vec<String> = fs::read_dir(CARDS)
         .unwrap()
         .map(|e| e.unwrap().file_name().into_string().unwrap())
@@ -192,7 +192,7 @@ fn r7_verify_park_accepts_every_writable_fixture() {
 }
 
 #[test]
-fn r7_verify_park_rejects_changed_byte_outside_block() {
+fn verify_park_rejects_changed_byte_outside_block() {
     let before = fs::read(Path::new(CARDS).join("w12_4_9.md")).unwrap();
     let a = append_note("w12_4_9.md", &before, &note("a")).unwrap();
     assert!(verify_park(&before, &a.bytes, a.inserted.clone()));

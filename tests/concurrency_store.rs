@@ -1,4 +1,4 @@
-//! TECHSPEC 10 and 12.1 (concurrency, threads), NFR-08, AS-8: parallel writes through the store.
+//! Concurrency in threads: parallel writes through the store.
 
 mod common;
 
@@ -21,14 +21,14 @@ use jiff::tz::TimeZone;
 const NOW: &str = "2026-10-08T11:52:00+03:00";
 const WORK_4_9: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/tests/fixtures/boards/work_4_9"
+    "/tests/fixtures/boards/work_example"
 );
 const W7: &str = "---\ncolumn: Doing\ntemplate: Chore\ncreated: 2026-10-08T09:00:00+03:00\n---\n# rotate the staging keys\n\n## Timeline\n";
 
 /// One thread's store call, repeatable because a `Busy` call is retried.
 type Job<T> = Box<dyn Fn(&Env, &Board) -> Result<T> + Send>;
 
-/// A temp home holding a copy of `work_4_9` plus `W-7` in Doing at `<home>/work`.
+/// A temp home holding a copy of `work_example` plus `W-7` in Doing at `<home>/work`.
 fn copy() -> (tempfile::TempDir, PathBuf) {
     let tmp = tempfile::tempdir().unwrap();
     let dir = tmp.path().join("work");
@@ -110,7 +110,7 @@ fn round_one(home: &Path, dir: &Path) -> Vec<Result<()>> {
 }
 
 #[test]
-fn nfr08_parallel_parks_and_moves_lose_nothing() {
+fn parallel_parks_and_moves_lose_nothing() {
     let (tmp, dir) = copy();
     let before = (notes(&dir, "W-12"), notes(&dir, "W-7"));
     let results = round_one(tmp.path(), &dir);
@@ -130,7 +130,7 @@ fn nfr08_parallel_parks_and_moves_lose_nothing() {
 }
 
 #[test]
-fn nfr08_parallel_creates_get_distinct_ids() {
+fn parallel_creates_get_distinct_ids() {
     let (tmp, dir) = copy();
     for r in round_one(tmp.path(), &dir) {
         r.unwrap();
@@ -166,7 +166,7 @@ fn nfr08_parallel_creates_get_distinct_ids() {
 }
 
 #[test]
-fn as8_parks_on_two_cards_in_one_second_both_land() {
+fn parks_on_two_cards_in_one_second_both_land() {
     let (tmp, dir) = copy();
     let files = ["W-12", "W-7"].map(|c| dir.join(format!("{c}.md")));
     let before = files.clone().map(|p| fs::read(p).unwrap());
@@ -187,7 +187,7 @@ fn as8_parks_on_two_cards_in_one_second_both_land() {
 }
 
 #[test]
-fn as8_two_parks_on_one_card_both_append() {
+fn two_parks_on_one_card_both_append() {
     let (tmp, dir) = copy();
     let path = dir.join("W-12.md");
     let before = fs::read(&path).unwrap();

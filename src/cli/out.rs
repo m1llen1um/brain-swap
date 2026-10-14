@@ -1,4 +1,4 @@
-//! Result, error and warning output (TECHSPEC 6.2, 6.7).
+//! Result, error and warning output.
 
 use crate::adapters::herdr::{Focused, PaneStatus};
 use crate::cli::cmd::Ctx;
@@ -10,7 +10,7 @@ use serde::ser::{SerializeStruct, Serializer};
 use std::io::{Stderr, Stdout, Write};
 use std::path::Path;
 
-/// The 6.7 Card.
+/// The JSON Card.
 #[derive(Serialize)]
 pub struct CardJson<'a> {
     pub id: String,
@@ -34,7 +34,7 @@ pub fn card_json<'a>(card: &'a Card, board: &'a Board, now: &Stamp) -> CardJson<
     }
 }
 
-/// The 6.7 note.
+/// The JSON note.
 #[derive(Serialize)]
 pub struct NoteJson<'a> {
     pub at: Option<String>,
@@ -91,7 +91,7 @@ pub enum SessionView {
     Resolved(Option<String>),
 }
 
-/// The block from `card:` on (6.3).
+/// The block from `card:` on.
 pub fn card_block(card: &Card, board: &Board, now: &Stamp, session: &SessionView) -> String {
     let s = format!(
         "card: {} {}\nboard: {}, column: {}\n",
@@ -143,7 +143,7 @@ pub fn note_block(label: &str, n: &Note, now: &Stamp, session: &SessionView) -> 
     s + &format!("Where: {cwd}{pane}\n")
 }
 
-/// `<n>. <ID> <title> [<column>] <age>[, <label>]: <preview>` (6.3), without a newline.
+/// `<n>. <ID> <title> [<column>] <age>[, <label>]: <preview>`, without a newline.
 pub fn picker_line(n: usize, card: &Card, label: Option<&str>, now: &Stamp) -> String {
     let (age, preview) = match card.latest_note() {
         Some(note) => (age(note.at.as_ref(), now).to_string(), preview(note)),
@@ -158,7 +158,7 @@ pub fn picker_line(n: usize, card: &Card, label: Option<&str>, now: &Stamp) -> S
     format!("{n}. {id} {title} [{column}] {age}{label}{preview}")
 }
 
-/// The 6.7 Candidate: a Card plus its 1-based printed position and 6.6 reason.
+/// The JSON Candidate: a Card plus its 1-based printed position and best-guess reason.
 #[derive(Serialize)]
 pub struct CandidateJson<'a> {
     #[serde(flatten)]
@@ -202,7 +202,7 @@ pub fn preview(note: &Note) -> String {
         .to_string()
 }
 
-/// The `locate` lines (6.3): the status, then `Where: <cwd>`.
+/// The `locate` lines: the status, then `Where: <cwd>`.
 pub fn locate_lines(status: &PaneStatus, place: &Place) -> String {
     let head = match status {
         PaneStatus::Live(p) => format!("live {}", p.pane),
@@ -220,7 +220,7 @@ pub fn locate_lines(status: &PaneStatus, place: &Place) -> String {
     format!("{head}\nWhere: {cwd}\n")
 }
 
-/// The 6.7 `locate` object: `pane` is the live pane for `live` and `moved`, else the recorded one.
+/// The JSON `locate` object: `pane` is the live pane for `live` and `moved`, else the recorded one.
 #[derive(Serialize)]
 pub struct LocateJson<'a> {
     pub status: &'static str,
@@ -242,7 +242,7 @@ impl<'a> LocateJson<'a> {
     }
 }
 
-/// The 6.7 `jump` object: the `locate` fields plus `focused` (`"pane"`, `"tab"` or `false`).
+/// The JSON `jump` object: the `locate` fields plus `focused` (`"pane"`, `"tab"` or `false`).
 pub struct JumpJson<'a> {
     pub locate: LocateJson<'a>,
     pub focused: Option<Focused>,
@@ -263,7 +263,7 @@ impl Serialize for JumpJson<'_> {
     }
 }
 
-/// The `install herdr` body (6.7).
+/// The `install herdr` body.
 #[derive(Serialize)]
 pub struct SnippetJson<'a> {
     pub snippet: &'a str,

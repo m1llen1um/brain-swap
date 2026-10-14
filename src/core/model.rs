@@ -1,11 +1,11 @@
-//! Domain model (TECHSPEC 3).
+//! Domain model.
 
 use std::fmt;
 use std::path::PathBuf;
 
 use crate::core::time::Stamp;
 
-/// A card ID such as `W-12` (I1).
+/// A card ID such as `W-12`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct CardId {
     pub letter: char,
@@ -27,14 +27,14 @@ impl CardId {
         })
     }
 
-    /// Reads a card file name `^[A-Z]-[1-9][0-9]*\.md$` (4.1).
+    /// Reads a card file name `^[A-Z]-[1-9][0-9]*\.md$`.
     pub fn from_file_name(name: &str) -> Option<CardId> {
         name.strip_suffix(".md")
             .filter(|s| s.starts_with(|c: char| c.is_ascii_uppercase()))
             .and_then(CardId::parse)
     }
 
-    /// The card file name `<id>.md` (I2).
+    /// The card file name `<id>.md`.
     pub fn file_name(&self) -> String {
         format!("{self}.md")
     }
@@ -46,7 +46,7 @@ impl fmt::Display for CardId {
     }
 }
 
-/// A card file (TECHSPEC 3, 4.4); `mtime` is filled by board loading.
+/// A card file; `mtime` is filled by board loading.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Card {
     pub id: CardId,
@@ -62,7 +62,7 @@ pub struct Card {
 }
 
 impl Card {
-    /// The last note's stamp, else `created`, else `mtime` (FR-09).
+    /// The last note's stamp, else `created`, else `mtime`.
     pub fn activity(&self) -> Option<&Stamp> {
         self.latest_note()
             .and_then(|n| n.at.as_ref())
@@ -70,12 +70,12 @@ impl Card {
             .or(self.mtime.as_ref())
     }
 
-    /// The last note in file order (I7).
+    /// The last note in file order.
     pub fn latest_note(&self) -> Option<&Note> {
         self.notes.last()
     }
 
-    /// The index of the last note with a `cwd` or `herdr` place (FR-25).
+    /// The index of the last note with a `cwd` or `herdr` place.
     pub fn jump_note(&self) -> Option<usize> {
         self.notes
             .iter()
@@ -83,7 +83,7 @@ impl Card {
     }
 }
 
-/// One switch note of a card's timeline (TECHSPEC 3).
+/// One switch note of a card's timeline.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Note {
     pub heading: String,
@@ -96,7 +96,7 @@ pub struct Note {
     pub extra: Vec<String>,
 }
 
-/// The values a new card file is rendered from (R4).
+/// The values a new card file is rendered from.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NewCard {
     pub title: String,
@@ -106,7 +106,7 @@ pub struct NewCard {
     pub body: String,
 }
 
-/// The values a switch note is rendered from; stamp and cwd are required (I6).
+/// The values a switch note is rendered from; stamp and cwd are required.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct NewNote {
     pub at: Stamp,
@@ -133,7 +133,7 @@ pub struct HerdrPlace {
     pub workspace: Option<String>,
 }
 
-/// A board's `board.md` settings (TECHSPEC 4.3).
+/// A board's `board.md` settings.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct BoardMeta {
     pub letter: char,
@@ -141,7 +141,7 @@ pub struct BoardMeta {
     pub next: u32,
 }
 
-/// A loaded board (TECHSPEC 3): its cards and every warning met while reading it.
+/// A loaded board: its cards and every warning met while reading it.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Board {
     pub name: String,
@@ -151,7 +151,7 @@ pub struct Board {
     pub warnings: Vec<String>,
 }
 
-/// A session reference (TECHSPEC 3, 6.4): the card a session last parked, linked or created.
+/// A session reference: the card a session last parked, linked or created.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct SessionRef {
     pub card: CardId,
@@ -170,7 +170,7 @@ mod tests {
     }
 
     #[test]
-    fn i1_parse_reads_letter_and_number() {
+    fn parse_reads_letter_and_number() {
         assert_eq!(
             CardId::parse("W-12"),
             Some(CardId {
@@ -181,24 +181,24 @@ mod tests {
     }
 
     #[test]
-    fn i1_parse_upper_cases_letter() {
+    fn parse_upper_cases_letter() {
         assert_eq!(CardId::parse("w-12"), CardId::parse("W-12"));
     }
 
     #[test]
-    fn i1_parse_rejects_malformed_ids() {
+    fn parse_rejects_malformed_ids() {
         for s in ["W-0", "W-012", "W-", "WW-1", "1-2", "W12", "W-1x", ""] {
             assert_eq!(CardId::parse(s), None, "{s}");
         }
     }
 
     #[test]
-    fn i1_parse_rejects_number_beyond_u32() {
+    fn parse_rejects_number_beyond_u32() {
         assert_eq!(CardId::parse("W-4294967296"), None);
     }
 
     #[test]
-    fn i2_file_name_is_id_dot_md() {
+    fn file_name_is_id_dot_md() {
         assert_eq!(
             (id("W-12").file_name(), id("W-12").to_string()),
             ("W-12.md".to_string(), "W-12".to_string())

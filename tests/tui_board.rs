@@ -1,4 +1,4 @@
-//! TECHSPEC 4.9, 7.2 and 7.3: the board's header, columns and cards (FR-20, NFR-10).
+//! The board's header, columns and cards.
 
 mod common;
 
@@ -23,7 +23,7 @@ fn card(app: &App, s: &str) -> Card {
 }
 
 fn w12_selected() -> App {
-    let mut app = app("work_4_9");
+    let mut app = app("work_example");
     app.sel = Selection {
         column: 1,
         card: Some(id("W-12")),
@@ -33,7 +33,7 @@ fn w12_selected() -> App {
 
 /// W-12 with its latest note's Doing and Next replaced.
 fn second_line(doing: &str, next: &str) -> String {
-    let app = app("work_4_9");
+    let app = app("work_example");
     let mut c = card(&app, "W-12");
     let n = c.notes.last_mut().unwrap();
     (n.doing, n.next) = (doing.into(), next.into());
@@ -41,8 +41,8 @@ fn second_line(doing: &str, next: &str) -> String {
 }
 
 #[test]
-fn fr20_card_lines_show_id_title_age_and_next() {
-    let app = app("work_4_9");
+fn card_lines_show_id_title_age_and_next() {
+    let app = app("work_example");
     assert_eq!(
         card_lines(&card(&app, "W-12"), &app.now),
         (
@@ -53,29 +53,29 @@ fn fr20_card_lines_show_id_title_age_and_next() {
 }
 
 #[test]
-fn fr20_card_without_notes_shows_no_note() {
-    let app = app("work_4_9");
+fn card_without_notes_shows_no_note() {
+    let app = app("work_example");
     assert_eq!(card_lines(&card(&app, "W-11"), &app.now).1, "  no note");
 }
 
 #[test]
-fn fr20_preview_falls_back_to_doing() {
+fn preview_falls_back_to_doing() {
     assert_eq!(second_line("first\nsecond", ""), "  39 min  first");
 }
 
 #[test]
-fn fr20_preview_is_first_line_of_next() {
+fn preview_is_first_line_of_next() {
     assert!(second_line("doing", "a\nb").ends_with("  a"));
 }
 
 #[test]
-fn fr20_empty_next_and_doing_show_only_age() {
+fn empty_next_and_doing_show_only_age() {
     assert_eq!(second_line("", ""), "  39 min");
 }
 
 #[test]
 fn ts7_2_header_shows_board_path_and_help_key() {
-    let rows = rows(&render(&app("work_4_9"), 80, 24));
+    let rows = rows(&render(&app("work_example"), 80, 24));
     assert!(
         rows[0].starts_with(" work  ~/.local/share/brain-swap/work"),
         "{}",
@@ -120,7 +120,7 @@ fn ts7_3_selection_is_reverse_video_and_focus_bold() {
 
 #[test]
 fn ts7_3_text_is_cut_at_column_width() {
-    let rows = rows(&render(&app("work_4_9"), 80, 24));
+    let rows = rows(&render(&app("work_example"), 80, 24));
     let next = rows[2].find("W-12").unwrap();
     let todo = rows[2][..next].trim();
     let rest = todo.strip_prefix("W-11 ").unwrap();
@@ -135,12 +135,12 @@ fn ts7_3_text_is_cut_at_column_width() {
 
 #[test]
 fn ts4_7_extra_column_renders_last() {
-    let rows = rows(&render(&app("as7"), 120, 40));
+    let rows = rows(&render(&app("hand_edit"), 120, 40));
     assert!(rows[1].ends_with("Doign (unknown) (1)"), "{}", rows[1]);
 }
 
 #[test]
-fn nfr10_board_uses_no_colour() {
+fn board_uses_no_colour() {
     let buf = render(&w12_selected(), 80, 24);
     assert!(
         rows(&buf)[1].contains("> Doing (1)"),
@@ -150,7 +150,7 @@ fn nfr10_board_uses_no_colour() {
 }
 
 #[test]
-fn fr20_preview_skips_blank_first_line_of_next() {
+fn preview_skips_blank_first_line_of_next() {
     assert_eq!(
         second_line("doing", "\nopen the MR"),
         "  39 min  open the MR"
@@ -158,7 +158,7 @@ fn fr20_preview_skips_blank_first_line_of_next() {
 }
 
 #[test]
-fn fr20_blank_next_falls_back_to_doing() {
+fn blank_next_falls_back_to_doing() {
     assert_eq!(second_line("first", "\n  \n"), "  39 min  first");
 }
 
@@ -169,8 +169,8 @@ fn w12_second_row(lines: &[String]) -> &str {
 }
 
 #[test]
-fn fr21_card_ages_are_floored() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn card_ages_are_floored() {
+    let fx = TuiFixture::new(Some("work_example"));
     let stamps = [
         "2026-10-08T11:51:01+03:00",
         "2026-10-08T11:51:00+03:00",
@@ -197,8 +197,8 @@ fn fr21_card_ages_are_floored() {
 }
 
 #[test]
-fn fr21_tick_refreshes_card_age() {
-    let mut app = app("work_4_9");
+fn tick_refreshes_card_age() {
+    let mut app = app("work_example");
     assert!(w12_second_row(&rows(&render(&app, 80, 24))).contains("39 min"));
     let later = app.now.checked_add(Duration::from_secs(60)).unwrap();
     update(&mut app, Input::Tick(later));
@@ -206,8 +206,8 @@ fn fr21_tick_refreshes_card_age() {
 }
 
 #[test]
-fn fr21_idle_runtime_refreshes_ages_within_30_seconds() {
-    let mut fx = TuiFixture::new(Some("work_4_9"));
+fn idle_runtime_refreshes_ages_within_30_seconds() {
+    let mut fx = TuiFixture::new(Some("work_example"));
     fx.env.now = fx.env.now.checked_add(Duration::from_secs(30)).unwrap();
     let (mut rt, _guard, events) = fx.runtime(80, 24);
     rt.draw().unwrap();
@@ -221,8 +221,8 @@ fn fr21_idle_runtime_refreshes_ages_within_30_seconds() {
 }
 
 #[test]
-fn fr22_panel_shows_latest_note_with_pane_and_cwd() {
-    let app = app("work_4_9");
+fn panel_shows_latest_note_with_pane_and_cwd() {
+    let app = app("work_example");
     assert_eq!(
         panel_lines(Some(&card(&app, "W-12")), &app.now),
         [
@@ -235,8 +235,8 @@ fn fr22_panel_shows_latest_note_with_pane_and_cwd() {
 }
 
 #[test]
-fn fr22_panel_marks_auto() {
-    let app = app("work_4_9");
+fn panel_marks_auto() {
+    let app = app("work_example");
     let mut c = card(&app, "W-12");
     let n = c.notes.last_mut().unwrap();
     n.auto = true;
@@ -249,8 +249,8 @@ fn fr22_panel_marks_auto() {
 }
 
 #[test]
-fn fr22_panel_without_pane_shows_cwd_only() {
-    let app = app("work_4_9");
+fn panel_without_pane_shows_cwd_only() {
+    let app = app("work_example");
     assert_eq!(
         panel_lines(Some(&card(&app, "W-9")), &app.now)[0],
         "W-9 latest: 1 d ago, /home/smilen/Work/private/brain-swap"
@@ -258,8 +258,8 @@ fn fr22_panel_without_pane_shows_cwd_only() {
 }
 
 #[test]
-fn fr22_panel_without_notes_says_no_note_yet() {
-    let app = app("work_4_9");
+fn panel_without_notes_says_no_note_yet() {
+    let app = app("work_example");
     assert_eq!(
         panel_lines(Some(&card(&app, "W-11")), &app.now),
         ["W-11 no note yet"]
@@ -267,8 +267,8 @@ fn fr22_panel_without_notes_says_no_note_yet() {
 }
 
 #[test]
-fn fr22_panel_shows_first_line_of_each_part() {
-    let app = app("work_4_9");
+fn panel_shows_first_line_of_each_part() {
+    let app = app("work_example");
     let mut c = card(&app, "W-12");
     c.notes.last_mut().unwrap().doing = "first\nsecond".into();
     assert_eq!(panel_lines(Some(&c), &app.now)[1], "Doing:      first");
@@ -281,8 +281,8 @@ fn is_separator(row: &str) -> bool {
 }
 
 #[test]
-fn fr22_panel_with_no_selection_shows_only_separator() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn panel_with_no_selection_shows_only_separator() {
+    let fx = TuiFixture::new(Some("work_example"));
     std::fs::remove_file(fx.board_dir.join("W-11.md")).unwrap();
     let mut app = fx.app();
     app.sel = Selection {
@@ -295,7 +295,7 @@ fn fr22_panel_with_no_selection_shows_only_separator() {
 }
 
 #[test]
-fn fr22_panel_hidden_below_20_rows() {
+fn panel_hidden_below_20_rows() {
     let app = w12_selected();
     let low = rows(&render(&app, 80, 19));
     assert!(!low.iter().any(|r| is_separator(r)), "{low:#?}");
@@ -338,7 +338,7 @@ fn ts4_9_board_snapshot_120x40() {
 }
 
 #[test]
-fn nfr10_panel_uses_no_colour() {
+fn panel_uses_no_colour() {
     for (w, h) in [(80, 24), (120, 40)] {
         let buf = render(&w12_selected(), w, h);
         assert!(
@@ -350,8 +350,8 @@ fn nfr10_panel_uses_no_colour() {
 }
 
 #[test]
-fn as7_hand_made_card_renders_in_first_column_with_no_note() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn hand_made_card_renders_in_first_column_with_no_note() {
+    let fx = TuiFixture::new(Some("work_example"));
     let (mut rt, _, _) = fx.runtime(80, 24);
     std::fs::write(fx.board_dir.join("W-20.md"), "# spike on caching\n").unwrap();
     rt.tick();
@@ -367,8 +367,8 @@ fn as7_hand_made_card_renders_in_first_column_with_no_note() {
 }
 
 #[test]
-fn as7_misspelt_column_renders_as_unknown_extra_column() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn misspelt_column_renders_as_unknown_extra_column() {
+    let fx = TuiFixture::new(Some("work_example"));
     // At 80 columns the window around the focused Doing hides the fourth column.
     let (mut rt, _, _) = fx.runtime(120, 40);
     std::fs::write(
@@ -391,9 +391,9 @@ fn as7_misspelt_column_renders_as_unknown_extra_column() {
 }
 
 #[test]
-fn as7_board_snapshot_80x24() {
+fn board_snapshot_80x24() {
     // The mtimes of W-13 and W-20 decide the initial selection; pin it to the hand-made card.
-    let mut app = app("as7");
+    let mut app = app("hand_edit");
     app.sel = Selection {
         column: 0,
         card: Some(id("W-20")),
@@ -404,7 +404,7 @@ fn as7_board_snapshot_80x24() {
 }
 
 #[test]
-fn as9_first_run_shows_notice_and_empty_board() {
+fn first_run_shows_notice_and_empty_board() {
     let mut fx = TuiFixture::without_config(None);
     let start = gate(&fx.env, None, true).unwrap();
     let path = start.config.as_ref().unwrap().created.clone().unwrap();

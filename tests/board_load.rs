@@ -1,4 +1,4 @@
-//! TECHSPEC 4.1, 4.6 and 10: discovering and loading the cards of a board folder.
+//! Discovering and loading the cards of a board folder.
 
 mod common;
 
@@ -16,11 +16,14 @@ use jiff::tz::TimeZone;
 const NOW: &str = "2026-10-08T11:52:00+03:00";
 const WORK_4_9: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/tests/fixtures/boards/work_4_9"
+    "/tests/fixtures/boards/work_example"
 );
-const AS7: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/boards/as7");
+const AS7: &str = concat!(
+    env!("CARGO_MANIFEST_DIR"),
+    "/tests/fixtures/boards/hand_edit"
+);
 
-/// A temp home holding a copy of `work_4_9` at `<home>/work`.
+/// A temp home holding a copy of `work_example` at `<home>/work`.
 fn copy() -> (tempfile::TempDir, PathBuf) {
     copy_of(WORK_4_9)
 }
@@ -57,7 +60,7 @@ fn set_next(dir: &Path, next: u32) {
 }
 
 #[test]
-fn fr04_missing_folder_reads_as_empty_board() {
+fn missing_folder_reads_as_empty_board() {
     let tmp = tempfile::tempdir().unwrap();
     let dir = tmp.path().join("work");
     let b = load_at(tmp.path(), &dir);
@@ -69,9 +72,9 @@ fn fr04_missing_folder_reads_as_empty_board() {
 }
 
 #[test]
-fn fr01_loads_one_card_per_file() {
+fn loads_one_card_per_file() {
     let (tmp, dir) = copy();
-    // A read-only folder proves loading writes nothing (FR-04).
+    // A read-only folder proves loading writes nothing.
     fs::set_permissions(&dir, fs::Permissions::from_mode(0o555)).unwrap();
     let b = load_at(tmp.path(), &dir);
     fs::set_permissions(&dir, fs::Permissions::from_mode(0o755)).unwrap();
@@ -219,7 +222,7 @@ fn one_card(notes: &[(&str, bool)]) -> Board {
 }
 
 #[test]
-fn fr08_card_in_last_column_is_not_open() {
+fn card_in_last_column_is_not_open() {
     let (tmp, dir) = copy();
     let b = load_at(tmp.path(), &dir);
     assert!(!b.is_open(get(&b, "W-9")));
@@ -228,7 +231,7 @@ fn fr08_card_in_last_column_is_not_open() {
 }
 
 #[test]
-fn fr08_custom_last_column_is_done() {
+fn custom_last_column_is_done() {
     let files = [("W-1.md", card("Shipped", None, &[]))];
     let (tmp, dir) = board("Backlog, Review, Shipped", &files);
     let b = load_at(tmp.path(), &dir);
@@ -236,7 +239,7 @@ fn fr08_custom_last_column_is_done() {
 }
 
 #[test]
-fn i5_unknown_column_is_extra_and_open() {
+fn unknown_column_is_extra_and_open() {
     let (tmp, dir) = copy();
     fs::write(dir.join("W-13.md"), card("Doign", None, &[])).unwrap();
     let b = load_at(tmp.path(), &dir);
@@ -286,7 +289,7 @@ fn ts4_7_column_matches_ignoring_case() {
 }
 
 #[test]
-fn fr09_cards_ordered_newest_activity_first() {
+fn cards_ordered_newest_activity_first() {
     let files = [
         (
             "W-1.md",
@@ -306,7 +309,7 @@ fn fr09_cards_ordered_newest_activity_first() {
 }
 
 #[test]
-fn fr09_equal_activity_ties_to_higher_number() {
+fn equal_activity_ties_to_higher_number() {
     let at = Some("2026-10-08T10:00:00+03:00");
     let (w7, w12) = (
         ("W-7.md", card("Todo", at, &[])),
@@ -319,7 +322,7 @@ fn fr09_equal_activity_ties_to_higher_number() {
 }
 
 #[test]
-fn fr09_activity_falls_back_to_created_then_mtime() {
+fn activity_falls_back_to_created_then_mtime() {
     let b = one_card(&[]);
     let c = get(&b, "W-1");
     assert!(c.mtime.is_some());
@@ -327,7 +330,7 @@ fn fr09_activity_falls_back_to_created_then_mtime() {
 }
 
 #[test]
-fn fr09_activity_compares_instants_across_offsets() {
+fn activity_compares_instants_across_offsets() {
     let files = [
         (
             "W-1.md",
@@ -343,7 +346,7 @@ fn fr09_activity_compares_instants_across_offsets() {
 }
 
 #[test]
-fn fr09_activity_uses_last_note_not_newest_stamp() {
+fn activity_uses_last_note_not_newest_stamp() {
     let b = one_card(&[
         ("2026-10-08T11:00:00+03:00", true),
         ("2026-10-08T10:00:00+03:00", true),
@@ -380,7 +383,7 @@ fn ts3_jump_note_none_without_placed_notes() {
     assert_eq!(get(&b, "W-1").jump_note(), None);
 }
 
-/// The `work_4_9` copy plus `home` holding `H-3.md`; `home` is unlistable, so only its `board.md` may be read.
+/// The `work_example` copy plus `home` holding `H-3.md`; `home` is unlistable, so only its `board.md` may be read.
 fn two_boards() -> (tempfile::TempDir, Vec<(String, PathBuf)>) {
     let (tmp, work) = copy();
     let home = tmp.path().join("home");
@@ -395,7 +398,7 @@ fn find(tmp: &tempfile::TempDir, boards: &[(String, PathBuf)], s: &str) -> Resul
 }
 
 #[test]
-fn fr10_lower_case_id_finds_card() {
+fn lower_case_id_finds_card() {
     let (tmp, boards) = two_boards();
     fs::set_permissions(&boards[1].1, fs::Permissions::from_mode(0o311)).unwrap();
     let r = find_card(
@@ -410,14 +413,14 @@ fn fr10_lower_case_id_finds_card() {
 }
 
 #[test]
-fn fr10_id_resolves_to_board_by_letter() {
+fn id_resolves_to_board_by_letter() {
     let (tmp, boards) = two_boards();
     let b = find(&tmp, &boards, "H-3").unwrap();
     assert_eq!(b.name, "home");
 }
 
 #[test]
-fn fr10_letter_from_board_md_is_used() {
+fn letter_from_board_md_is_used() {
     let (tmp, mut boards) = two_boards();
     let ops = tmp.path().join("ops");
     fs::create_dir(&ops).unwrap();
@@ -511,7 +514,7 @@ fn ts4_9_jump_note_of_w12_targets_pane_w4v_p9() {
 }
 
 #[test]
-fn as7_hand_made_card_lands_in_first_column_without_notes() {
+fn hand_made_card_lands_in_first_column_without_notes() {
     let (tmp, dir) = copy_of(AS7);
     let b = load_at(tmp.path(), &dir);
     assert!(order(&b, 0).contains(&"W-20".to_string()));
@@ -521,13 +524,13 @@ fn as7_hand_made_card_lands_in_first_column_without_notes() {
 }
 
 #[test]
-fn as7_next_card_skips_past_hand_made_card() {
+fn next_card_skips_past_hand_made_card() {
     let (tmp, dir) = copy_of(AS7);
     assert_eq!(load_at(tmp.path(), &dir).meta.next, 21);
 }
 
 #[test]
-fn as7_misspelt_column_shows_as_unknown_extra_column() {
+fn misspelt_column_shows_as_unknown_extra_column() {
     let (tmp, dir) = copy_of(AS7);
     let b = load_at(tmp.path(), &dir);
     let cols = b.column_list();
@@ -545,7 +548,7 @@ fn as7_misspelt_column_shows_as_unknown_extra_column() {
 }
 
 #[test]
-fn as7_hand_edit_shows_on_next_load() {
+fn hand_edit_shows_on_next_load() {
     let (tmp, dir) = copy_of(AS7);
     assert_eq!(
         get(&load_at(tmp.path(), &dir), "W-12").title,

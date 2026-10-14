@@ -1,5 +1,5 @@
 #!/bin/sh
-# Fake herdr for process-level tests (TECHSPEC 12.1): logs argv to $HOME/fake-herdr.log,
+# Fake herdr for process-level tests: logs argv to $HOME/fake-herdr.log,
 # then answers per tests/fake_herdr/scenarios/$FAKE_HERDR_SCENARIO.sh.
 printf '%s\n' "$*" >> "$HOME/fake-herdr.log"
 if [ -z "$FAKE_HERDR_SCENARIO" ]; then

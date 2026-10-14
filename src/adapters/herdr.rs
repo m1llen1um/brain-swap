@@ -1,4 +1,4 @@
-//! The herdr adapter (TECHSPEC 9): herdr runs through its public CLI only.
+//! The herdr adapter: herdr runs through its public CLI only.
 
 use crate::adapters::runner::{RunOutcome, RunResult, Runner};
 use crate::core::env::Env;
@@ -10,10 +10,10 @@ use std::time::Duration;
 /// The timeout every herdr call asks for.
 pub const CALL_TIMEOUT: Duration = Duration::from_secs(2);
 
-/// The budget `locate` and `focus` share (FR-63, 9.3).
+/// The budget `locate` and `focus` share.
 pub const BUDGET: Duration = Duration::from_secs(3);
 
-/// A `Runner` over another that gives each call `min(timeout, left())` (9.3).
+/// A `Runner` over another that gives each call `min(timeout, left())`.
 pub struct Budget<'a> {
     runner: &'a dyn Runner,
     left: Cell<Duration>,
@@ -46,7 +46,7 @@ impl Runner for Budget<'_> {
     }
 }
 
-/// The herdr part of a note's place at park time (9.1, FR-15, FR-58); runs no herdr command.
+/// The herdr part of a note's place at park time; runs no herdr command.
 pub fn capture(env: &Env, _runner: &dyn Runner) -> Option<HerdrPlace> {
     let set = |v: &Option<String>| v.clone().filter(|v| !v.is_empty());
     if !env.herdr_active() {
@@ -59,7 +59,7 @@ pub fn capture(env: &Env, _runner: &dyn Runner) -> Option<HerdrPlace> {
     })
 }
 
-/// The current pane's `agent_session.value` (9.2, 6.4 step 3); `None` outside herdr or on any failure.
+/// The current pane's `agent_session.value`; `None` outside herdr or on any failure.
 pub fn pane_session(env: &Env, runner: &dyn Runner) -> Option<String> {
     let pane = env.herdr_pane_id.as_deref().filter(|p| !p.is_empty());
     let pane = pane.filter(|_| env.herdr_active())?;
@@ -75,7 +75,7 @@ pub fn pane_session(env: &Env, runner: &dyn Runner) -> Option<String> {
     Some(PaneJson::from_response(&v)?.session()?.to_string())
 }
 
-/// A tolerant reader over one herdr pane object (9.3); no serde-derived herdr types.
+/// A tolerant reader over one herdr pane object; no serde-derived herdr types.
 pub struct PaneJson<'a>(&'a Value);
 
 impl<'a> PaneJson<'a> {
@@ -107,12 +107,12 @@ impl<'a> PaneJson<'a> {
         self.text("/workspace_id")
     }
 
-    /// `agent_session.value`, non-empty (9.2).
+    /// `agent_session.value`, non-empty.
     pub fn session(&self) -> Option<&str> {
         self.text("/agent_session/value")
     }
 
-    /// The `LivePane.agent` rule of 9.3.
+    /// The `LivePane.agent` rule.
     pub fn has_agent(&self) -> bool {
         let status = self.0.get("agent_status").and_then(Value::as_str);
         self.0.get("agent").is_some()
@@ -121,7 +121,7 @@ impl<'a> PaneJson<'a> {
     }
 }
 
-/// The `workspace_id`s of a `workspace list` answer, in listed order (9.3).
+/// The `workspace_id`s of a `workspace list` answer, in listed order.
 pub fn workspace_ids(v: &Value) -> Vec<String> {
     let all = v.pointer("/result/workspaces").and_then(Value::as_array);
     let ids = all.into_iter().flatten();
@@ -129,13 +129,13 @@ pub fn workspace_ids(v: &Value) -> Vec<String> {
     ids.filter(|id| !id.is_empty()).map(String::from).collect()
 }
 
-/// The panes of a `pane list` answer, in listed order (9.3).
+/// The panes of a `pane list` answer, in listed order.
 pub fn list_panes(v: &Value) -> Vec<PaneJson<'_>> {
     let all = v.pointer("/result/panes").and_then(Value::as_array);
     all.into_iter().flatten().map(PaneJson::new).collect()
 }
 
-/// The moved search of 9.3: the first listed pane running `session`; `Err` holds the status otherwise.
+/// The moved search: the first listed pane running `session`; `Err` holds the status otherwise.
 fn find_session(session: &str, runner: &dyn Runner) -> Result<LivePane, PaneStatus> {
     let list = |args: &[&str]| match runner.run(args, CALL_TIMEOUT).outcome {
         RunOutcome::Exited {
@@ -164,13 +164,13 @@ fn find_session(session: &str, runner: &dyn Runner) -> Result<LivePane, PaneStat
     Err(PaneStatus::Closed)
 }
 
-/// `error.code` of herdr's JSON stderr, else `None` (9.3).
+/// `error.code` of herdr's JSON stderr, else `None`.
 pub fn error_code(stderr: &str) -> Option<String> {
     let v: Value = serde_json::from_str(stderr).ok()?;
     Some(v.pointer("/error/code")?.as_str()?.to_string())
 }
 
-/// A pane herdr answered for, with live IDs (TECHSPEC 3, 9.3).
+/// A pane herdr answered for, with live IDs.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct LivePane {
     pub pane: String,
@@ -179,7 +179,7 @@ pub struct LivePane {
     pub agent: bool,
 }
 
-/// What `locate` found for a note's place (TECHSPEC 3).
+/// What `locate` found for a note's place.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum PaneStatus {
     Live(LivePane),
@@ -192,7 +192,7 @@ pub enum PaneStatus {
 }
 
 impl PaneStatus {
-    /// The `status` name of the `locate` and `jump` objects (6.7).
+    /// The `status` name of the `locate` and `jump` objects.
     pub fn json_status(&self) -> &'static str {
         match self {
             PaneStatus::Live(_) => "live",
@@ -206,7 +206,7 @@ impl PaneStatus {
     }
 }
 
-/// Turns a note's place into a `PaneStatus` (9.3).
+/// Turns a note's place into a `PaneStatus`.
 pub fn locate(place: &Place, env: &Env, runner: &dyn Runner) -> PaneStatus {
     if !env.herdr_active() {
         return PaneStatus::OutsideHerdr;
@@ -254,21 +254,21 @@ pub fn locate(place: &Place, env: &Env, runner: &dyn Runner) -> PaneStatus {
     }
 }
 
-/// How `focus` reached a pane (9.3).
+/// How `focus` reached a pane.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Focused {
     Agent,
     Tab,
 }
 
-/// Why `focus` did not reach a pane (9.3).
+/// Why `focus` did not reach a pane.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum FocusError {
     Failed,
     NotResponding,
 }
 
-/// Focuses a located pane (9.3, FR-59); herdr has no focus by pane ID.
+/// Focuses a located pane; herdr has no focus by pane ID.
 pub fn focus(p: &LivePane, runner: &dyn Runner) -> Result<Focused, FocusError> {
     // Ok(true) on exit 0, Ok(false) on any other failure; stderr is never read.
     let ok = |args: &[&str]| match runner.run(args, CALL_TIMEOUT) {
@@ -284,7 +284,7 @@ pub fn focus(p: &LivePane, runner: &dyn Runner) -> Result<Focused, FocusError> {
     Err(FocusError::Failed)
 }
 
-/// The 9.4 key binding with `command` as a TOML basic string (FR-64).
+/// The key binding with `command` as a TOML basic string.
 pub fn key_snippet(command: &str) -> String {
     let command = command.replace('\\', "\\\\").replace('"', "\\\"");
     format!(
@@ -317,7 +317,7 @@ mod tests {
     }
 
     #[test]
-    fn fr41_pane_json_reads_agent_session_value() {
+    fn pane_json_reads_agent_session_value() {
         let v = json(AGENT);
         let p = PaneJson::from_response(&v).unwrap();
         assert_eq!(p.session(), Some("55583127-a22a-49bc-a803-e777c377a595"));

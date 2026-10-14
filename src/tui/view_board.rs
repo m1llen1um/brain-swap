@@ -1,4 +1,4 @@
-//! The board screen of TECHSPEC 4.9: header, columns and cards (7.2, 7.3).
+//! The board screen: header, columns and cards.
 
 use std::ops::Range;
 
@@ -15,7 +15,7 @@ use crate::core::time::{Age, Stamp, age};
 /// Narrowest column before the board shows a window of columns.
 pub const MIN_COLUMN_WIDTH: u16 = 20;
 
-/// Terminal rows below which the preview panel is hidden (7.3).
+/// Terminal rows below which the preview panel is hidden.
 pub const PANEL_MIN_ROWS: u16 = 20;
 
 /// The columns drawn at `width`, a window around `focused` when not all fit.
@@ -25,7 +25,7 @@ pub fn visible_columns(count: usize, focused: usize, width: u16) -> Range<usize>
     start..start + fit
 }
 
-/// `<ID> <title>` and `  <age>  <preview>`, uncut (FR-20).
+/// `<ID> <title>` and `  <age>  <preview>`, uncut.
 pub fn card_lines(card: &Card, now: &Stamp) -> (String, String) {
     let second = match card.latest_note() {
         None => "  no note".to_string(),
@@ -41,7 +41,7 @@ pub fn card_lines(card: &Card, now: &Stamp) -> (String, String) {
     (format!("{} {}", card.id, card.title), second)
 }
 
-/// `now`, else `<age> ago` (the panel's form, 7.3).
+/// `now`, else `<age> ago` (the panel's form).
 pub fn age_ago(at: Option<&Stamp>, now: &Stamp) -> String {
     match age(at, now) {
         Age::Now => "now".into(),
@@ -49,7 +49,7 @@ pub fn age_ago(at: Option<&Stamp>, now: &Stamp) -> String {
     }
 }
 
-/// The preview panel's rows after the separator, without the margin (FR-22).
+/// The preview panel's rows after the separator, without the margin.
 pub fn panel_lines(card: Option<&Card>, now: &Stamp) -> Vec<String> {
     let Some(card) = card else {
         return Vec::new();
@@ -99,7 +99,7 @@ pub fn draw(frame: &mut Frame, area: Rect, app: &App) {
     let shown = visible_columns(columns.len(), app.sel.column, area.width);
     let w = area.width.saturating_sub(1) / shown.len().max(1) as u16;
     let text = w.saturating_sub(2);
-    // The panel takes the separator and four rows above the status line (7.3).
+    // The panel takes the separator and four rows above the status line.
     let panel = 5 * u16::from(frame.area().height >= PANEL_MIN_ROWS);
     let slots = area.height.saturating_sub(2 + panel) as usize / 2;
     for (k, i) in shown.enumerate() {

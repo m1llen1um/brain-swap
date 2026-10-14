@@ -1,4 +1,4 @@
-//! TECHSPEC 7.1 and 7.2: the ConfigError screen (FR-45).
+//! The ConfigError screen.
 
 mod common;
 
@@ -18,7 +18,7 @@ fn app() -> App {
 }
 
 #[test]
-fn fr45_config_error_any_key_emits_only_quit() {
+fn config_error_any_key_emits_only_quit() {
     for k in ["n", "L", "e", "enter", "b", "q"] {
         let mut app = app();
         assert_eq!(press(&mut app, &[k]), [Effect::Quit], "{k}");
@@ -26,7 +26,7 @@ fn fr45_config_error_any_key_emits_only_quit() {
 }
 
 #[test]
-fn fr45_config_error_screen_shows_error() {
+fn config_error_screen_shows_error() {
     for (w, h) in [(80, 24), (40, 24)] {
         let rows = rows(&render(&app(), w, h));
         let shown: Vec<&str> = rows[..h as usize - 1]
@@ -39,9 +39,9 @@ fn fr45_config_error_screen_shows_error() {
 }
 
 #[test]
-fn fr45_config_error_ignores_reload_and_tick() {
+fn config_error_ignores_reload_and_tick() {
     let mut app = app();
-    let board = TuiFixture::new(Some("work_4_9")).board();
+    let board = TuiFixture::new(Some("work_example")).board();
     let later = now()
         .checked_add(jiff::SignedDuration::from_mins(1))
         .unwrap();
@@ -54,7 +54,7 @@ fn fr45_config_error_ignores_reload_and_tick() {
 }
 
 #[test]
-fn fr45_config_error_snapshots() {
+fn config_error_snapshots() {
     for (w, h) in [(80, 24), (120, 40)] {
         let buf = render(&app(), w, h);
         assert_no_colour(&buf);

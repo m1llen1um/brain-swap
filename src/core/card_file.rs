@@ -1,4 +1,4 @@
-//! Card file grammar (TECHSPEC 4.4).
+//! Card file grammar.
 
 use std::ops::Range;
 use std::path::{Path, PathBuf};
@@ -16,7 +16,7 @@ pub struct Parsed {
     pub warnings: Vec<String>,
 }
 
-/// Reads a card; the ID always comes from `id` (FR-01, I2), `mtime` is left `None`.
+/// Reads a card; the ID always comes from `id`, `mtime` is left `None`.
 pub fn parse(id: CardId, path: &Path, bytes: &[u8], default_column: &str, tz: &TimeZone) -> Parsed {
     let name = path.file_name().unwrap_or_default().to_string_lossy();
     let problem = read_only(&name, bytes);
@@ -53,7 +53,7 @@ pub fn parse(id: CardId, path: &Path, bytes: &[u8], default_column: &str, tz: &T
     }
 }
 
-/// A new card's canonical bytes (R4) and its warnings; the ID is never written (I2).
+/// A new card's canonical bytes and its warnings; the ID is never written.
 pub fn render_new(card: &NewCard) -> (Vec<u8>, Vec<String>) {
     let mut warnings = Vec::new();
     let (mut body, mut fence) = (String::new(), None);
@@ -90,7 +90,7 @@ pub fn render_new(card: &NewCard) -> (Vec<u8>, Vec<String>) {
     (text.into_bytes(), warnings)
 }
 
-/// A card's bytes after an append; `inserted` holds every added byte (R3, R5).
+/// A card's bytes after an append; `inserted` holds every added byte.
 #[derive(Debug)]
 pub struct Appended {
     pub bytes: Vec<u8>,
@@ -98,7 +98,7 @@ pub struct Appended {
     pub warnings: Vec<String>,
 }
 
-/// A note block (4.4 writer) with `eol` line ends, and its warnings.
+/// A note block with `eol` line ends, and its warnings.
 pub fn render_note(note: &NewNote, eol: &str) -> (String, Vec<String>) {
     let mut out = format!("\n### {}", format_stamp(&note.at));
     if note.auto {
@@ -144,7 +144,7 @@ pub fn render_note(note: &NewNote, eol: &str) -> (String, Vec<String>) {
 }
 
 /// Splices `block` into the timeline after its last non-blank line, before trailing
-/// blank lines and the post (R3); without a timeline one is appended (R5).
+/// blank lines and the post; without a timeline one is appended.
 pub fn append_raw(name: &str, bytes: &[u8], block: &str) -> crate::core::error::Result<Appended> {
     check_writable(name, bytes)?;
     let text = std::str::from_utf8(bytes).unwrap_or_default();
@@ -178,7 +178,7 @@ pub fn append_raw(name: &str, bytes: &[u8], block: &str) -> crate::core::error::
     })
 }
 
-/// Appends a switch note; all three parts blank is `empty note` (FR-16, FR-18).
+/// Appends a switch note; all three parts blank is `empty note`.
 pub fn append_note(
     name: &str,
     bytes: &[u8],
@@ -196,13 +196,13 @@ pub fn append_note(
     Ok(a)
 }
 
-/// Sets the card's column by a one-line frontmatter splice (FR-16, R2).
+/// Sets the card's column by a one-line frontmatter splice.
 pub fn set_column(name: &str, bytes: &[u8], column: &str) -> crate::core::error::Result<Vec<u8>> {
     check_writable(name, bytes)?;
     crate::core::frontmatter::set(bytes, "column", column)
 }
 
-/// Refuses a read-only card (4.7): invalid frontmatter, non-UTF-8 bytes or a conflict marker.
+/// Refuses a read-only card: invalid frontmatter, non-UTF-8 bytes or a conflict marker.
 pub fn check_writable(name: &str, bytes: &[u8]) -> crate::core::error::Result<()> {
     read_only(name, bytes).map_or(Ok(()), |w| Err(Error::Unreadable(w)))
 }
@@ -221,7 +221,7 @@ fn read_only(name: &str, bytes: &[u8]) -> Option<String> {
         .then(|| format!("{name}: not UTF-8, read only"))
 }
 
-/// Each note's bytes, from its `### ` heading to its last non-blank line (7.6).
+/// Each note's bytes, from its `### ` heading to its last non-blank line.
 pub fn note_blocks(text: &str) -> Vec<Range<usize>> {
     let mut blocks: Vec<Range<usize>> = Vec::new();
     let Some(tl) = layout(text).2 else {

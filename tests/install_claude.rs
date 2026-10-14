@@ -1,5 +1,5 @@
-//! TECHSPEC 8.8 and 6.7 `install claude`: the embedded skills copied into Claude Code's
-//! skills folder under a temp `HOME` (FR-67).
+//! `install claude`: the embedded skills copied into Claude Code's
+//! skills folder under a temp `HOME`.
 
 mod common;
 
@@ -54,7 +54,7 @@ fn tree(dir: &Path) -> Vec<PathBuf> {
 }
 
 #[test]
-fn fr67_install_writes_the_copies() {
+fn install_writes_the_copies() {
     let s = Sandbox::new();
     run(&s, &["install", "claude"]);
     for skill in &SKILLS {
@@ -65,7 +65,7 @@ fn fr67_install_writes_the_copies() {
 }
 
 #[test]
-fn fr67_install_writes_plain_folders() {
+fn install_writes_plain_folders() {
     let s = Sandbox::new();
     run(&s, &["install", "claude"]);
     for skill in &SKILLS {
@@ -131,7 +131,7 @@ fn ts6_7_install_json_lists_linked_paths() {
 }
 
 #[test]
-fn fr67_install_never_edits_claude_settings() {
+fn install_never_edits_claude_settings() {
     let s = Sandbox::new();
     let claude = s.root().join("home/.claude");
     let files = [
@@ -211,7 +211,7 @@ fn ts8_8_is_ours_rejects_other_text() {
 }
 
 #[test]
-fn fr67_reinstall_of_the_same_version_is_idempotent() {
+fn reinstall_of_the_same_version_is_idempotent() {
     let s = Sandbox::new();
     run(&s, &["install", "claude"]);
     run(&s, &["install", "claude"]);
@@ -222,7 +222,7 @@ fn fr67_reinstall_of_the_same_version_is_idempotent() {
 }
 
 #[test]
-fn fr67_upgrade_rewrites_our_older_copies() {
+fn upgrade_rewrites_our_older_copies() {
     let s = Sandbox::new();
     for skill in &SKILLS {
         let dir = skills(&s).join(skill.name);
@@ -281,7 +281,7 @@ fn assert_our_copy(s: &Sandbox, name: &str) {
 }
 
 #[test]
-fn fr67_foreign_directory_is_refused_without_force() {
+fn foreign_directory_is_refused_without_force() {
     let s = Sandbox::new();
     let dir = foreign_park(&s);
     let (_, err) = fail(&s, &["install", "claude"]);
@@ -291,7 +291,7 @@ fn fr67_foreign_directory_is_refused_without_force() {
 }
 
 #[test]
-fn fr67_a_refusal_writes_nothing() {
+fn a_refusal_writes_nothing() {
     let s = Sandbox::new();
     foreign_park(&s);
     fail(&s, &["install", "claude"]);
@@ -302,7 +302,7 @@ fn fr67_a_refusal_writes_nothing() {
 }
 
 #[test]
-fn fr67_foreign_file_and_symlinks_are_refused_without_force() {
+fn foreign_file_and_symlinks_are_refused_without_force() {
     let s = Sandbox::new();
     let file = skills(&s).join("bs-card");
     fs::create_dir_all(skills(&s)).unwrap();
@@ -353,7 +353,7 @@ fn ts6_2_a_refusal_under_json_is_the_error_envelope() {
 }
 
 #[test]
-fn fr67_force_replaces_a_foreign_directory() {
+fn force_replaces_a_foreign_directory() {
     let s = Sandbox::new();
     let dir = foreign_park(&s);
     let (out, _) = run(&s, &["--json", "install", "claude", "--force"]);
@@ -364,7 +364,7 @@ fn fr67_force_replaces_a_foreign_directory() {
 }
 
 #[test]
-fn fr67_force_replaces_a_foreign_file_and_symlink() {
+fn force_replaces_a_foreign_file_and_symlink() {
     let s = Sandbox::new();
     fs::create_dir_all(skills(&s)).unwrap();
     fs::write(skills(&s).join("bs-card"), "mine").unwrap();
@@ -412,7 +412,7 @@ fn assert_checkout_copies(s: &Sandbox, repo: &Path) {
 }
 
 #[test]
-fn fr67_link_copies_the_checkout_skills() {
+fn link_copies_the_checkout_skills() {
     let s = Sandbox::new();
     let repo = checkout(&s);
     run(&s, &["install", "claude", "--link", repo.to_str().unwrap()]);
@@ -420,7 +420,7 @@ fn fr67_link_copies_the_checkout_skills() {
 }
 
 #[test]
-fn fr67_link_with_a_relative_repo_reads_the_checkout() {
+fn link_with_a_relative_repo_reads_the_checkout() {
     let s = Sandbox::new();
     let repo = checkout(&s);
     let mut cmd = s.cmd(&["install", "claude", "--link", "."]);
@@ -430,7 +430,7 @@ fn fr67_link_with_a_relative_repo_reads_the_checkout() {
 }
 
 #[test]
-fn fr67_link_to_a_folder_without_the_skills_fails_and_changes_nothing() {
+fn link_to_a_folder_without_the_skills_fails_and_changes_nothing() {
     let s = Sandbox::new();
     let repo = checkout(&s);
     let missing = repo.join("pack/claude/skills/bs-back/SKILL.md");
@@ -448,7 +448,7 @@ fn fr67_link_to_a_folder_without_the_skills_fails_and_changes_nothing() {
 }
 
 #[test]
-fn fr67_link_refuses_a_foreign_entry_without_force() {
+fn link_refuses_a_foreign_entry_without_force() {
     let s = Sandbox::new();
     let repo = checkout(&s);
     let park = skills(&s).join("bs-park");
@@ -466,7 +466,7 @@ fn fr67_link_refuses_a_foreign_entry_without_force() {
 }
 
 #[test]
-fn fr67_install_after_link_switches_to_the_embedded_skills() {
+fn install_after_link_switches_to_the_embedded_skills() {
     let s = Sandbox::new();
     let repo = checkout(&s);
     run(&s, &["install", "claude", "--link", repo.to_str().unwrap()]);
@@ -479,7 +479,7 @@ fn fr67_install_after_link_switches_to_the_embedded_skills() {
 }
 
 #[test]
-fn fr67_link_after_install_switches_to_the_checkout() {
+fn link_after_install_switches_to_the_checkout() {
     let s = Sandbox::new();
     let repo = checkout(&s);
     run(&s, &["install", "claude"]);
@@ -507,7 +507,7 @@ fn assert_removed(s: &Sandbox, out: &str) {
 }
 
 #[test]
-fn fr67_remove_deletes_our_copies() {
+fn remove_deletes_our_copies() {
     let s = Sandbox::new();
     run(&s, &["install", "claude"]);
     let (out, _) = run(&s, &["install", "claude", "--remove"]);
@@ -515,7 +515,7 @@ fn fr67_remove_deletes_our_copies() {
 }
 
 #[test]
-fn fr67_remove_keeps_foreign_entries_and_settings() {
+fn remove_keeps_foreign_entries_and_settings() {
     let s = Sandbox::new();
     run(&s, &["install", "claude"]);
     let claude = s.root().join("home/.claude");
@@ -533,7 +533,7 @@ fn fr67_remove_keeps_foreign_entries_and_settings() {
 }
 
 #[test]
-fn fr67_remove_deletes_checkout_copies_but_not_the_checkout() {
+fn remove_deletes_checkout_copies_but_not_the_checkout() {
     let s = Sandbox::new();
     let repo = checkout(&s);
     run(&s, &["install", "claude", "--link", repo.to_str().unwrap()]);
@@ -544,7 +544,7 @@ fn fr67_remove_deletes_checkout_copies_but_not_the_checkout() {
 }
 
 #[test]
-fn fr67_remove_with_nothing_installed_exits_0() {
+fn remove_with_nothing_installed_exits_0() {
     let s = Sandbox::new();
     let (out, _) = run(&s, &["--json", "install", "claude", "--remove"]);
     let v: serde_json::Value = serde_json::from_str(&out).unwrap();
@@ -562,7 +562,7 @@ fn ts6_7_remove_json_lists_removed_paths() {
 }
 
 #[test]
-fn fr67_remove_ignores_force_and_link() {
+fn remove_ignores_force_and_link() {
     let s = Sandbox::new();
     run(&s, &["install", "claude"]);
     fs::create_dir_all(skills(&s).join("other")).unwrap();

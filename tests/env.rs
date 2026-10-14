@@ -1,4 +1,4 @@
-//! TECHSPEC 3, 5.1, 6.1, 9.1, 9.4, 10: the `Env` value and its paths.
+//! The `Env` value and its paths.
 
 mod common;
 
@@ -32,7 +32,7 @@ fn p(s: &str) -> PathBuf {
 }
 
 #[test]
-fn nfr09_xdg_defaults_under_home_on_every_platform() {
+fn xdg_defaults_under_home_on_every_platform() {
     let env = build(&[("HOME", "/h")]).unwrap();
     assert_eq!(env.config_file(), p("/h/.config/brain-swap/config.toml"));
     assert_eq!(env.templates_dir(), p("/h/.config/brain-swap/templates"));

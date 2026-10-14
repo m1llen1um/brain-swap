@@ -1,4 +1,4 @@
-//! The frame: the mode's screen above, the status line on the last row (TECHSPEC 7.2).
+//! The frame: the mode's screen above, the status line on the last row.
 
 use ratatui::Frame;
 use ratatui::layout::Rect;

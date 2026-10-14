@@ -1,4 +1,4 @@
-//! TECHSPEC 7.1: App state and the initial selection (FR-19, I5).
+//! App state and the initial selection.
 
 mod common;
 
@@ -52,14 +52,14 @@ fn closed_board() -> TuiFixture {
 }
 
 #[test]
-fn fr19_selects_open_card_with_newest_activity() {
+fn selects_open_card_with_newest_activity() {
     let app = newest_board().app();
     assert_eq!(app.sel, sel(1, Some(2)));
     assert_eq!(app.mode, Mode::Board);
 }
 
 #[test]
-fn fr19_activity_tie_selects_higher_number() {
+fn activity_tie_selects_higher_number() {
     let fx = TuiFixture::new(None);
     let t = at("10:00:00");
     write_card(&fx.board_dir, "W-5", "Todo", &at("08:00:00"), &[(&t, "n")]);
@@ -68,19 +68,19 @@ fn fr19_activity_tie_selects_higher_number() {
 }
 
 #[test]
-fn fr19_no_open_card_focuses_first_column() {
+fn no_open_card_focuses_first_column() {
     assert_eq!(closed_board().app().sel, sel(0, None));
 }
 
 #[test]
-fn fr19_empty_board_focuses_first_column() {
+fn empty_board_focuses_first_column() {
     let fx = TuiFixture::new(None);
     assert!(!fx.board_dir.exists());
     assert_eq!(fx.app().sel, sel(0, None));
 }
 
 #[test]
-fn i5_card_in_extra_column_can_be_selected_first() {
+fn card_in_extra_column_can_be_selected_first() {
     let fx = TuiFixture::new(None);
     write_card(&fx.board_dir, "W-1", "Todo", &at("09:00:00"), &[]);
     write_card(
@@ -96,13 +96,13 @@ fn i5_card_in_extra_column_can_be_selected_first() {
 }
 
 #[test]
-fn fr19_initial_selection_snapshot() {
+fn initial_selection_snapshot() {
     let both = [newest_board().board(), closed_board().board()].map(|b| initial_selection(&b));
     insta::assert_debug_snapshot!("initial_selection", both);
 }
 
-fn work_4_9() -> brain_swap::tui::app::App {
-    TuiFixture::new(Some("work_4_9")).app()
+fn work_example() -> brain_swap::tui::app::App {
+    TuiFixture::new(Some("work_example")).app()
 }
 
 fn ev(code: KeyCode, m: KeyModifiers) -> Option<KeyPress> {
@@ -111,8 +111,8 @@ fn ev(code: KeyCode, m: KeyModifiers) -> Option<KeyPress> {
 
 #[test]
 fn ts7_1_quit_key_emits_quit() {
-    assert_eq!(press(&mut work_4_9(), &["q"]), [Effect::Quit]);
-    assert_eq!(press(&mut work_4_9(), &["esc"]), [Effect::Quit]);
+    assert_eq!(press(&mut work_example(), &["q"]), [Effect::Quit]);
+    assert_eq!(press(&mut work_example(), &["esc"]), [Effect::Quit]);
 }
 
 #[test]
@@ -177,7 +177,7 @@ fn ts5_3_ctrl_and_alt_carry_over() {
 
 #[test]
 fn ts7_1_key_release_is_ignored() {
-    let mut app = work_4_9();
+    let mut app = work_example();
     let mut q = key("q");
     q.kind = KeyEventKind::Release;
     assert_eq!(update(&mut app, Input::Key(q)), []);
@@ -185,7 +185,7 @@ fn ts7_1_key_release_is_ignored() {
 
 #[test]
 fn ts5_2_rebound_quit_key() {
-    let mut app = work_4_9();
+    let mut app = work_example();
     let (keys, warnings) = KeyMap::build(&[("quit".to_string(), vec!["x".to_string()])]);
     assert_eq!(warnings, Vec::<String>::new());
     app.keys = keys;
@@ -195,7 +195,7 @@ fn ts5_2_rebound_quit_key() {
 
 #[test]
 fn ts5_2_board_ignores_scroll_keys() {
-    let mut app = work_4_9();
+    let mut app = work_example();
     assert_eq!(press(&mut app, &["ctrl+d", "ctrl+u"]), []);
     assert_eq!(app.mode, Mode::Board);
 }
@@ -243,7 +243,7 @@ fn ts5_2_mode_maps_to_key_context() {
 
 #[test]
 fn ts5_3_backtab_binding_matches_shift_backtab_event() {
-    let mut app = work_4_9();
+    let mut app = work_example();
     let (keys, warnings) = KeyMap::build(&[("quit".to_string(), vec!["backtab".to_string()])]);
     assert_eq!(warnings, Vec::<String>::new());
     app.keys = keys;

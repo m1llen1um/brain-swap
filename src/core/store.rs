@@ -1,4 +1,4 @@
-//! Every write to a board (TECHSPEC 4.3, 4.6, 10, 12.1).
+//! Every write to a board.
 
 use crate::core::env::{Env, encode_file_name};
 use crate::core::error::{Error, Result};
@@ -29,7 +29,7 @@ pub fn lock_path(env: &Env, board_dir: &Path) -> Result<PathBuf> {
     Ok(env.locks_dir().join(format!("{name}.lock")))
 }
 
-/// Creates `board_dir`, then takes its lock within 2 seconds or fails `Busy` (10).
+/// Creates `board_dir`, then takes its lock within 2 seconds or fails `Busy`.
 pub fn lock_board(env: &Env, board_dir: &Path) -> Result<BoardLock> {
     fs::create_dir_all(board_dir).map_err(io)?;
     let path = lock_path(env, board_dir)?;
@@ -65,7 +65,7 @@ pub fn temp_path(target: &Path, pid: u32) -> PathBuf {
     target.with_file_name(format!(".{name}.bs-tmp-{pid}"))
 }
 
-/// Verifies `bytes`, then writes them to a temp file and renames it over `target` (R7, TECHSPEC 10).
+/// Verifies `bytes`, then writes them to a temp file and renames it over `target`.
 /// Errors remove the temp file, except a failpoint, which leaves it as a crash would.
 pub fn write_atomic(
     env: &Env,
@@ -100,8 +100,8 @@ pub fn write_atomic(
     File::open(dir).and_then(|d| d.sync_all()).map_err(io)
 }
 
-/// Prunes old session files and removes `.*.bs-tmp-*` entries in `board_dir` over an hour old
-/// (4.6, 10); every error is ignored. Callers run it after releasing the board lock.
+/// Prunes old session files and removes `.*.bs-tmp-*` entries in `board_dir` over an hour old;
+/// every error is ignored. Callers run it after releasing the board lock.
 pub fn cleanup(env: &Env, board_dir: &Path) {
     session::prune(env);
     let now = env.now.timestamp();
@@ -121,9 +121,9 @@ pub fn cleanup(env: &Env, board_dir: &Path) {
     }
 }
 
-// Create (TECHSPEC 4.6 steps 1 to 3, 4.3, R4, R7).
+// Create.
 
-/// Maps a `hard_link` error other than `AlreadyExists` to `Error::Io` for board `board` (4.6).
+/// Maps a `hard_link` error other than `AlreadyExists` to `Error::Io` for board `board`.
 pub fn link_error(board: &str, e: &std::io::Error) -> Error {
     match e.kind() {
         ErrorKind::Unsupported | ErrorKind::PermissionDenied => {
@@ -133,10 +133,10 @@ pub fn link_error(board: &str, e: &std::io::Error) -> Error {
     }
 }
 
-/// Link attempts before `create` gives up on finding a free number (4.6).
+/// Link attempts before `create` gives up on finding a free number.
 pub const MAX_LINK_ATTEMPTS: u32 = 100;
 
-/// What `create` writes: the column defaults to the board's first (I3), the body to the skeleton.
+/// What `create` writes: the column defaults to the board's first, the body to the skeleton.
 pub struct CreateRequest<'a> {
     pub title: &'a str,
     pub template: &'a Template,
@@ -150,7 +150,7 @@ pub struct Created {
     pub warnings: Vec<String>,
 }
 
-/// Allocates `<L>-<n>.md` inside the board lock and links the rendered card there (4.6).
+/// Allocates `<L>-<n>.md` inside the board lock and links the rendered card there.
 pub fn create(env: &Env, board: &Board, req: &CreateRequest) -> Result<Created> {
     let title = req.title.trim();
     if title.is_empty() {
@@ -223,7 +223,7 @@ pub fn create(env: &Env, board: &Board, req: &CreateRequest) -> Result<Created> 
             })
             .map_err(io)?;
         failpoint::check(env, "create:after_tmp")?;
-        // Linking never overwrites: a name taken meanwhile fails with AlreadyExists (4.6).
+        // Linking never overwrites: a name taken meanwhile fails with AlreadyExists.
         if let Err(e) = fs::hard_link(&tmp, &target) {
             let _ = fs::remove_file(&tmp);
             if e.kind() == ErrorKind::AlreadyExists {
@@ -251,7 +251,7 @@ pub struct Moved {
     pub changed: bool,
 }
 
-/// Moves card `id` to `column`, re-reading its file inside the lock (6.2, 10, R2, R7).
+/// Moves card `id` to `column`, re-reading its file inside the lock.
 pub fn move_card(env: &Env, board: &Board, id: CardId, column: &str) -> Result<Moved> {
     let column = board.column(column)?;
     let lock = lock_board(env, &board.path)?;
@@ -289,7 +289,7 @@ pub fn move_card(env: &Env, board: &Board, id: CardId, column: &str) -> Result<M
     })
 }
 
-/// R7 for a move: `after` parses to `column` and differs from `before` only as R2 allows.
+/// The verify step for a move: `after` parses to `column` and differs from `before` only by the column splice.
 pub fn verify_move(before: &[u8], after: &[u8], column: &str) -> bool {
     let id = CardId {
         letter: 'X',
@@ -306,12 +306,12 @@ pub fn verify_move(before: &[u8], after: &[u8], column: &str) -> bool {
         .take_while(|(x, y)| x == y)
         .count();
     let (removed, added) = (b.len() - pre - suf, a.len() - pre - suf);
-    // R2: one line changed, added or already right, or a three-line frontmatter put in front.
+    // One line changed, added or already right, or a three-line frontmatter put in front.
     let r2 = (removed <= added && added <= 1) || (pre == 0 && removed == 0 && added == 3);
     r2 && parsed.column == column
 }
 
-// Park (FR-16, R3, R7).
+// Park.
 
 /// A parked card re-read from the written bytes, and the splice warnings.
 #[derive(Debug)]
@@ -320,7 +320,7 @@ pub struct Parked {
     pub warnings: Vec<String>,
 }
 
-/// R7 for park: `after` holds exactly one more note and equals `before` outside `inserted`.
+/// The verify step for park: `after` holds exactly one more note and equals `before` outside `inserted`.
 pub fn verify_park(before: &[u8], after: &[u8], inserted: Range<usize>) -> bool {
     let notes = |b: &[u8]| card_file::note_blocks(&String::from_utf8_lossy(b)).len();
     let (s, e) = (inserted.start, inserted.end);
@@ -330,7 +330,7 @@ pub fn verify_park(before: &[u8], after: &[u8], inserted: Range<usize>) -> bool 
         && notes(after) == notes(before) + 1
 }
 
-/// Appends `note` to card `id` under the board lock, re-reading the file inside it (FR-16).
+/// Appends `note` to card `id` under the board lock, re-reading the file inside it.
 pub fn park(env: &Env, board: &Board, id: CardId, note: &NewNote) -> Result<Parked> {
     if [&note.doing, &note.next, &note.watch_out]
         .iter()
@@ -356,7 +356,7 @@ pub fn park(env: &Env, board: &Board, id: CardId, note: &NewNote) -> Result<Park
     })
 }
 
-// Editor merge (7.6, R6).
+// Editor merge.
 
 /// What `merge_edit` did: whether it wrote, and how many parked notes it carried over.
 #[derive(Debug)]
@@ -365,8 +365,8 @@ pub struct Merged {
     pub added_notes: usize,
 }
 
-/// Writes the editor's bytes `edited` over card `id`, merging what changed on disk since `c0` (7.6).
-/// The only store function that writes bytes it did not splice itself (R6): the user's bytes, plus
+/// Writes the editor's bytes `edited` over card `id`, merging what changed on disk since `c0`.
+/// The only store function that writes bytes it did not splice itself: the user's bytes, plus
 /// the note blocks parked meanwhile, plus the file's column line when only the file changed it.
 pub fn merge_edit(
     env: &Env,

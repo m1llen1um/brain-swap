@@ -1,4 +1,4 @@
-//! TECHSPEC 5.2 and 6.2: parsing `config.toml` and looking up boards.
+//! Parsing `config.toml` and looking up boards.
 
 mod common;
 
@@ -38,7 +38,7 @@ fn strings(v: &[&str]) -> Vec<String> {
 }
 
 #[test]
-fn fr42_parses_default_file() {
+fn parses_default_file() {
     let c = cfg(&default_text());
     assert_eq!(c.default_board, "work");
     assert_eq!(c.editor, "");
@@ -55,14 +55,14 @@ fn fr42_parses_default_file() {
 }
 
 #[test]
-fn fr02_boards_keep_file_order() {
+fn boards_keep_file_order() {
     let c = cfg("default_board = \"mid\"\n[boards]\nzeta = \"/z\"\nalpha = \"/a\"\nmid = \"/m\"\n");
     let names: Vec<&str> = c.boards.iter().map(|(n, _)| n.as_str()).collect();
     assert_eq!(names, ["zeta", "alpha", "mid"]);
 }
 
 #[test]
-fn fr02_default_board_defaults_to_work() {
+fn default_board_defaults_to_work() {
     let c = cfg("[boards]\nwork = \"/b/w\"\n");
     assert_eq!(c.default_board, "work");
 }
@@ -97,7 +97,7 @@ fn ts6_2_unknown_board_lists_names() {
 }
 
 #[test]
-fn fr42_key_value_is_string_or_list() {
+fn key_value_is_string_or_list() {
     let c = cfg("[boards]\nwork = \"/w\"\n[keys]\nopen = \"o\"\nquit = [\"q\", \"esc\"]\n");
     assert_eq!(
         c.keys,
@@ -149,7 +149,7 @@ fn error_cases() -> Vec<Error> {
 }
 
 #[test]
-fn fr45_syntax_error_names_file_line_col() {
+fn syntax_error_names_file_line_col() {
     let e = err("editor = \"\"\n\n\ndefault_board \"work\"\n");
     let (line, col, _) = at(&e);
     assert_eq!(line, 4);
@@ -229,7 +229,7 @@ fn ts5_2_unknown_top_level_key_warns() {
 }
 
 #[test]
-fn fr45_config_errors_exit_1() {
+fn config_errors_exit_1() {
     let cases = error_cases();
     assert_eq!(cases.len(), 12);
     for e in cases {
@@ -239,7 +239,7 @@ fn fr45_config_errors_exit_1() {
 }
 
 #[test]
-fn fr66_missing_config_is_written_and_reported() {
+fn missing_config_is_written_and_reported() {
     let tmp = tempfile::tempdir().unwrap();
     let env = core_env(tmp.path(), NOW);
     let loaded = load(&env).unwrap();
@@ -249,13 +249,13 @@ fn fr66_missing_config_is_written_and_reported() {
 }
 
 #[test]
-fn fr66_default_text_equals_5_2_under_default_xdg() {
+fn default_text_equals_5_2_under_default_xdg() {
     let env = core_env(Path::new("/h"), NOW);
     assert_eq!(text_for(&env), default_text());
 }
 
 #[test]
-fn fr66_existing_config_is_not_rewritten() {
+fn existing_config_is_not_rewritten() {
     let tmp = tempfile::tempdir().unwrap();
     let env = core_env(tmp.path(), NOW);
     fs::create_dir_all(env.config_file().parent().unwrap()).unwrap();
@@ -271,7 +271,7 @@ fn fr66_existing_config_is_not_rewritten() {
 }
 
 #[test]
-fn fr66_create_new_never_clobbers() {
+fn create_new_never_clobbers() {
     let tmp = tempfile::tempdir().unwrap();
     let env = core_env(tmp.path(), NOW);
     fs::create_dir_all(env.config_file().parent().unwrap()).unwrap();
@@ -284,7 +284,7 @@ fn fr66_create_new_never_clobbers() {
 }
 
 #[test]
-fn fr66_first_run_creates_no_board_folder() {
+fn first_run_creates_no_board_folder() {
     let tmp = tempfile::tempdir().unwrap();
     let env = core_env(tmp.path(), NOW);
     load(&env).unwrap();
@@ -312,7 +312,7 @@ fn config_dir_entries(env: &brain_swap::core::env::Env) -> Vec<String> {
 }
 
 #[test]
-fn fr66_first_run_leaves_no_temp_file() {
+fn first_run_leaves_no_temp_file() {
     let tmp = tempfile::tempdir().unwrap();
     let env = core_env(tmp.path(), NOW);
     write_default(&env).unwrap();
@@ -324,7 +324,7 @@ fn fr66_first_run_leaves_no_temp_file() {
 }
 
 #[test]
-fn fr66_stale_temp_does_not_block_first_run() {
+fn stale_temp_does_not_block_first_run() {
     let tmp = tempfile::tempdir().unwrap();
     let env = core_env(tmp.path(), NOW);
     let dir = env.config_file().parent().unwrap().to_path_buf();
@@ -340,7 +340,7 @@ fn fr66_stale_temp_does_not_block_first_run() {
 }
 
 #[test]
-fn fr45_invalid_utf8_is_config_error_at_its_line() {
+fn invalid_utf8_is_config_error_at_its_line() {
     let tmp = tempfile::tempdir().unwrap();
     let env = core_env(tmp.path(), NOW);
     fs::create_dir_all(env.config_file().parent().unwrap()).unwrap();

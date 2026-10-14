@@ -1,4 +1,4 @@
-//! TECHSPEC 12.1 docs: no U+2014 or U+2013 in any repository markdown file.
+//! No U+2014 or U+2013 in any repository markdown file.
 
 use std::fs;
 use std::path::{Path, PathBuf};
@@ -102,7 +102,7 @@ fn herdr_blocks() -> Vec<String> {
 }
 
 #[test]
-fn fr64_readme_snippet_matches_install_output() {
+fn readme_snippet_matches_install_output() {
     assert_eq!(
         herdr_blocks()[0],
         brain_swap::adapters::herdr::key_snippet(
@@ -112,7 +112,7 @@ fn fr64_readme_snippet_matches_install_output() {
 }
 
 #[test]
-fn fr64_readme_second_binding_opens_board_home() {
+fn readme_second_binding_opens_board_home() {
     let blocks = herdr_blocks();
     let binding = |b: &str| {
         let t: toml::Table = b.parse().unwrap();

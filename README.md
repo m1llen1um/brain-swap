@@ -1,15 +1,13 @@
 # brain-swap
 
-A keyboard-first kanban board for the terminal, built to make switching between parallel AI coding sessions cheap.
-
-Each card is a task. When you leave a session, you park a short note on the card (Doing / Next / Watch out). When you come back, you read the note first and pick up where you left off in seconds, instead of rereading the chat transcript.
+Running several AI coding agents at once makes every switch expensive: when you come back to a parked session you have to rebuild what you were doing, what comes next and what to watch out for, usually by rereading a long chat transcript. In *Thinking, Fast and Slow*, Daniel Kahneman calls that kind of effortful reconstruction slow thinking (System 2), while recognising a familiar cue is fast thinking (System 1), nearly free. brain-swap turns each return into the fast kind. Before you leave a session you park a two or three line note on its card (Doing, Next, Watch out); when you come back you read that note first and are back on track in seconds. The cards sit on a keyboard-first kanban board in your terminal, so you see at a glance where every parallel task stands and how long ago you left it, and inside herdr one key takes you from a card straight back to its agent's pane.
 
 - Boards are plain markdown folders you own (e.g. work, home, personal).
 - Vim-like keys, every binding configurable.
 - Optional Claude Code commands: `/bs-card`, `/bs-park`, `/bs-back`, `/bs-link`.
 - Optional herdr integration: open the board with a key, jump from a card to its pane.
 
-Written in Rust, one binary that is both the board (run `brain-swap` with no arguments) and the CLI. The product idea is in [idea.md](idea.md), the requirements in [PRD.md](PRD.md), the design in [TECHSPEC.md](TECHSPEC.md) and feature candidates in [roadmap/](roadmap/README.md).
+Written in Rust, one binary that is both the board (run `brain-swap` with no arguments) and the CLI. Feature candidates are in [roadmap/](roadmap/README.md).
 
 ## Cheat sheet
 
@@ -33,8 +31,6 @@ In a shell:
 Board keys: `hjkl` move, `H` `L` move card, `o` open, `enter` jump, `n` new, `e` edit, `b` board, `?` help, `q` quit.
 
 The full guide with examples is [docs/usage.md](docs/usage.md).
-
-How the success metrics are measured: [docs/metrics.md](docs/metrics.md).
 
 ## Install
 

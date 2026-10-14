@@ -1,4 +1,4 @@
-//! TECHSPEC 9.1: `ProcessRunner` starts the herdr binary with plain arguments; 11: each call is logged.
+//! `ProcessRunner` starts the herdr binary with plain arguments; 11: each call is logged.
 
 mod common;
 

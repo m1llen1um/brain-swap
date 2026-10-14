@@ -1,4 +1,4 @@
-//! `board.md` reader (TECHSPEC 4.3).
+//! `board.md` reader.
 
 use crate::core::error::Result;
 use crate::core::frontmatter::{FmRead, read};
@@ -77,7 +77,7 @@ pub fn parse(board_name: &str, bytes: Option<&[u8]>) -> BoardFile {
     b
 }
 
-/// `existing` with `next: <n>`: created, prepended or spliced (4.3, R1).
+/// `existing` with `next: <n>`: created, prepended or spliced.
 pub fn set_next(existing: Option<&[u8]>, n: u32) -> Result<Vec<u8>> {
     match existing {
         None => Ok(format!("---\nnext: {n}\n---\n").into_bytes()),
@@ -93,7 +93,7 @@ mod tests {
         i3(parse("work", Some(text.as_bytes())))
     }
 
-    /// Asserts I3: columns non-empty and unique ignoring case.
+    /// Asserts that columns are non-empty and unique ignoring case.
     fn i3(b: BoardFile) -> BoardFile {
         assert!(!b.columns.is_empty());
         for (i, c) in b.columns.iter().enumerate() {
@@ -113,7 +113,7 @@ mod tests {
     }
 
     #[test]
-    fn fr03_missing_board_md_gives_defaults() {
+    fn missing_board_md_gives_defaults() {
         let b = i3(parse("work", None));
         defaults(&b);
         assert!(b.writable);
@@ -121,7 +121,7 @@ mod tests {
     }
 
     #[test]
-    fn fr03_reads_letter_columns_next() {
+    fn reads_letter_columns_next() {
         let b = p("---\nletter: W\ncolumns: Todo, Doing, Done\nnext: 13\n---\n");
         assert_eq!(b.letter, 'W');
         assert_eq!(b.columns, ["Todo", "Doing", "Done"]);
@@ -155,7 +155,7 @@ mod tests {
     }
 
     #[test]
-    fn i3_duplicate_columns_dropped_with_warning() {
+    fn duplicate_columns_dropped_with_warning() {
         let b = p("---\ncolumns: Todo, todo, Done\n---\n");
         assert_eq!(b.columns, ["Todo", "Done"]);
         assert_eq!(b.warnings, ["board.md: duplicate column 'todo' dropped"]);
@@ -165,7 +165,7 @@ mod tests {
     }
 
     #[test]
-    fn i3_empty_columns_give_defaults() {
+    fn empty_columns_give_defaults() {
         let b = p("---\ncolumns:\n---\n");
         assert_eq!(b.columns, ["Todo", "Doing", "Done"]);
         assert_eq!(

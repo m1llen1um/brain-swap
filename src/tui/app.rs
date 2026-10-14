@@ -1,4 +1,4 @@
-//! TUI state machine (TECHSPEC 7.1): pure, no I/O.
+//! TUI state machine: pure, no I/O.
 
 use std::path::PathBuf;
 
@@ -101,7 +101,7 @@ pub enum Effect {
     },
     Edit(CardId),
     LoadBoard(String),
-    /// The card and the index into its `notes` (7.7).
+    /// The card and the index into its `notes`.
     Jump(CardId, usize),
     Quit,
 }
@@ -152,7 +152,7 @@ impl App {
     }
 }
 
-/// The open card of newest activity and its column, else column 0 (FR-19).
+/// The open card of newest activity and its column, else column 0.
 pub fn initial_selection(board: &Board) -> Selection {
     let newest = board
         .open_cards()
@@ -173,7 +173,7 @@ pub fn initial_selection(board: &Board) -> Selection {
     }
 }
 
-/// The neighbouring configured column; a card in an extra column goes to the first (7.3, 4.7).
+/// The neighbouring configured column; a card in an extra column goes to the first.
 pub fn move_target(board: &Board, card: &Card, right: bool) -> Option<String> {
     let cols = &board.meta.columns;
     let Some(i) = cols.iter().position(|c| *c == card.column) else {
@@ -183,7 +183,7 @@ pub fn move_target(board: &Board, card: &Card, right: bool) -> Option<String> {
     cols.get(j).cloned()
 }
 
-/// The configured column at `column`, or the first one for an extra column (4.7).
+/// The configured column at `column`, or the first one for an extra column.
 pub fn create_column(board: &Board, column: usize) -> String {
     let cols = &board.meta.columns;
     cols.get(column)
@@ -193,7 +193,7 @@ pub fn create_column(board: &Board, column: usize) -> String {
 }
 
 /// Replaces the board, keeping the selected card wherever it now is; a vanished card gives
-/// the card at its old row in the same column, clamped (7.4).
+/// the card at its old row in the same column, clamped.
 fn reload(app: &mut App, board: Board) {
     let sel = &app.sel;
     let row = app
@@ -226,7 +226,7 @@ fn reload(app: &mut App, board: Board) {
 }
 
 pub fn update(app: &mut App, input: Input) -> Vec<Effect> {
-    // Nothing but Quit leaves ConfigError, so no effect can name a folder (FR-45).
+    // Nothing but Quit leaves ConfigError, so no effect can name a folder.
     if let Mode::ConfigError(_) = app.mode {
         return match input {
             Input::Key(e) if e.kind != KeyEventKind::Release => vec![Effect::Quit],
@@ -311,7 +311,7 @@ pub fn update(app: &mut App, input: Input) -> Vec<Effect> {
             app.mode = Mode::TemplatePick { sel: 0 };
             Vec::new()
         }
-        // Action keys first, then a template hotkey (5.2).
+        // Action keys first, then a template hotkey.
         (&Mode::TemplatePick { sel }, a) => {
             let hotkey = match press {
                 Some(KeyPress {
@@ -370,7 +370,7 @@ pub fn update(app: &mut App, input: Input) -> Vec<Effect> {
             };
             effects
         }
-        // A text field: only `confirm` and `cancel` are actions there (5.2).
+        // A text field: only `confirm` and `cancel` are actions there.
         (Mode::TitleInput { template, buf }, a) => match a {
             Some(Action::Confirm) if !buf.trim().is_empty() => {
                 let effect = Effect::Create {
@@ -473,7 +473,7 @@ pub fn update(app: &mut App, input: Input) -> Vec<Effect> {
             app.mode = Mode::Board;
             Vec::new()
         }
-        // Board targets the jump note, Detail the note shown (7.7); no card, no jump.
+        // Board targets the jump note, Detail the note shown; no card, no jump.
         (Mode::Board | Mode::Detail { .. }, Some(Action::Jump)) => {
             let target = match &app.mode {
                 &Mode::Detail { card, note, .. } => app
@@ -509,7 +509,7 @@ pub fn update(app: &mut App, input: Input) -> Vec<Effect> {
     }
 }
 
-/// The Message of a failed jump, one item per line (7.7); `None` for a jump that worked.
+/// The Message of a failed jump, one item per line; `None` for a jump that worked.
 pub fn jump_message(outcome: &Outcome, card: CardId) -> Option<String> {
     let (first, cwd) = match outcome {
         Outcome::NotJumped(status, cwd) => {

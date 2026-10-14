@@ -6,7 +6,7 @@ Only Claude Code has a command pack. A user running other coding agents (Codex, 
 
 ## Proposal
 
-A pack per agent, each a folder under `pack/`, built only on the public CLI subcommands of TECHSPEC section 6, as the Claude Code pack is. The rule that adapters use only the public CLI (TECHSPEC 2.2) already keeps the core unchanged.
+A pack per agent, each a folder under `pack/`, built only on the public CLI subcommands, as the Claude Code pack is. The rule that adapters use only the public CLI already keeps the core unchanged.
 
 ## Open questions
 

@@ -1,4 +1,4 @@
-//! TECHSPEC 6.3 and 6.7 `locate`, 9.3 and 9.5 through the fake herdr script (FR-40, FR-60 to FR-63).
+//! `locate` through the fake herdr script.
 
 mod common;
 
@@ -17,7 +17,7 @@ fn text(b: &[u8]) -> String {
 fn sandbox(scenario: &str, inside: bool) -> Sandbox {
     let mut s = Sandbox::new();
     s.write_config();
-    s.copy_board("work_4_9", "work");
+    s.copy_board("work_example", "work");
     let sc = s.scenario_mut();
     let mut next = sc.clone().fake_scenario(scenario);
     if inside {
@@ -39,7 +39,7 @@ fn log(s: &Sandbox) -> Vec<String> {
 }
 
 #[test]
-fn fr40_locate_live_pane() {
+fn locate_live_pane() {
     let s = sandbox("live-agent", true);
     let (out, _) = locate(&s, &["locate", "W-12"]);
     assert_eq!(out, format!("live w4V:p9\n{BILLING}\n"));
@@ -47,7 +47,7 @@ fn fr40_locate_live_pane() {
 }
 
 #[test]
-fn fr60_locate_moved_pane() {
+fn locate_moved_pane() {
     let s = sandbox("moved", true);
     let (out, _) = locate(&s, &["locate", "W-12"]);
     assert_eq!(out.lines().next(), Some("moved w7Q:p2"), "{out}");
@@ -63,14 +63,14 @@ fn fr60_locate_moved_pane() {
 }
 
 #[test]
-fn fr61_locate_closed_pane() {
+fn locate_closed_pane() {
     let s = sandbox("closed", true);
     let (out, _) = locate(&s, &["locate", "W-12"]);
     assert_eq!(out, format!("closed w4V:p9\n{BILLING}\n"));
 }
 
 #[test]
-fn fr62_locate_outside_herdr() {
+fn locate_outside_herdr() {
     let s = sandbox("live-agent", false);
     let (out, _) = locate(&s, &["locate", "W-12"]);
     assert_eq!(out, format!("not in herdr\n{BILLING}\n"));
@@ -78,7 +78,7 @@ fn fr62_locate_outside_herdr() {
 }
 
 #[test]
-fn fr62_locate_note_without_pane() {
+fn locate_note_without_pane() {
     let s = sandbox("live-agent", true);
     let (out, _) = locate(&s, &["locate", "W-9"]);
     assert_eq!(
@@ -89,7 +89,7 @@ fn fr62_locate_note_without_pane() {
 }
 
 #[test]
-fn fr63_locate_hang_is_not_responding() {
+fn locate_hang_is_not_responding() {
     let s = sandbox("hang", true);
     let (out, took) = locate(&s, &["locate", "W-12"]);
     assert_eq!(out, format!("herdr not responding\n{BILLING}\n"));
@@ -108,7 +108,7 @@ fn ts9_3_locate_herdr_error() {
 }
 
 #[test]
-fn as11_locate_answers_within_3_seconds() {
+fn locate_answers_within_3_seconds() {
     let s = sandbox("slow-then-hang", true);
     let (out, took) = locate(&s, &["locate", "W-12"]);
     assert_eq!(out, format!("herdr not responding\n{BILLING}\n"));
@@ -119,7 +119,7 @@ fn as11_locate_answers_within_3_seconds() {
 }
 
 #[test]
-fn fr40_locate_never_focuses() {
+fn locate_never_focuses() {
     for scenario in ["live-agent", "live-shell", "moved"] {
         let s = sandbox(scenario, true);
         locate(&s, &["locate", "W-12"]);

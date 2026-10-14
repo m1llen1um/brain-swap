@@ -1,4 +1,4 @@
-//! TECHSPEC 6.3 and 6.7 `install herdr`, 9.4: the key binding snippet (FR-64).
+//! `install herdr`: the key binding snippet.
 
 mod common;
 
@@ -37,7 +37,7 @@ fn files(dir: &Path) -> Vec<PathBuf> {
 }
 
 #[test]
-fn fr64_install_herdr_prints_the_snippet() {
+fn install_herdr_prints_the_snippet() {
     let s = Sandbox::new();
     let text = stdout(&s, &["install", "herdr"])
         .replace(FAKE_HERDR, "<fake herdr>")
@@ -46,7 +46,7 @@ fn fr64_install_herdr_prints_the_snippet() {
 }
 
 #[test]
-fn fr64_snippet_names_the_canonical_absolute_path() {
+fn snippet_names_the_canonical_absolute_path() {
     let mut s = Sandbox::new();
     let link = s.root().join("bin/bs");
     fs::create_dir_all(link.parent().unwrap()).unwrap();
@@ -63,7 +63,7 @@ fn fr64_snippet_names_the_canonical_absolute_path() {
 }
 
 #[test]
-fn fr64_install_herdr_never_edits_herdr_config() {
+fn install_herdr_never_edits_herdr_config() {
     let s = Sandbox::new();
     let herdr = s.root().join("config/herdr/config.toml");
     fs::create_dir_all(herdr.parent().unwrap()).unwrap();

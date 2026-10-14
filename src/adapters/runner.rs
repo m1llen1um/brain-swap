@@ -1,4 +1,4 @@
-//! The one process boundary of the herdr adapter (TECHSPEC 2.2, 9.1): herdr runs through its CLI only.
+//! The one process boundary of the herdr adapter: herdr runs through its CLI only.
 
 use crate::core::env::Env;
 use std::io::Read;
@@ -124,7 +124,7 @@ fn drain(stream: Option<impl Read + Send + 'static>) -> mpsc::Receiver<String> {
     rx
 }
 
-/// A scripted `Runner` for in-process tests (TECHSPEC 12.1); it never sleeps and never starts a process.
+/// A scripted `Runner` for in-process tests; it never sleeps and never starts a process.
 #[derive(Debug, Default)]
 pub struct FakeRunner {
     answers: std::collections::HashMap<String, Answer>,

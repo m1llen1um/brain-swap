@@ -1,4 +1,4 @@
-//! TECHSPEC 6.3 `new`, 6.7 Card, 4.3 invalid `board.md`, AS-9 first run.
+//! `new`: the JSON Card, an invalid `board.md` and the first run.
 
 mod common;
 
@@ -28,7 +28,7 @@ fn work(s: &Sandbox) -> std::path::PathBuf {
 }
 
 #[test]
-fn fr13_new_creates_card_from_feature_skeleton() {
+fn new_creates_card_from_feature_skeleton() {
     let s = sandbox();
     let out = run(&s, &["new", "migrate", "invoices", "to", "v13"], 0);
     assert_eq!(
@@ -78,7 +78,7 @@ fn ts6_7_new_json_returns_card() {
 }
 
 #[test]
-fn as9_new_on_first_run_writes_config_and_card() {
+fn new_on_first_run_writes_config_and_card() {
     let s = Sandbox::new();
     let out = run(&s, &["new", "first", "card"], 0);
     let config = s.config_file();
@@ -189,7 +189,7 @@ fn ts6_2_unknown_board_exits_3_listing_boards() {
 }
 
 #[test]
-fn i3_new_template_and_column_flags() {
+fn new_template_and_column_flags() {
     let s = sandbox();
     let out = run(
         &s,
@@ -250,7 +250,7 @@ fn run_in(s: &Sandbox, args: &[&str], stdin: &str, code: i32) -> Output {
 const BODY: &str = "# migrate invoices\n\n## Goal\nswitch reads\n";
 
 #[test]
-fn fr13_new_body_from_stdin_replaces_skeleton() {
+fn new_body_from_stdin_replaces_skeleton() {
     let s = sandbox();
     let out = run_in(&s, &["new", "--body", "-"], BODY, 0);
     assert_eq!(
@@ -303,7 +303,7 @@ fn ts6_3_new_body_later_heading_is_not_title() {
 }
 
 #[test]
-fn r4_new_body_drops_timeline_heading_with_warning() {
+fn new_body_drops_timeline_heading_with_warning() {
     let s = sandbox();
     let stdin = "# t\n## Timeline\n### 2026-10-08T10:00:00+03:00\n- Doing: x\n";
     let out = run_in(&s, &["new", "--body", "-"], stdin, 0);
@@ -339,10 +339,10 @@ fn ts6_3_new_body_flag_accepts_only_dash() {
 }
 
 #[test]
-fn r7_cli_new_without_fixed_clock_succeeds() {
+fn cli_new_without_fixed_clock_succeeds() {
     let mut s = Sandbox::new();
     s.write_config();
-    s.copy_board("work_4_9", "work");
+    s.copy_board("work_example", "work");
     let sc = s.scenario_mut();
     *sc = sc.clone().unset("BRAIN_SWAP_NOW");
     let out = run(&s, &["new", "x"], 0);

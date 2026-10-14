@@ -1,4 +1,4 @@
-//! TECHSPEC 2.2 layering rules, checked by a plain-text scan of `src/`.
+//! Layering rules, checked by a plain-text scan of `src/`.
 
 use std::fs;
 use std::path::Path;
@@ -29,35 +29,35 @@ const RULES: &[(&str, &str, &[&str], &str)] = &[
     ),
     ("src/adapters/", "crate::cli", &[], "adapters import no cli"),
     ("src/adapters/", "crate::tui", &[], "adapters import no tui"),
-    ("src/", "std::net", &[], "no socket (NFR-04)"),
-    ("src/", "TcpStream", &[], "no socket (NFR-04)"),
-    ("src/", "TcpListener", &[], "no socket (NFR-04)"),
-    ("src/", "UdpSocket", &[], "no socket (NFR-04)"),
-    ("src/", "UnixStream", &[], "no socket (NFR-04)"),
-    ("src/", "UnixListener", &[], "no socket (NFR-04)"),
+    ("src/", "std::net", &[], "no socket"),
+    ("src/", "TcpStream", &[], "no socket"),
+    ("src/", "TcpListener", &[], "no socket"),
+    ("src/", "UdpSocket", &[], "no socket"),
+    ("src/", "UnixStream", &[], "no socket"),
+    ("src/", "UnixListener", &[], "no socket"),
     (
         "src/",
         "Command::new",
         &["src/adapters/runner.rs", "src/tui/editor.rs"],
-        "process only in runner or editor (NFR-03)",
+        "process only in runner or editor",
     ),
     (
         "src/",
         "cfg(target_os",
         &[],
-        "one code path for Linux and macOS (NFR-09)",
+        "one code path for Linux and macOS",
     ),
     (
         "tests/",
         "Command::new",
         &["tests/common/spawn.rs", "tests/layering.rs"],
-        "tests spawn only through tests/common/spawn.rs (12.1)",
+        "tests spawn only through tests/common/spawn.rs",
     ),
     (
         "tests/",
         "cargo_bin",
         &["tests/common/spawn.rs", "tests/layering.rs"],
-        "tests spawn only through tests/common/spawn.rs (12.1)",
+        "tests spawn only through tests/common/spawn.rs",
     ),
 ];
 
@@ -168,7 +168,7 @@ fn hits(file: &str, line: usize, text: &str) -> Vec<String> {
 }
 
 #[test]
-fn nfr11_manifest_lists_six_runtime_crates() {
+fn manifest_lists_six_runtime_crates() {
     let text =
         fs::read_to_string(Path::new(env!("CARGO_MANIFEST_DIR")).join("Cargo.toml")).unwrap();
     let manifest: toml::Table = text.parse().unwrap();
@@ -229,7 +229,7 @@ fn ts2_2_adapters_importing_cli_fails() {
 }
 
 #[test]
-fn nfr04_socket_type_anywhere_fails() {
+fn socket_type_anywhere_fails() {
     assert_eq!(
         hits(
             "src/adapters/herdr.rs",
@@ -241,14 +241,14 @@ fn nfr04_socket_type_anywhere_fails() {
 }
 
 #[test]
-fn nfr03_command_outside_runner_and_editor_fails() {
+fn command_outside_runner_and_editor_fails() {
     let line = "let c = Command::new(\"sh\");";
     assert_eq!(hits("src/cli/cmd.rs", 2, line), ["src/cli/cmd.rs:2"]);
     assert!(hits("src/adapters/runner.rs", 2, line).is_empty());
 }
 
 #[test]
-fn nfr09_target_os_cfg_fails() {
+fn target_os_cfg_fails() {
     assert_eq!(
         hits("src/core/store.rs", 6, "#[cfg(target_os = \"linux\")]"),
         ["src/core/store.rs:6"]

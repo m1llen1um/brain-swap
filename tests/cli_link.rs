@@ -1,4 +1,4 @@
-//! TECHSPEC 6.3 `link`, 6.4 session resolution, 6.7 `link`.
+//! `link`, session resolution and its JSON.
 
 mod common;
 
@@ -47,7 +47,7 @@ fn latest_line(s: &Sandbox, id: &str) -> String {
 }
 
 #[test]
-fn fr57_link_sets_reference_and_prints_block() {
+fn link_sets_reference_and_prints_block() {
     let mut s = sandbox();
     let out = s.redact(&text(
         &run(&s, &["link", "W-12", "--session", UUID], 0).stdout,
@@ -104,7 +104,7 @@ fn ts6_3_link_unknown_card_exits_3_changes_nothing() {
 }
 
 #[test]
-fn fr41_link_without_session_exits_1() {
+fn link_without_session_exits_1() {
     let mut s = sandbox();
     let out = run(&s, &["link", "W-12"], 1);
     let err = text(&out.stderr);
@@ -123,7 +123,7 @@ fn fr41_link_without_session_exits_1() {
 }
 
 #[test]
-fn fr41_link_placeholder_session_outside_herdr_exits_1() {
+fn link_placeholder_session_outside_herdr_exits_1() {
     let s = sandbox();
     let out = run(
         &s,
@@ -137,7 +137,7 @@ fn fr41_link_placeholder_session_outside_herdr_exits_1() {
 }
 
 #[test]
-fn fr41_link_inside_herdr_uses_pane_session() {
+fn link_inside_herdr_uses_pane_session() {
     let mut s = sandbox();
     let sc = s.scenario_mut();
     *sc = sc

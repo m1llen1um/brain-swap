@@ -1,4 +1,4 @@
-//! TECHSPEC 6.3 and 6.7 `jump` through the fake herdr script (FR-59, FR-60, AS-10).
+//! `jump` through the fake herdr script.
 
 mod common;
 
@@ -18,7 +18,7 @@ fn sandbox(scenario: &str) -> Sandbox {
 fn sandbox_at(scenario: &str, inside: bool) -> Sandbox {
     let mut s = Sandbox::new();
     s.write_config();
-    s.copy_board("work_4_9", "work");
+    s.copy_board("work_example", "work");
     let sc = s.scenario_mut();
     let mut next = sc.clone().fake_scenario(scenario);
     if inside {
@@ -55,7 +55,7 @@ fn log(s: &Sandbox) -> Vec<String> {
 }
 
 #[test]
-fn fr59_jump_focuses_the_agent_pane() {
+fn jump_focuses_the_agent_pane() {
     let s = sandbox("live-agent");
     assert_eq!(
         jump(&s, &["jump", "W-12"]),
@@ -65,7 +65,7 @@ fn fr59_jump_focuses_the_agent_pane() {
 }
 
 #[test]
-fn fr59_jump_without_agent_focuses_the_tab() {
+fn jump_without_agent_focuses_the_tab() {
     let s = sandbox("live-shell");
     assert_eq!(
         jump(&s, &["jump", "W-12"]),
@@ -78,7 +78,7 @@ fn fr59_jump_without_agent_focuses_the_tab() {
 }
 
 #[test]
-fn as10_jump_to_a_moved_pane_reports_its_new_id() {
+fn jump_to_a_moved_pane_reports_its_new_id() {
     let s = sandbox("moved");
     assert_eq!(jump(&s, &["jump", "W-12"]), "pane moved: now w7Q:p2\n");
     assert_eq!(
@@ -135,7 +135,7 @@ fn ts6_3_jump_focus_timeout_exits_6_not_responding() {
 }
 
 #[test]
-fn fr61_jump_to_a_closed_pane_exits_6() {
+fn jump_to_a_closed_pane_exits_6() {
     let s = sandbox("closed");
     let (out, _) = no_jump(&s, &["jump", "W-12"]);
     assert_eq!(out, format!("closed w4V:p9\n{BILLING}\n"));
@@ -143,7 +143,7 @@ fn fr61_jump_to_a_closed_pane_exits_6() {
 }
 
 #[test]
-fn fr62_jump_outside_herdr_exits_6_without_herdr_call() {
+fn jump_outside_herdr_exits_6_without_herdr_call() {
     let s = sandbox_at("live-agent", false);
     let (out, _) = no_jump(&s, &["jump", "W-12"]);
     assert_eq!(out, format!("not in herdr\n{BILLING}\n"));
@@ -152,7 +152,7 @@ fn fr62_jump_outside_herdr_exits_6_without_herdr_call() {
 }
 
 #[test]
-fn fr62_jump_to_a_note_without_pane_exits_6() {
+fn jump_to_a_note_without_pane_exits_6() {
     let s = sandbox("live-agent");
     let (out, _) = no_jump(&s, &["jump", "W-9"]);
     assert_eq!(
@@ -163,7 +163,7 @@ fn fr62_jump_to_a_note_without_pane_exits_6() {
 }
 
 #[test]
-fn fr63_jump_while_herdr_hangs_exits_6() {
+fn jump_while_herdr_hangs_exits_6() {
     let s = sandbox("hang");
     let (out, took) = no_jump(&s, &["jump", "W-12"]);
     assert_eq!(out, format!("herdr not responding\n{BILLING}\n"));
@@ -191,7 +191,7 @@ fn ts6_3_jump_card_without_note_exits_6() {
 }
 
 #[test]
-fn as11_jump_budget_is_shared_with_focus() {
+fn jump_budget_is_shared_with_focus() {
     let s = sandbox("slow-live-focus-hangs");
     let (out, took) = no_jump(&s, &["jump", "W-12"]);
     assert_eq!(out, format!("herdr not responding\n{BILLING}\n"));

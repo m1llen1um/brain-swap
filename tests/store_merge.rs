@@ -1,4 +1,4 @@
-//! TECHSPEC 4.7, 4.8 R6, 7.6 and 11: merging an editor's bytes with notes parked meanwhile.
+//! Merging an editor's bytes with notes parked meanwhile.
 
 mod common;
 
@@ -18,10 +18,10 @@ use jiff::tz::TimeZone;
 const NOW: &str = "2026-10-08T11:52:00+03:00";
 const WORK_4_9: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/tests/fixtures/boards/work_4_9"
+    "/tests/fixtures/boards/work_example"
 );
 
-/// A temp home holding a copy of `work_4_9` at `<home>/work`, its env, its board and `W-12.md`.
+/// A temp home holding a copy of `work_example` at `<home>/work`, its env, its board and `W-12.md`.
 fn copy() -> (tempfile::TempDir, Env, Board, PathBuf) {
     let tmp = tempfile::tempdir().unwrap();
     let dir = tmp.path().join("work");
@@ -59,7 +59,7 @@ const TITLE: &str = "# migrate invoices to v13\n";
 const NEW_TITLE: &str = "# migrate invoices to v13 (edited)\n";
 
 #[test]
-fn r6_unchanged_file_gets_users_bytes() {
+fn unchanged_file_gets_users_bytes() {
     let (_tmp, env, board, p) = copy();
     let c0 = fs::read_to_string(&p).unwrap();
     let edited = c0.replace(TITLE, NEW_TITLE);
@@ -69,7 +69,7 @@ fn r6_unchanged_file_gets_users_bytes() {
 }
 
 #[test]
-fn r6_note_parked_meanwhile_survives_edit() {
+fn note_parked_meanwhile_survives_edit() {
     let (_tmp, env, board, p) = copy();
     let c0 = fs::read_to_string(&p).unwrap();
     let b = block("parked meanwhile");
@@ -81,7 +81,7 @@ fn r6_note_parked_meanwhile_survives_edit() {
 }
 
 #[test]
-fn r6_two_notes_in_one_second_are_both_kept() {
+fn two_notes_in_one_second_are_both_kept() {
     let (_tmp, env, board, p) = copy();
     let c0 = fs::read_to_string(&p).unwrap();
     let (b1, b2) = (block("first"), block("second"));
@@ -93,7 +93,7 @@ fn r6_two_notes_in_one_second_are_both_kept() {
 }
 
 #[test]
-fn r6_note_deleted_by_user_stays_deleted() {
+fn note_deleted_by_user_stays_deleted() {
     let (_tmp, env, board, p) = copy();
     let c0 = fs::read_to_string(&p).unwrap();
     let first = "\n### 2026-10-08T10:31:05+03:00 auto\n";
@@ -109,7 +109,7 @@ fn r6_note_deleted_by_user_stays_deleted() {
 }
 
 #[test]
-fn r6_file_column_kept_when_user_left_column() {
+fn file_column_kept_when_user_left_column() {
     let (_tmp, env, board, p) = copy();
     let c0 = fs::read_to_string(&p).unwrap();
     fs::write(&p, c0.replace("column: Doing", "column: Done")).unwrap();
@@ -120,7 +120,7 @@ fn r6_file_column_kept_when_user_left_column() {
 }
 
 #[test]
-fn r6_user_column_change_wins() {
+fn user_column_change_wins() {
     let (_tmp, env, board, p) = copy();
     let c0 = fs::read_to_string(&p).unwrap();
     fs::write(&p, c0.replace("column: Doing", "column: Done")).unwrap();
@@ -132,7 +132,7 @@ fn r6_user_column_change_wins() {
 }
 
 #[test]
-fn r6_missing_timeline_in_edit_is_readded_for_merged_notes() {
+fn missing_timeline_in_edit_is_readded_for_merged_notes() {
     let (_tmp, env, board, p) = copy();
     let c0 = fs::read_to_string(&p).unwrap();
     let edited = c0[..c0.find("## Timeline\n").unwrap()].to_string();
@@ -145,7 +145,7 @@ fn r6_missing_timeline_in_edit_is_readded_for_merged_notes() {
 }
 
 #[test]
-fn r6_no_change_writes_nothing() {
+fn no_change_writes_nothing() {
     let (_tmp, env, board, p) = copy();
     let c0 = fs::read_to_string(&p).unwrap();
     let f = format!("{c0}{}", block("parked meanwhile"));

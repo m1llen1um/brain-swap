@@ -1,4 +1,4 @@
-//! TECHSPEC 8.1, 8.8: the binary embeds exactly the four skill files of the pack.
+//! The binary embeds exactly the four skill files of the pack.
 
 mod common;
 

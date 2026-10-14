@@ -1,4 +1,4 @@
-//! Card templates (TECHSPEC 5.4): built-ins and template file parsing.
+//! Card templates: built-ins and template file parsing.
 
 use crate::core::error::{Error, Result};
 use crate::core::frontmatter::{self, FmRead};
@@ -169,19 +169,19 @@ mod tests {
     }
 
     #[test]
-    fn fr11_builtins_are_feature_bug_research_chore() {
+    fn builtins_are_feature_bug_research_chore() {
         let names: Vec<String> = builtins().into_iter().map(|t| t.name).collect();
         assert_eq!(names, ["Feature", "Bug", "Research", "Chore"]);
     }
 
     #[test]
-    fn fr11_builtin_hotkeys_are_f_b_r_c() {
+    fn builtin_hotkeys_are_f_b_r_c() {
         let keys: Vec<Option<char>> = builtins().iter().map(|t| t.key).collect();
         assert_eq!(keys, [Some('f'), Some('b'), Some('r'), Some('c')]);
     }
 
     #[test]
-    fn fr11_builtin_fields_follow_5_4() {
+    fn builtin_fields_follow_5_4() {
         let fields: Vec<Vec<String>> = builtins().iter().map(Template::fields).collect();
         assert_eq!(
             fields,
@@ -195,7 +195,7 @@ mod tests {
     }
 
     #[test]
-    fn fr13_skeleton_is_text_after_frontmatter() {
+    fn skeleton_is_text_after_frontmatter() {
         let feature = &builtins()[0];
         assert!(feature.skeleton.starts_with("## Goal"));
         assert!(!feature.skeleton.contains("---"));
@@ -203,13 +203,13 @@ mod tests {
     }
 
     #[test]
-    fn fr11_fields_skip_fenced_headings() {
+    fn fields_skip_fenced_headings() {
         let t = parse_template("x", "## A\n```\n## B\n```\n").unwrap();
         assert_eq!(t.fields(), ["A"]);
     }
 
     #[test]
-    fn fr12_user_file_adds_template() {
+    fn user_file_adds_template() {
         let tmp = dir_with(
             "spike.md",
             b"---\nname: Spike\nkey: s\n---\n## Hypothesis\n",
@@ -224,7 +224,7 @@ mod tests {
     }
 
     #[test]
-    fn fr12_user_file_replaces_builtin_ignoring_case() {
+    fn user_file_replaces_builtin_ignoring_case() {
         let tmp = dir_with("my-feature.md", b"---\nname: feature\n---\n## Why\n");
         let (ts, _) = load(tmp.path());
         assert_eq!(ts.len(), 4);
@@ -234,7 +234,7 @@ mod tests {
     }
 
     #[test]
-    fn fr12_name_defaults_to_capitalised_stem() {
+    fn name_defaults_to_capitalised_stem() {
         let tmp = dir_with("spike.md", b"---\nkey: s\n---\n## Hypothesis\n");
         let (ts, _) = load(tmp.path());
         assert_eq!(ts[4].name, "Spike");

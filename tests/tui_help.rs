@@ -1,4 +1,4 @@
-//! TECHSPEC 7.1 and 7.2: the Help and Message screens (FR-32, NFR-10).
+//! The Help and Message screens.
 
 mod common;
 
@@ -6,12 +6,12 @@ use brain_swap::core::keys::KeyMap;
 use brain_swap::tui::app::{App, Mode};
 use common::tui::{TuiFixture, assert_no_colour, press, render, rows};
 
-fn work_4_9() -> App {
-    TuiFixture::new(Some("work_4_9")).app()
+fn work_example() -> App {
+    TuiFixture::new(Some("work_example")).app()
 }
 
 fn help() -> App {
-    let mut app = work_4_9();
+    let mut app = work_example();
     app.mode = Mode::Help {
         back: Box::new(Mode::Board),
     };
@@ -19,7 +19,7 @@ fn help() -> App {
 }
 
 fn message() -> App {
-    let mut app = work_4_9();
+    let mut app = work_example();
     app.mode = Mode::Message {
         text: "pane closed\n/w".into(),
         back: Box::new(Mode::Board),
@@ -28,8 +28,8 @@ fn message() -> App {
 }
 
 #[test]
-fn fr32_help_key_opens_help() {
-    let mut app = work_4_9();
+fn help_key_opens_help() {
+    let mut app = work_example();
     assert!(press(&mut app, &["?"]).is_empty());
     assert_eq!(
         app.mode,
@@ -49,7 +49,7 @@ fn ts7_1_any_key_in_help_returns() {
 }
 
 #[test]
-fn fr32_help_lists_every_action_with_default_keys() {
+fn help_lists_every_action_with_default_keys() {
     let rows = rows(&render(&help(), 80, 24));
     assert_eq!(rows[0], " help");
     assert_eq!(
@@ -77,7 +77,7 @@ fn fr32_help_lists_every_action_with_default_keys() {
 }
 
 #[test]
-fn fr32_help_shows_current_keys_after_rebinding() {
+fn help_shows_current_keys_after_rebinding() {
     let mut app = help();
     app.keys = KeyMap::build(&[("open".into(), vec!["x".into()])]).0;
     let rows = rows(&render(&app, 80, 24));
@@ -86,7 +86,7 @@ fn fr32_help_shows_current_keys_after_rebinding() {
 }
 
 #[test]
-fn fr32_help_lists_all_warnings() {
+fn help_lists_all_warnings() {
     let mut app = help();
     app.warnings = vec!["config: unknown key 'colour'".into()];
     app.board.warnings = vec!["W-13: unknown column 'Doign'".into()];

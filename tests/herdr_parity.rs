@@ -1,4 +1,4 @@
-//! NFR-05, FR-58, FR-62, TECHSPEC 9.5: the Core CLI flow is the same inside and outside herdr.
+//! The Core CLI flow is the same inside and outside herdr.
 
 mod common;
 
@@ -70,7 +70,7 @@ fn ids(text: &str) -> BTreeSet<String> {
 }
 
 #[test]
-fn nfr05_cli_flow_exit_codes_match_inside_and_outside_herdr() {
+fn cli_flow_exit_codes_match_inside_and_outside_herdr() {
     for inside in [false, true] {
         let s = sandbox(inside);
         for (args, (code, out)) in FLOW.iter().zip(flow(&s)) {
@@ -80,7 +80,7 @@ fn nfr05_cli_flow_exit_codes_match_inside_and_outside_herdr() {
 }
 
 #[test]
-fn nfr05_cli_flow_output_matches_after_masking_the_pane() {
+fn cli_flow_output_matches_after_masking_the_pane() {
     let outside = flow(&sandbox(false));
     let inside = flow(&sandbox(true));
     for ((args, (_, o)), (_, i)) in FLOW.iter().zip(&outside).zip(&inside) {
@@ -93,7 +93,7 @@ fn nfr05_cli_flow_output_matches_after_masking_the_pane() {
 }
 
 #[test]
-fn nfr05_outside_herdr_runs_no_herdr_command() {
+fn outside_herdr_runs_no_herdr_command() {
     let s = sandbox(false);
     flow(&s);
     let lines = "not in herdr\nWhere: <sandbox>/elsewhere\n";

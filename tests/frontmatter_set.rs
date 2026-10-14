@@ -1,4 +1,4 @@
-//! TECHSPEC 4.2 and 4.8: setting a frontmatter key is a byte splice.
+//! Setting a frontmatter key is a byte splice.
 
 mod common;
 
@@ -11,7 +11,7 @@ fn set_ok(before: &str, key: &str, value: &str) -> String {
 }
 
 #[test]
-fn r2_set_replaces_existing_line_only() {
+fn set_replaces_existing_line_only() {
     let before = "---\ncolumn: Todo\ntemplate: Feature\n---\nbody\n";
     let after = set_ok(before, "column", "Doing");
     assert_eq!(after, "---\ncolumn: Doing\ntemplate: Feature\n---\nbody\n");
@@ -19,7 +19,7 @@ fn r2_set_replaces_existing_line_only() {
 }
 
 #[test]
-fn r2_set_keeps_key_spelling() {
+fn set_keeps_key_spelling() {
     let before = "---\nColumn: Todo\n---\n";
     let after = set_ok(before, "column", "Doing");
     assert_eq!(after, "---\nColumn: Doing\n---\n");
@@ -27,7 +27,7 @@ fn r2_set_keeps_key_spelling() {
 }
 
 #[test]
-fn r2_set_inserts_before_closing_line() {
+fn set_inserts_before_closing_line() {
     let before = "---\ntemplate: Feature\n---\nbody\n";
     let after = set_ok(before, "column", "Doing");
     assert_eq!(after, "---\ntemplate: Feature\ncolumn: Doing\n---\nbody\n");
@@ -35,7 +35,7 @@ fn r2_set_inserts_before_closing_line() {
 }
 
 #[test]
-fn r2_set_prepends_three_line_block() {
+fn set_prepends_three_line_block() {
     let before = "# t\nbody\n";
     let after = set_ok(before, "column", "Doing");
     assert_eq!(after, "---\ncolumn: Doing\n---\n# t\nbody\n");
@@ -47,7 +47,7 @@ fn r2_set_prepends_three_line_block() {
 }
 
 #[test]
-fn r5_inserted_line_uses_crlf_in_crlf_file() {
+fn inserted_line_uses_crlf_in_crlf_file() {
     let before = "---\r\ntemplate: Feature\r\n---\r\nbody\r\n";
     let after = set_ok(before, "column", "Doing");
     assert_eq!(
@@ -58,7 +58,7 @@ fn r5_inserted_line_uses_crlf_in_crlf_file() {
 }
 
 #[test]
-fn r5_prepended_block_uses_dominant_line_ending() {
+fn prepended_block_uses_dominant_line_ending() {
     let before = "# t\r\nbody\r\n";
     let after = set_ok(before, "column", "Doing");
     assert_eq!(after, "---\r\ncolumn: Doing\r\n---\r\n# t\r\nbody\r\n");
@@ -70,7 +70,7 @@ fn r5_prepended_block_uses_dominant_line_ending() {
 }
 
 #[test]
-fn nfr07_unknown_keys_comments_and_continuations_survive() {
+fn unknown_keys_comments_and_continuations_survive() {
     let before = "---\nowner: me\n# c\ncolumn: Todo\ntags:\n  - x\n---\nbody\n";
     let after = set_ok(before, "column", "Done");
     assert_eq!(

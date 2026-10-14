@@ -1,4 +1,4 @@
-//! Frontmatter reader: the flat subset of TECHSPEC 4.2, parsed by hand.
+//! Frontmatter reader: a flat subset of YAML, parsed by hand.
 
 use crate::core::error::{Error, Result};
 
@@ -91,7 +91,7 @@ pub fn read(text: &str) -> FmRead {
     }
 }
 
-/// The dominant line end of `bytes` (TECHSPEC 4.8 R5).
+/// The dominant line end of `bytes`.
 /// CRLF only when CRLF line ends outnumber bare LF ones.
 pub fn line_ending(bytes: &[u8]) -> &'static str {
     let lf = bytes.iter().filter(|&&b| b == b'\n').count();
@@ -99,7 +99,7 @@ pub fn line_ending(bytes: &[u8]) -> &'static str {
     if crlf > lf - crlf { "\r\n" } else { "\n" }
 }
 
-/// Sets `key` to `value` by splicing one line (TECHSPEC 4.2, 4.8 R1, R2).
+/// Sets `key` to `value` by splicing one line.
 /// Every byte outside the changed or inserted line stays identical.
 pub fn set(bytes: &[u8], key: &str, value: &str) -> Result<Vec<u8>> {
     // The block is parsed from the longest valid UTF-8 prefix; bytes after it are only copied.

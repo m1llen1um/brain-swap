@@ -1,4 +1,4 @@
-//! TECHSPEC 10: pruning `sessions/` and `panes/` after 30 days (FR-05).
+//! Pruning `sessions/` and `panes/` after 30 days.
 
 mod common;
 

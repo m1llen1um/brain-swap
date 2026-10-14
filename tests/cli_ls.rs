@@ -1,4 +1,4 @@
-//! TECHSPEC 4.7 extra columns, 5.2, 6.2 `io`, 6.3 `ls` and the picker line, 6.6, 6.7 `ls`, 11.
+//! `ls`: extra columns, `io` errors, the picker line, the best guess and its JSON.
 
 mod common;
 
@@ -156,7 +156,7 @@ fn line2(out: &Output) -> String {
 }
 
 #[test]
-fn fr38_ls_guess_orders_open_cards_by_tier() {
+fn ls_guess_orders_open_cards_by_tier() {
     let s = sandbox();
     let out = run(&s, &["ls", "--open", "--guess"], 0);
     let stdout = text(&out.stdout);
@@ -165,7 +165,7 @@ fn fr38_ls_guess_orders_open_cards_by_tier() {
 }
 
 #[test]
-fn fr38_ls_guess_same_folder_label() {
+fn ls_guess_same_folder_label() {
     let s = sandbox();
     let cwd = s.root().join("acts/src");
     fs::create_dir_all(&cwd).unwrap();
@@ -178,7 +178,7 @@ fn fr38_ls_guess_same_folder_label() {
 }
 
 #[test]
-fn fr38_ls_guess_same_pane_label() {
+fn ls_guess_same_pane_label() {
     let mut s = sandbox();
     let scenario = s.scenario_mut();
     *scenario = scenario.clone().herdr("w4V:p9", "w4V:t1", "w4V");
@@ -199,7 +199,7 @@ fn ts6_6_pane_ignored_outside_herdr() {
 }
 
 #[test]
-fn fr38_ls_guess_linked_here_from_pane_hint() {
+fn ls_guess_linked_here_from_pane_hint() {
     let mut s = sandbox();
     let mut env = common::env::core_env(&s.root().join("home"), "2026-10-08T11:52:00+03:00");
     env.state_home = s.root().join("state");

@@ -1,4 +1,4 @@
-//! TECHSPEC 11 and FR-05: the `BRAIN_SWAP_LOG` sink.
+//! The `BRAIN_SWAP_LOG` sink.
 
 mod common;
 
@@ -58,7 +58,7 @@ fn ts11_event_keeps_existing_lines() {
 }
 
 #[test]
-fn fr05_log_inside_board_folder_is_ignored_with_warning() {
+fn log_inside_board_folder_is_ignored_with_warning() {
     let tmp = tempfile::tempdir().unwrap();
     let work = tmp.path().join("work");
     fs::create_dir(&work).unwrap();
@@ -75,7 +75,7 @@ fn fr05_log_inside_board_folder_is_ignored_with_warning() {
 }
 
 #[test]
-fn fr05_log_outside_board_folders_is_kept() {
+fn log_outside_board_folders_is_kept() {
     let tmp = tempfile::tempdir().unwrap();
     let work = tmp.path().join("work");
     let mut env = core_env(tmp.path(), NOW);
@@ -122,7 +122,7 @@ fn ts11_concurrent_events_do_not_splice_lines() {
 }
 
 #[test]
-fn fr05_log_with_dotdot_inside_board_folder_is_ignored() {
+fn log_with_dotdot_inside_board_folder_is_ignored() {
     let tmp = tempfile::tempdir().unwrap();
     let work = tmp.path().join("work");
     let mut env = core_env(tmp.path(), NOW);
