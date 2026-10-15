@@ -1,4 +1,4 @@
-//! TECHSPEC 5.2 and 7.3: Board navigation, vertical scroll and the column window.
+//! Board navigation, vertical scroll and the column window.
 
 mod common;
 
@@ -63,7 +63,7 @@ fn ts7_3_up_and_down_stop_at_ends() {
 
 #[test]
 fn ts7_3_right_and_left_move_focus_one_column() {
-    let mut app = fixture("work_4_9", sel(0, "W-11"));
+    let mut app = fixture("work_example", sel(0, "W-11"));
     press(&mut app, &["l"]);
     assert_eq!(app.sel, sel(1, "W-12"));
     press(&mut app, &["h"]);
@@ -72,10 +72,10 @@ fn ts7_3_right_and_left_move_focus_one_column() {
 
 #[test]
 fn ts7_3_left_and_right_stop_at_first_and_last_column() {
-    let mut app = fixture("work_4_9", sel(0, "W-11"));
+    let mut app = fixture("work_example", sel(0, "W-11"));
     press(&mut app, &["h"]);
     assert_eq!(app.sel, sel(0, "W-11"));
-    let mut app = fixture("as7", sel(0, "W-11"));
+    let mut app = fixture("hand_edit", sel(0, "W-11"));
     let last = app.board.column_list().len() - 1;
     assert!(app.board.column_list()[last].unknown);
     app.sel = sel(last, "W-13");

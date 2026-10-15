@@ -1,4 +1,4 @@
-//! The detail view of one card on one note (TECHSPEC 7.2).
+//! The detail view of one card on one note.
 
 use ratatui::Frame;
 use ratatui::layout::Rect;
@@ -63,7 +63,7 @@ pub fn draw(frame: &mut Frame, area: Rect, app: &App) {
     frame.render_widget(Paragraph::new(hint_line(&app.keys)), hint);
 }
 
-/// Each Detail action's first binding with its word (TECHSPEC 7.2).
+/// Each Detail action's first binding with its word.
 pub fn hint_line(keys: &KeyMap) -> String {
     let hints = [
         (Action::Down, "older"),
@@ -88,7 +88,7 @@ pub fn note_lines(note: &Note, index: usize, count: usize, now: &Stamp) -> Vec<S
         Age::Now => "now".to_string(),
         a => format!("{a} ago"),
     };
-    // A bad stamp shows the heading text after `### ` (TECHSPEC 4.7).
+    // A bad stamp shows the heading text after `### `.
     let stamp = note.at.as_ref().map_or_else(
         || note.heading.get(4..).unwrap_or_default().trim().to_string(),
         format_stamp,

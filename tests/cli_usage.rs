@@ -1,4 +1,4 @@
-//! TECHSPEC 6.2: usage errors exit 2 and `--help` documents the exit codes.
+//! Usage errors exit 2 and `--help` documents the exit codes.
 
 mod common;
 
@@ -69,7 +69,7 @@ fn ts6_2_usage_error_json_envelope() {
 }
 
 #[test]
-fn fr36_help_documents_exit_codes() {
+fn help_documents_exit_codes() {
     let s = sandbox();
     let out = s.cmd(&["--help"]).assert().code(0).get_output().clone();
     let stdout = text(&out.stdout);

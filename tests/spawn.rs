@@ -1,4 +1,4 @@
-//! TECHSPEC 12.1: the hermetic spawn helper.
+//! The hermetic spawn helper.
 
 mod common;
 

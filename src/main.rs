@@ -22,7 +22,7 @@ fn main() {
     std::process::exit(code);
 }
 
-/// The only place that reads the process environment (TECHSPEC 6.1).
+/// The only place that reads the process environment.
 fn env() -> Result<Env> {
     let cwd = std::env::current_dir().map_err(|e| Error::Io(format!("current dir: {e}")))?;
     let tz = TimeZone::system();

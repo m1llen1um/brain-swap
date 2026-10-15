@@ -1,4 +1,4 @@
-//! Session identity (TECHSPEC 3 I8, 6.4 steps 1, 2 and 4).
+//! Session identity (2 and 4).
 
 use crate::core::env::{Env, encode_file_name};
 use crate::core::error::{Error, Result};
@@ -25,7 +25,7 @@ pub struct Resolution {
     pub warnings: Vec<String>,
 }
 
-/// I8: empty or `$`, `{`, `}` is a placeholder; else valid when `[A-Za-z0-9._-]{1,128}`.
+/// Empty or `$`, `{`, `}` is a placeholder; else valid when `[A-Za-z0-9._-]{1,128}`.
 pub fn check_id(s: &str) -> IdCheck {
     if s.is_empty() || s.contains(['$', '{', '}']) {
         IdCheck::Placeholder
@@ -39,7 +39,8 @@ pub fn check_id(s: &str) -> IdCheck {
     }
 }
 
-/// Steps 1 (`flag`), 2 (`env.session`, empty counts as unset) and 4 of TECHSPEC 6.4; never fails.
+/// Session resolution: `flag` (step 1), else `env.session` (step 2, empty counts as unset), else
+/// none (step 4); never fails.
 /// A `None` session means steps 1 and 2 gave no valid ID; only the caller may then try step 3
 /// (herdr's pane session), `resolve` reads nothing but `env.session` and calls no herdr.
 pub fn resolve(flag: Option<&str>, env: &Env) -> Resolution {
@@ -101,7 +102,7 @@ pub mod stamp_serde {
     }
 }
 
-/// Writes the reference of `session` atomically through `store::write_atomic` (6.4).
+/// Writes the reference of `session` atomically through `store::write_atomic`.
 pub fn write_reference(env: &Env, session: &str, r: &SessionRef) -> Result<()> {
     let path = reference_path(env, session).ok_or(Error::InvalidInput(WARN_INVALID.into()))?;
     let file = RefFile {
@@ -132,7 +133,7 @@ fn write(env: &Env, dir: &std::path::Path, path: &std::path::Path, text: &str) -
     crate::core::store::write_atomic(env, path, text.as_bytes(), &|_| true, None)
 }
 
-/// The reference of `session`; `None` for an invalid ID, a missing or unparsable file (6.4).
+/// The reference of `session`; `None` for an invalid ID, a missing or unparsable file.
 pub fn read_reference(env: &Env, session: &str) -> Option<SessionRef> {
     let text = fs::read_to_string(reference_path(env, session)?).ok()?;
     let f: RefFile = toml::from_str(&text).ok()?;
@@ -145,7 +146,7 @@ pub fn read_reference(env: &Env, session: &str) -> Option<SessionRef> {
     })
 }
 
-/// The pane hint `panes/<pane>`: the card and session last set in that pane (6.4).
+/// The pane hint `panes/<pane>`: the card and session last set in that pane.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct PaneHint {
     pub card: CardId,
@@ -158,7 +159,7 @@ struct HintFile {
     session: String,
 }
 
-/// 6.4: `[A-Za-z0-9:._-]{1,128}`, but neither `.` nor `..`, which name folders.
+/// `[A-Za-z0-9:._-]{1,128}`, but neither `.` nor `..`, which name folders.
 pub fn valid_pane_id(p: &str) -> bool {
     (1..=128).contains(&p.len())
         && p != "."
@@ -181,7 +182,7 @@ pub fn read_pane_hint(env: &Env, pane: &str) -> Option<PaneHint> {
     })
 }
 
-/// Age after which `prune` removes a file from `sessions/` or `panes/` (TECHSPEC 10).
+/// Age after which `prune` removes a file from `sessions/` or `panes/`.
 pub const PRUNE_AFTER: SignedDuration = SignedDuration::from_hours(720);
 
 /// Removes every regular file in `sessions/` and `panes/` whose mtime lies more than

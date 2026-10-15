@@ -1,4 +1,4 @@
-//! brain-swap: module layout of TECHSPEC 2.1, layering of 2.2.
+//! brain-swap: the core, adapters, CLI and TUI modules.
 
 pub mod core {
     pub mod board;
@@ -44,7 +44,7 @@ pub mod tui {
         pub templates: Vec<crate::core::template::Template>,
     }
 
-    /// The checked bare invocation; a config error is carried for ConfigError (FR-45).
+    /// The checked bare invocation; a config error is carried for ConfigError.
     #[derive(Debug)]
     pub struct TuiStart {
         pub config: crate::core::error::Result<crate::core::config::Loaded>,
@@ -68,7 +68,7 @@ pub mod tui {
         Ok(TuiStart { config, board })
     }
 
-    /// The app to start: ConfigError, or the board with its warnings (7.1, 11).
+    /// The app to start: ConfigError, or the board with its warnings.
     pub fn prepare(
         env: &mut crate::core::env::Env,
         start: TuiStart,
@@ -124,7 +124,7 @@ pub mod tui {
         })
     }
 
-    /// `gate` and `prepare`, then the runtime on the real terminal (6.3, 7.5); an error
+    /// `gate` and `prepare`, then the runtime on the real terminal; an error
     /// before it prints on stderr only, with the screen untouched.
     pub fn run(mut env: crate::core::env::Env, board: Option<String>, terminal: bool) -> i32 {
         use runtime::{

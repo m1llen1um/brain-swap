@@ -1,4 +1,4 @@
-//! TECHSPEC 3 (I8) and 6.4: session ID check and resolution, the reference store.
+//! Session ID check and resolution, the reference store.
 
 mod common;
 
@@ -31,33 +31,33 @@ fn res(session: Option<&str>, warnings: &[&str]) -> Resolution {
 }
 
 #[test]
-fn fr41_valid_flag_resolves_without_warning() {
+fn valid_flag_resolves_without_warning() {
     assert_eq!(run(Some(UUID), None), res(Some(UUID), &[]));
 }
 
 #[test]
-fn i8_valid_ids_match_pattern() {
+fn valid_ids_match_pattern() {
     for s in ["a", "A.b_c-1", &"x".repeat(128)] {
         assert_eq!(check_id(s), IdCheck::Valid, "{s}");
     }
 }
 
 #[test]
-fn i8_empty_dollar_or_brace_is_placeholder() {
+fn empty_dollar_or_brace_is_placeholder() {
     for s in ["", "${CLAUDE_SESSION_ID}", "$X", "{x", "x}"] {
         assert_eq!(check_id(s), IdCheck::Placeholder, "{s}");
     }
 }
 
 #[test]
-fn i8_other_bad_ids_are_invalid() {
+fn other_bad_ids_are_invalid() {
     for s in ["a b", "a/b", "é", &"x".repeat(129)] {
         assert_eq!(check_id(s), IdCheck::Invalid, "{s}");
     }
 }
 
 #[test]
-fn fr41_empty_flag_warns_and_falls_back_to_env() {
+fn empty_flag_warns_and_falls_back_to_env() {
     assert_eq!(
         run(Some(""), Some("b")),
         res(Some("b"), &["session id not substituted"])
@@ -65,7 +65,7 @@ fn fr41_empty_flag_warns_and_falls_back_to_env() {
 }
 
 #[test]
-fn fr41_placeholder_flag_without_env_resolves_none() {
+fn placeholder_flag_without_env_resolves_none() {
     assert_eq!(
         run(Some("${CLAUDE_SESSION_ID}"), None),
         res(None, &["session id not substituted"])
@@ -73,7 +73,7 @@ fn fr41_placeholder_flag_without_env_resolves_none() {
 }
 
 #[test]
-fn fr41_invalid_flag_resolves_none_with_warning() {
+fn invalid_flag_resolves_none_with_warning() {
     assert_eq!(run(Some("a b"), None), res(None, &["invalid session id"]));
 }
 
@@ -153,7 +153,7 @@ fn write_raw(env: &Env, name: &str, text: &[u8]) {
 const VALID: &str = "card = \"W-12\"\nboard = \"work\"\nset_at = \"2026-10-08T11:52:00+03:00\"\n";
 
 #[test]
-fn fr57_reference_round_trips() {
+fn reference_round_trips() {
     let home = tempfile::tempdir().unwrap();
     let env = core_env(home.path(), NOW);
     write_reference(&env, "s1", &full()).unwrap();
@@ -183,7 +183,7 @@ fn ts6_4_absent_pane_and_cwd_are_left_out() {
 }
 
 #[test]
-fn fr57_new_session_id_starts_unlinked() {
+fn new_session_id_starts_unlinked() {
     let home = tempfile::tempdir().unwrap();
     let env = core_env(home.path(), NOW);
     write_reference(&env, "s1", &full()).unwrap();
@@ -191,7 +191,7 @@ fn fr57_new_session_id_starts_unlinked() {
 }
 
 #[test]
-fn fr57_setting_again_replaces_reference() {
+fn setting_again_replaces_reference() {
     let home = tempfile::tempdir().unwrap();
     let env = core_env(home.path(), NOW);
     write_reference(&env, "s1", &sref("W-12", None, None)).unwrap();
@@ -248,7 +248,7 @@ fn ts6_4_set_at_without_offset_reads_as_utc() {
 }
 
 #[test]
-fn i8_invalid_session_id_is_neither_written_nor_read() {
+fn invalid_session_id_is_neither_written_nor_read() {
     let home = tempfile::tempdir().unwrap();
     let env = core_env(home.path(), NOW);
     assert_eq!(
@@ -261,7 +261,7 @@ fn i8_invalid_session_id_is_neither_written_nor_read() {
 }
 
 #[test]
-fn fr05_reference_lives_in_state_folder() {
+fn reference_lives_in_state_folder() {
     let tmp = tempfile::tempdir().unwrap();
     let env = core_env(tmp.path(), NOW);
     let board = tmp.path().join("boards/work");
@@ -402,7 +402,7 @@ fn ts6_4_unparsable_hint_reads_as_none() {
 }
 
 #[test]
-fn fr57_hint_outlives_session_change_without_park() {
+fn hint_outlives_session_change_without_park() {
     let home = tempfile::tempdir().unwrap();
     let env = core_env(home.path(), NOW);
     write_reference(&env, "old", &sref("W-11", Some("w4V:p11"), None)).unwrap();

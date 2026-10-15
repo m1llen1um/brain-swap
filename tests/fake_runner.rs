@@ -1,4 +1,4 @@
-//! TECHSPEC 12.1: `FakeRunner` scripts herdr answers for in-process tests without sleeping.
+//! `FakeRunner` scripts herdr answers for in-process tests without sleeping.
 
 use brain_swap::adapters::runner::{Answer, FakeRunner, RunOutcome, RunResult, Runner};
 use std::time::{Duration, Instant};

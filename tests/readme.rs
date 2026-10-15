@@ -1,5 +1,5 @@
-//! TECHSPEC 13: the README's install, pack, herdr key and upgrade
-//! sections (FR-64, FR-67, FR-68).
+//! The README's install, pack, herdr key and upgrade
+//! sections.
 
 mod common;
 
@@ -52,7 +52,7 @@ fn key(text: &str) -> String {
 }
 
 #[test]
-fn fr68_readme_install_lists_three_steps_in_order() {
+fn readme_install_lists_three_steps_in_order() {
     let install = section("## Install");
     assert_three_steps(&install);
     assert!(install.contains("herdr server reload-config"));
@@ -74,7 +74,7 @@ fn ts13_readme_brain_swap_commands_parse() {
 }
 
 #[test]
-fn fr64_readme_herdr_key_matches_install_herdr() {
+fn readme_herdr_key_matches_install_herdr() {
     let s = Sandbox::new();
     let out = s
         .cmd(&["install", "herdr"])
@@ -87,7 +87,7 @@ fn fr64_readme_herdr_key_matches_install_herdr() {
 }
 
 #[test]
-fn fr67_readme_pack_section_names_commands_and_hints() {
+fn readme_pack_section_names_commands_and_hints() {
     let pack = section("## Claude Code pack");
     for word in [
         "/bs-card",

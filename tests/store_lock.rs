@@ -1,4 +1,4 @@
-//! TECHSPEC 10 and 11: the per-board lock in the state folder.
+//! The per-board lock in the state folder.
 
 mod common;
 
@@ -42,7 +42,7 @@ fn contended_wait(env: &brain_swap::core::env::Env, board: &Path) -> Duration {
 }
 
 #[test]
-fn fr05_lock_file_lives_in_state_folder() {
+fn lock_file_lives_in_state_folder() {
     let tmp = tempfile::tempdir().unwrap();
     let env = core_env(tmp.path(), NOW);
     let board = tmp.path().join("b");
@@ -53,7 +53,7 @@ fn fr05_lock_file_lives_in_state_folder() {
 }
 
 #[test]
-fn fr04_lock_creates_missing_board_folder() {
+fn lock_creates_missing_board_folder() {
     let tmp = tempfile::tempdir().unwrap();
     let env = core_env(tmp.path(), NOW);
     let board = tmp.path().join("new/b");

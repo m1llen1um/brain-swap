@@ -1,4 +1,4 @@
-//! Board loading (TECHSPEC 3, 4.1).
+//! Board loading.
 
 use std::cmp::Reverse;
 use std::fs;
@@ -11,7 +11,7 @@ use crate::core::env::Env;
 use crate::core::error::{Error, Result};
 use crate::core::model::{Board, BoardMeta, Card, CardId};
 
-/// Reads the board folder `path`; creates and locks nothing (FR-04).
+/// Reads the board folder `path`; creates and locks nothing.
 pub fn load(name: &str, path: &Path, env: &Env) -> Result<Board> {
     let mut warnings = Vec::new();
     let md = match fs::read(path.join("board.md")) {
@@ -91,7 +91,7 @@ pub fn board_letter(name: &str, path: &Path) -> (char, Vec<String>) {
     (bf.letter, bf.warnings)
 }
 
-/// Loads the first board whose letter is `id.letter` and checks it holds `id` (FR-10).
+/// Loads the first board whose letter is `id.letter` and checks it holds `id`.
 pub fn find_card(boards: &[(String, PathBuf)], id: CardId, env: &Env) -> Result<Board> {
     let not_found = || Error::NotFound(format!("{id} not found"));
     let mut hits = boards
@@ -111,7 +111,7 @@ pub fn find_card(boards: &[(String, PathBuf)], id: CardId, env: &Env) -> Result<
     Ok(b)
 }
 
-/// A board column; `unknown` marks an extra column holding unmatched cards (I5).
+/// A board column; `unknown` marks an extra column holding unmatched cards.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Column {
     pub name: String,
@@ -119,7 +119,7 @@ pub struct Column {
 }
 
 impl Board {
-    /// Configured column names, then the unmatched ones in card number order (I5).
+    /// Configured column names, then the unmatched ones in card number order.
     fn names(&self) -> Vec<&str> {
         let mut v: Vec<&str> = self.meta.columns.iter().map(String::as_str).collect();
         for c in &self.cards {
@@ -146,7 +146,7 @@ impl Board {
             .collect()
     }
 
-    /// The cards of column `column_index`, newest activity first, ties to the higher number (FR-09).
+    /// The cards of column `column_index`, newest activity first, ties to the higher number.
     pub fn cards_in(&self, column_index: usize) -> Vec<&Card> {
         let name = self.names()[column_index];
         let mut v: Vec<&Card> = self.cards.iter().filter(|c| c.column == name).collect();
@@ -154,7 +154,7 @@ impl Board {
         v
     }
 
-    /// Not in the last configured column; extra columns are open (FR-08, I5).
+    /// Not in the last configured column; extra columns are open.
     pub fn is_open(&self, card: &Card) -> bool {
         self.meta.columns.last() != Some(&card.column)
     }
@@ -167,7 +167,7 @@ impl Board {
         self.cards.iter().find(|c| c.id == id)
     }
 
-    /// The configured column matching `name` ignoring case; extra columns never match (6.2, 4.7).
+    /// The configured column matching `name` ignoring case; extra columns never match.
     pub fn column(&self, name: &str) -> Result<&str> {
         let lower = name.to_lowercase();
         self.meta

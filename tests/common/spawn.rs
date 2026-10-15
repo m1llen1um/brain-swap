@@ -1,4 +1,4 @@
-//! The one spawn helper (TECHSPEC 12.1): every process a test starts gets a cleared
+//! The one spawn helper: every process a test starts gets a cleared
 //! environment plus exactly the scenario's variables.
 
 use std::collections::BTreeMap;

@@ -1,4 +1,4 @@
-//! Message and ConfigError: the text, one row per line, wrapped to the width (TECHSPEC 7.2).
+//! Message and ConfigError: the text, one row per line, wrapped to the width.
 
 use ratatui::Frame;
 use ratatui::layout::Rect;

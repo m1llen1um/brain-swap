@@ -1,4 +1,4 @@
-//! `config.toml` (TECHSPEC 5.2) parsed into a `Config`.
+//! `config.toml` parsed into a `Config`.
 
 use crate::core::env::Env;
 use crate::core::error::{Error, Result};
@@ -16,7 +16,7 @@ pub struct Config {
 }
 
 impl Config {
-    /// The board named `name`, ignoring case (6.2).
+    /// The board named `name`, ignoring case.
     pub fn board(&self, name: &str) -> Result<(&str, &Path)> {
         self.boards
             .iter()
@@ -139,7 +139,7 @@ pub fn parse(text: &str, path: &Path, home: &Path) -> Result<(Config, Vec<String
     Ok((config, warnings))
 }
 
-/// A loaded config; `created` is the path this process just wrote on first run (FR-66).
+/// A loaded config; `created` is the path this process just wrote on first run.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Loaded {
     pub config: Config,
@@ -147,7 +147,7 @@ pub struct Loaded {
     pub created: Option<PathBuf>,
 }
 
-/// The 5.2 file with each board at `<data_dir>/<name>`, as `~/...` under `HOME`.
+/// The default config file with each board at `<data_dir>/<name>`, as `~/...` under `HOME`.
 pub fn default_text(env: &Env) -> String {
     let dir = |name: &str| {
         let p = env.default_board_dir(name);
@@ -200,7 +200,7 @@ pub fn load(env: &Env) -> Result<Loaded> {
 }
 
 /// Writes `default_text` to a synced temp file and hard-links it into place, so the
-/// config is never seen half-written and an existing one is never replaced (FR-66).
+/// config is never seen half-written and an existing one is never replaced.
 #[doc(hidden)]
 pub fn write_default(env: &Env) -> Result<Loaded> {
     let path = env.config_file();

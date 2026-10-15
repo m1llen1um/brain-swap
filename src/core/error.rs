@@ -1,14 +1,14 @@
-//! Errors, exit codes and error codes (TECHSPEC 6.2, 11).
+//! Errors, exit codes and error codes.
 
 use std::fmt;
 use std::path::PathBuf;
 
-/// Exit 6: `jump` did not focus the pane; it has no error object (6.2).
+/// Exit 6: `jump` did not focus the pane; it has no error object.
 pub const EXIT_JUMP_NOT_PERFORMED: i32 = 6;
 
 /// Every failure of brain-swap, one line each.
 ///
-/// Exit codes (FR-36, TECHSPEC 6.2):
+/// Exit codes:
 /// - 0 success
 /// - 1 runtime error: `io`, `unreadable`, `invalid_input`, `config`, `verify_failed`
 /// - 2 usage, or the TUI without a terminal: `usage`
@@ -103,19 +103,19 @@ mod tests {
     }
 
     #[test]
-    fn fr36_not_found_exits_3() {
+    fn not_found_exits_3() {
         let e = Error::NotFound(s("W-99 not found"));
         assert_eq!((e.exit_code(), e.code()), (3, "not_found"));
     }
 
     #[test]
-    fn fr36_no_reference_exits_4() {
+    fn no_reference_exits_4() {
         let e = Error::NoReference(s("no session reference"));
         assert_eq!((e.exit_code(), e.code()), (4, "no_reference"));
     }
 
     #[test]
-    fn fr36_busy_exits_5() {
+    fn busy_exits_5() {
         let e = Error::Busy(s("board is busy"));
         assert_eq!((e.exit_code(), e.code()), (5, "busy"));
     }
@@ -141,7 +141,7 @@ mod tests {
     }
 
     #[test]
-    fn fr36_exit_codes_are_distinct() {
+    fn exit_codes_are_distinct() {
         let codes = [
             Error::NotFound(s("x")).exit_code(),
             Error::NoReference(s("x")).exit_code(),

@@ -1,4 +1,4 @@
-//! The process environment read once by `main` (TECHSPEC 5.1, 6.1).
+//! The process environment read once by `main`.
 
 use crate::core::error::{Error, Result};
 use crate::core::failpoint::Failpoint;
@@ -32,7 +32,7 @@ pub struct Env {
 }
 
 impl Env {
-    /// Reads only the 6.1 names from `vars`; `BRAIN_SWAP_NOW` replaces `clock`, both land in `tz` to the second.
+    /// Reads only brain-swap's own names from `vars`; `BRAIN_SWAP_NOW` replaces `clock`, both land in `tz` to the second.
     pub fn from_vars(
         vars: impl IntoIterator<Item = (String, String)>,
         cwd: PathBuf,
@@ -85,7 +85,7 @@ impl Env {
         })
     }
 
-    /// herdr integration is active only for `HERDR_ENV=1` (9.1, FR-58).
+    /// herdr integration is active only for `HERDR_ENV=1`.
     pub fn herdr_active(&self) -> bool {
         self.herdr_env.as_deref() == Some("1")
     }
@@ -127,7 +127,7 @@ impl Env {
     }
 }
 
-/// A path as one file name (10, 6.4): `%` becomes `%25`, then `/` becomes `%2F`.
+/// A path as one file name: `%` becomes `%25`, then `/` becomes `%2F`.
 pub fn encode_file_name(name: &str) -> String {
     name.replace('%', "%25").replace('/', "%2F")
 }

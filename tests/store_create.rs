@@ -1,4 +1,4 @@
-//! TECHSPEC 4.3, 4.6 and R4: creating a card inside the board lock.
+//! Creating a card inside the board lock.
 
 mod common;
 
@@ -20,10 +20,10 @@ use jiff::tz::TimeZone;
 const NOW: &str = "2026-10-08T11:52:00+03:00";
 const WORK_4_9: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/tests/fixtures/boards/work_4_9"
+    "/tests/fixtures/boards/work_example"
 );
 
-/// A temp home holding a copy of `work_4_9` at `<home>/work`.
+/// A temp home holding a copy of `work_example` at `<home>/work`.
 fn copy() -> (tempfile::TempDir, PathBuf) {
     let tmp = tempfile::tempdir().unwrap();
     let dir = tmp.path().join("work");
@@ -83,7 +83,7 @@ fn board_md(dir: &Path) -> String {
 }
 
 #[test]
-fn fr06_create_takes_next_number() {
+fn create_takes_next_number() {
     let (tmp, dir) = copy();
     let c = new(tmp.path(), &dir).unwrap();
     assert_eq!(c.card.id.to_string(), "W-13");
@@ -92,7 +92,7 @@ fn fr06_create_takes_next_number() {
 }
 
 #[test]
-fn fr13_create_uses_template_skeleton() {
+fn create_uses_template_skeleton() {
     let (tmp, dir) = copy();
     let c = new(tmp.path(), &dir).unwrap();
     for h in ["## Goal", "## Acceptance", "## Context"] {
@@ -104,7 +104,7 @@ fn fr13_create_uses_template_skeleton() {
 }
 
 #[test]
-fn fr13_create_uses_supplied_body() {
+fn create_uses_supplied_body() {
     let (tmp, dir) = copy();
     let env = core_env(tmp.path(), NOW);
     let c = new_in(&env, &dir, "new task", None, Some("## Notes\nx\n")).unwrap();
@@ -113,7 +113,7 @@ fn fr13_create_uses_supplied_body() {
 }
 
 #[test]
-fn i3_create_enters_first_column_unless_given() {
+fn create_enters_first_column_unless_given() {
     let (tmp, dir) = copy();
     let env = core_env(tmp.path(), NOW);
     let c = new_in(&env, &dir, "a", None, None).unwrap();
@@ -127,7 +127,7 @@ fn i3_create_enters_first_column_unless_given() {
 }
 
 #[test]
-fn fr04_create_makes_missing_board_folder() {
+fn create_makes_missing_board_folder() {
     let tmp = tempfile::tempdir().unwrap();
     let dir = tmp.path().join("work");
     new(tmp.path(), &dir).unwrap();
@@ -136,7 +136,7 @@ fn fr04_create_makes_missing_board_folder() {
 }
 
 #[test]
-fn nfr06_create_changes_only_next_line_of_board_md() {
+fn create_changes_only_next_line_of_board_md() {
     let (tmp, dir) = copy();
     let before = fs::read(dir.join("board.md")).unwrap();
     let files_before = files(&dir);
@@ -171,7 +171,7 @@ fn ts4_3_create_with_invalid_board_md_is_unreadable() {
 }
 
 #[test]
-fn i4_next_exceeds_every_number_after_create() {
+fn next_exceeds_every_number_after_create() {
     let (tmp, dir) = empty();
     fs::write(dir.join("board.md"), "---\nnext: 3\n---\n").unwrap();
     fs::write(dir.join("W-12.md"), "# old\n").unwrap();
@@ -204,7 +204,7 @@ fn ts6_3_create_with_empty_title_is_invalid_input() {
 }
 
 #[test]
-fn r4_created_card_parses_to_request_values() {
+fn created_card_parses_to_request_values() {
     let (tmp, dir) = copy();
     let env = core_env(tmp.path(), NOW);
     let c = new_in(&env, &dir, "migrate invoices to v13", Some("Doing"), None).unwrap();
@@ -235,7 +235,7 @@ fn ts3_created_is_written_in_local_zone() {
     );
 }
 
-/// A copy of `work_4_9` plus directories `W-<n>.md` for each `n` in `numbers`.
+/// A copy of `work_example` plus directories `W-<n>.md` for each `n` in `numbers`.
 fn copy_with_dirs(numbers: std::ops::RangeInclusive<u32>) -> (tempfile::TempDir, PathBuf) {
     let (tmp, dir) = copy();
     for n in numbers {
@@ -252,7 +252,7 @@ fn temp_files(dir: &Path) -> Vec<String> {
 }
 
 #[test]
-fn fr06_create_skips_name_that_appears_inside_lock() {
+fn create_skips_name_that_appears_inside_lock() {
     let (tmp, dir) = copy_with_dirs(13..=13);
     let c = new(tmp.path(), &dir).unwrap();
     assert_eq!(c.card.id.to_string(), "W-14");
@@ -263,7 +263,7 @@ fn fr06_create_skips_name_that_appears_inside_lock() {
 }
 
 #[test]
-fn fr06_create_never_overwrites_existing_file() {
+fn create_never_overwrites_existing_file() {
     let (tmp, dir) = copy_with_dirs(13..=13);
     let snapshot = |dir: &Path| -> BTreeMap<String, Option<Vec<u8>>> {
         files(dir)
@@ -316,7 +316,7 @@ fn ts4_6_other_link_error_keeps_os_message() {
 }
 
 #[test]
-fn r7_create_with_subsecond_clock_succeeds() {
+fn create_with_subsecond_clock_succeeds() {
     let (tmp, dir) = copy();
     let home = tmp.path().to_string_lossy().into_owned();
     let clock = parse_stamp("2026-10-08T08:52:00.123456789+00:00", &TimeZone::UTC).unwrap();

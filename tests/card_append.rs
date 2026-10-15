@@ -1,4 +1,4 @@
-//! TECHSPEC 4.4 writer and 4.8 R3, R5: rendering and appending a switch note.
+//! Rendering and appending a switch note.
 
 use std::path::{Path, PathBuf};
 
@@ -19,7 +19,7 @@ fn card(bytes: &[u8]) -> Card {
     parse(id, Path::new("W-12.md"), bytes, "Todo", &TimeZone::UTC).card
 }
 
-/// The values of the first note of TECHSPEC 4.9.
+/// The values of the first note of the example board.
 fn note() -> NewNote {
     NewNote {
         at: parse_stamp("2026-10-08T10:31:05+03:00", &TimeZone::UTC).unwrap(),
@@ -50,7 +50,7 @@ fn block() -> String {
 }
 
 #[test]
-fn fr16_append_only_adds_lines_inside_timeline() {
+fn append_only_adds_lines_inside_timeline() {
     let input = fixture("w12_4_9.md");
     let a = append("w12_4_9.md", &input);
     assert_eq!(outside(&a), input);
@@ -64,7 +64,7 @@ fn fr16_append_only_adds_lines_inside_timeline() {
 }
 
 #[test]
-fn fr14_written_note_parses_back() {
+fn written_note_parses_back() {
     let n = note();
     let a = append("w11_4_9.md", &fixture("w11_4_9.md"));
     let last = card(&a.bytes).notes.pop().unwrap();
@@ -85,7 +85,7 @@ fn fr14_written_note_parses_back() {
             session: n.session
         }
     );
-    // The block for the 4.9 first note is the 4.9 text byte for byte.
+    // The block for the example board's first note is its text byte for byte.
     let text = String::from_utf8(fixture("w12_4_9.md")).unwrap();
     assert!(text.contains(&block()), "{}", block());
     insta::assert_snapshot!("note_4_9", block());
@@ -141,7 +141,7 @@ fn ts4_4_place_value_with_comment_end_is_dropped() {
 }
 
 #[test]
-fn fr18_all_empty_parts_rejected() {
+fn all_empty_parts_rejected() {
     let n = NewNote {
         doing: String::new(),
         next: " ".into(),
@@ -156,7 +156,7 @@ fn fr18_all_empty_parts_rejected() {
 }
 
 #[test]
-fn r3_note_goes_before_post_section() {
+fn note_goes_before_post_section() {
     let input = fixture("post_section.md");
     let a = append("post_section.md", &input);
     assert!(a.bytes[..a.inserted.start].ends_with(b"- Watch out: f\n"));
@@ -167,7 +167,7 @@ fn r3_note_goes_before_post_section() {
 }
 
 #[test]
-fn r3_missing_timeline_is_appended_at_end() {
+fn missing_timeline_is_appended_at_end() {
     let input = fixture("no_timeline.md");
     let a = append("no_timeline.md", &input);
     let want = [&input[..], b"\n## Timeline\n", block().as_bytes()].concat();
@@ -175,7 +175,7 @@ fn r3_missing_timeline_is_appended_at_end() {
 }
 
 #[test]
-fn r5_missing_final_newline_added_before_block() {
+fn missing_final_newline_added_before_block() {
     let input = fixture("no_final_newline.md");
     let a = append("no_final_newline.md", &input);
     let want = [&input[..], b"\n", block().as_bytes()].concat();
@@ -183,7 +183,7 @@ fn r5_missing_final_newline_added_before_block() {
 }
 
 #[test]
-fn r5_block_uses_crlf_in_crlf_card() {
+fn block_uses_crlf_in_crlf_card() {
     let lf = String::from_utf8(fixture("w12_4_9.md")).unwrap();
     let input = lf.replace('\n', "\r\n").into_bytes();
     let a = append("w12_4_9.md", &input);
@@ -208,7 +208,7 @@ fn ts4_7_append_to_read_only_card_is_unreadable() {
 }
 
 #[test]
-fn nfr07_bytes_around_block_identical_with_unknown_keys() {
+fn bytes_around_block_identical_with_unknown_keys() {
     let input = fixture("unknown_keys.md");
     let a = append("unknown_keys.md", &input);
     assert_eq!(outside(&a), input);

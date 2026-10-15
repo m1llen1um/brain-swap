@@ -1,4 +1,4 @@
-//! PRD AS-6 end to end: TUI and CLI only, no Claude (FR-25, FR-59), no terminal, no real herdr.
+//! End to end: TUI and CLI only, no Claude, no terminal, no real herdr.
 
 mod common;
 
@@ -13,8 +13,8 @@ use std::fs;
 const SHELL: &str = include_str!("fixtures/herdr/pane_shell.json");
 
 #[test]
-fn as6_tui_card_park_from_shell_and_enter_focuses_the_tab() {
-    let fx = TuiFixture::new(Some("as6"));
+fn tui_card_park_from_shell_and_enter_focuses_the_tab() {
+    let fx = TuiFixture::new(Some("no_claude"));
     let w12 = CardId {
         letter: 'W',
         number: 12,
@@ -40,7 +40,7 @@ fn as6_tui_card_park_from_shell_and_enter_focuses_the_tab() {
 
     let s = Scenario::new(fx.home.parent().unwrap())
         .herdr("w4V:p3", "w4V:t2", "w4V")
-        .fake_scenario("as6-shell");
+        .fake_scenario("plain-shell");
     let out = brain_swap(&s)
         .args(["park", "--card", "W-12"])
         .current_dir(&fx.home)

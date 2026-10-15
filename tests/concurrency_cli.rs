@@ -1,4 +1,4 @@
-//! TECHSPEC 10 and 12.1 (concurrency, process level), FR-16, AS-8: parallel `park`, `move` and `new`.
+//! Concurrency at process level: parallel `park`, `move` and `new`.
 
 mod common;
 
@@ -118,7 +118,7 @@ fn ts12_1_parallel_creations_get_distinct_ids() {
 }
 
 #[test]
-fn as8_two_parks_on_different_cards_in_one_second() {
+fn two_parks_on_different_cards_in_one_second() {
     let s = sandbox("work");
     let read = |name: &str| fs::read(dir(&s).join(name)).unwrap();
     let names = ["W-9.md", "W-11.md", "board.md", "W-12.md", "W-7.md"];
@@ -141,7 +141,7 @@ fn as8_two_parks_on_different_cards_in_one_second() {
 }
 
 #[test]
-fn as8_two_parks_on_one_card_append_both() {
+fn two_parks_on_one_card_append_both() {
     let s = sandbox("work");
     let path = dir(&s).join("W-12.md");
     let before = fs::read_to_string(&path).unwrap();

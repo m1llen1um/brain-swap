@@ -1,4 +1,4 @@
-//! The 6.1 and 6.3 command line surface.
+//! The command line surface.
 
 use crate::core::model::CardId;
 use clap::{Parser, Subcommand};
@@ -8,7 +8,7 @@ fn card_id(s: &str) -> Result<CardId, String> {
     CardId::parse(s).ok_or_else(|| format!("invalid card ID '{s}'"))
 }
 
-/// The TECHSPEC 6.2 exit code table, also in README.
+/// The exit code table, also in README.
 const EXIT_CODES: &str = "Exit codes:
   0 success
   1 runtime error

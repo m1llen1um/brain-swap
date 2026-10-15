@@ -1,4 +1,4 @@
-//! NFR-10: keyboard accessibility of the defaults and the shell screens (TECHSPEC 5.2, 7.3).
+//! Keyboard accessibility of the defaults and the shell screens.
 
 mod common;
 
@@ -8,7 +8,7 @@ use brain_swap::tui::app::{App, Effect, Mode};
 use common::tui::{NOW, TuiFixture, assert_no_colour, press, render, rows};
 
 fn board() -> App {
-    TuiFixture::new(Some("work_4_9")).app()
+    TuiFixture::new(Some("work_example")).app()
 }
 
 fn with_mode(mode: Mode) -> App {
@@ -36,7 +36,7 @@ fn config_error() -> App {
 }
 
 #[test]
-fn nfr10_every_action_has_a_default_key() {
+fn every_action_has_a_default_key() {
     let keys = KeyMap::defaults();
     assert_eq!(Action::all().count(), 17);
     for a in Action::all() {
@@ -45,7 +45,7 @@ fn nfr10_every_action_has_a_default_key() {
 }
 
 #[test]
-fn nfr10_defaults_need_no_modifier_beyond_shift_except_scrolling() {
+fn defaults_need_no_modifier_beyond_shift_except_scrolling() {
     let keys = KeyMap::defaults();
     for a in Action::all() {
         let scroll = matches!(a, Action::ScrollDown | Action::ScrollUp);
@@ -57,7 +57,7 @@ fn nfr10_defaults_need_no_modifier_beyond_shift_except_scrolling() {
 }
 
 #[test]
-fn nfr10_shell_modes_have_a_default_way_out() {
+fn shell_modes_have_a_default_way_out() {
     for (mut app, k, out) in [
         (help(), "x", None),
         (message(), "x", None),
@@ -76,7 +76,7 @@ fn nfr10_shell_modes_have_a_default_way_out() {
 }
 
 #[test]
-fn nfr10_help_fits_80x24() {
+fn help_fits_80x24() {
     let rows = rows(&render(&help(), 80, 24));
     for a in Action::all() {
         let name = format!(" {:<14}", a.config_name());
@@ -89,7 +89,7 @@ fn nfr10_help_fits_80x24() {
 }
 
 #[test]
-fn nfr10_shell_screens_use_no_colour() {
+fn shell_screens_use_no_colour() {
     let mut status = board();
     status.status = Some("move failed: card 4 is locked".into());
     for app in [help(), message(), config_error(), status] {

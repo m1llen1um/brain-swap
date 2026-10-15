@@ -1,4 +1,4 @@
-//! TECHSPEC 4.8 R2, R7, 6.2 and 10: moving a card between columns.
+//! Moving a card between columns.
 
 mod common;
 
@@ -15,11 +15,11 @@ use std::path::{Path, PathBuf};
 const NOW: &str = "2026-10-08T11:52:00+03:00";
 const WORK_4_9: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/tests/fixtures/boards/work_4_9"
+    "/tests/fixtures/boards/work_example"
 );
 const CARDS: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/cards");
 
-/// A temp home holding a copy of `work_4_9` at `<home>/work`.
+/// A temp home holding a copy of `work_example` at `<home>/work`.
 fn copy() -> (tempfile::TempDir, PathBuf) {
     let tmp = tempfile::tempdir().unwrap();
     let dir = tmp.path().join("work");
@@ -54,7 +54,7 @@ fn files(dir: &Path) -> Vec<(PathBuf, Vec<u8>)> {
 }
 
 #[test]
-fn nfr06_move_changes_only_column_line() {
+fn move_changes_only_column_line() {
     let (tmp, dir) = copy();
     let path = dir.join("W-12.md");
     let before = fs::read(&path).unwrap();
@@ -119,7 +119,7 @@ fn ts4_7_move_of_read_only_card_is_unreadable() {
 }
 
 #[test]
-fn nfr06_move_adds_frontmatter_to_card_without_one() {
+fn move_adds_frontmatter_to_card_without_one() {
     let (tmp, dir) = copy();
     let path = dir.join("W-20.md");
     fs::write(&path, "# spike on caching\n").unwrap();
@@ -154,7 +154,7 @@ fn ts6_2_move_to_current_column_in_other_case_writes_nothing() {
 }
 
 #[test]
-fn r7_verify_move_accepts_every_writable_fixture() {
+fn verify_move_accepts_every_writable_fixture() {
     let mut n = 0;
     for e in fs::read_dir(CARDS).unwrap() {
         let name = e.unwrap().file_name().into_string().unwrap();

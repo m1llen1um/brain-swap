@@ -1,4 +1,4 @@
-//! Best guess: the order of a board's open cards (TECHSPEC 6.6, FR-38).
+//! Best guess: the order of a board's open cards.
 
 use std::cmp::Reverse;
 use std::path::{Path, PathBuf};
@@ -7,7 +7,7 @@ use crate::core::env::Env;
 use crate::core::model::{Board, Card, CardId};
 use crate::core::session;
 
-/// A candidate's tier, best first (6.6).
+/// A candidate's tier, best first.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Tier {
     LinkedHere,
@@ -18,7 +18,7 @@ pub enum Tier {
 }
 
 impl Tier {
-    /// The JSON `reason` (6.6, 6.7).
+    /// The JSON `reason`.
     pub fn reason(&self) -> &'static str {
         match self {
             Tier::LinkedHere => "linked_here",
@@ -29,7 +29,7 @@ impl Tier {
         }
     }
 
-    /// The text label; tiers 3 and 4 have none (6.6).
+    /// The text label; tiers 3 and 4 have none.
     pub fn label(&self) -> Option<&'static str> {
         match self {
             Tier::LinkedHere => Some("linked here"),
@@ -71,7 +71,7 @@ impl GuessInput {
     }
 }
 
-/// The open cards of `board` in 6.6 order; pure: no `Env`, no I/O, no clock.
+/// The open cards of `board` in best-guess order; pure: no `Env`, no I/O, no clock.
 pub fn best_guess<'a>(board: &'a Board, input: &GuessInput) -> Vec<Candidate<'a>> {
     let cols = &board.meta.columns;
     let middle = cols
@@ -105,7 +105,7 @@ pub fn best_guess<'a>(board: &'a Board, input: &GuessInput) -> Vec<Candidate<'a>
     v
 }
 
-/// 6.6 tier 2, lexical and component-wise (`Path::starts_with`); a `/` or `$HOME` note cwd never contains the current one.
+/// Tier 2, lexical and component-wise (`Path::starts_with`); a `/` or `$HOME` note cwd never contains the current one.
 fn same_folder(c: &Path, input: &GuessInput) -> bool {
     c.starts_with(&input.cwd)
         || (input.cwd.starts_with(c) && c != Path::new("/") && c != input.home)

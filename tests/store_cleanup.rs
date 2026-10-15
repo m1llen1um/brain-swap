@@ -1,4 +1,4 @@
-//! TECHSPEC 4.6 and 10: cleanup of stale temp files and old session files after store writes (FR-05).
+//! Cleanup of stale temp files and old session files after store writes.
 
 mod common;
 
@@ -19,10 +19,10 @@ use jiff::tz::TimeZone;
 const NOW: &str = "2026-10-08T11:52:00+03:00";
 const WORK_4_9: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/tests/fixtures/boards/work_4_9"
+    "/tests/fixtures/boards/work_example"
 );
 
-/// A temp home holding a copy of `work_4_9` at `<home>/work`, its env and its board.
+/// A temp home holding a copy of `work_example` at `<home>/work`, its env and its board.
 fn copy() -> (tempfile::TempDir, Env, Board) {
     let tmp = tempfile::tempdir().unwrap();
     let dir = tmp.path().join("work");

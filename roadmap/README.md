@@ -1,6 +1,6 @@
 # Roadmap
 
-Feature candidates for brain-swap. None is scheduled. A candidate becomes work by updating `idea.md`, `PRD.md` and `TECHSPEC.md` to include it.
+Feature candidates for brain-swap. None is scheduled.
 
 | Candidate | Summary |
 |---|---|

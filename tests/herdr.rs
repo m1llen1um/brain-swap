@@ -1,8 +1,8 @@
-//! TECHSPEC 9.1, 9.5: `capture` builds the herdr place from `HERDR_*` and runs no herdr command.
-//! TECHSPEC 9.2: `pane_session` reads the current pane's agent session in at most one call.
-//! TECHSPEC 9.3: `locate` turns a note's place into a `PaneStatus`.
-//! TECHSPEC 9.3: `locate` and its callers share a 3 second budget, each call asking for `min(2 s, rest)`.
-//! TECHSPEC 9.3: `focus` uses `agent focus` for an agent pane, else `workspace focus` then `tab focus`.
+//! `capture` builds the herdr place from `HERDR_*` and runs no herdr command.
+//! `pane_session` reads the current pane's agent session in at most one call.
+//! `locate` turns a note's place into a `PaneStatus`.
+//! `locate` and its callers share a 3 second budget, each call asking for `min(2 s, rest)`.
+//! `focus` uses `agent focus` for an agent pane, else `workspace focus` then `tab focus`.
 
 mod common;
 
@@ -30,7 +30,7 @@ fn env(herdr: Option<&str>, pane: Option<&str>, tab: Option<&str>, ws: Option<&s
 }
 
 #[test]
-fn fr15_capture_builds_place_from_herdr_variables() {
+fn capture_builds_place_from_herdr_variables() {
     let fake = FakeRunner::new();
     let e = env(Some("1"), Some("w4V:p9"), Some("w4V:t1"), Some("w4V"));
     assert_eq!(
@@ -45,14 +45,14 @@ fn fr15_capture_builds_place_from_herdr_variables() {
 }
 
 #[test]
-fn fr58_no_capture_outside_herdr() {
+fn no_capture_outside_herdr() {
     let fake = FakeRunner::new();
     let e = env(None, Some("w4V:p9"), Some("w4V:t1"), Some("w4V"));
     assert_eq!(capture(&e, &fake), None);
 }
 
 #[test]
-fn fr58_herdr_env_must_be_1() {
+fn herdr_env_must_be_1() {
     let fake = FakeRunner::new();
     for v in ["0", "true"] {
         let e = env(Some(v), Some("w4V:p9"), Some("w4V:t1"), Some("w4V"));
@@ -90,7 +90,7 @@ fn answering(answer: Answer) -> FakeRunner {
 }
 
 #[test]
-fn fr41_pane_session_returns_agent_session_value() {
+fn pane_session_returns_agent_session_value() {
     let fake = answering(Answer::ok(AGENT));
     assert_eq!(
         pane_session(&in_pane(), &fake),
@@ -101,14 +101,14 @@ fn fr41_pane_session_returns_agent_session_value() {
 }
 
 #[test]
-fn fr41_pane_without_agent_returns_none() {
+fn pane_without_agent_returns_none() {
     let fake = answering(Answer::ok(SHELL));
     assert_eq!(pane_session(&in_pane(), &fake), None);
     assert_eq!(fake.calls().len(), 1);
 }
 
 #[test]
-fn fr58_pane_session_outside_herdr_calls_nothing() {
+fn pane_session_outside_herdr_calls_nothing() {
     let fake = FakeRunner::new();
     let e = env(None, Some("w4V:p9"), None, None);
     assert_eq!(pane_session(&e, &fake), None);
@@ -144,7 +144,7 @@ fn ts9_2_unreadable_answer_returns_none() {
     assert_eq!(fake.calls().len(), 1);
 }
 
-/// The place of W-12's second note in the 4.9 board.
+/// The place of W-12's second note in the example board.
 fn w12_place() -> Place {
     Place {
         cwd: Some("/home/smilen/Work/ati.billing".into()),
@@ -176,7 +176,7 @@ fn live(status: PaneStatus) -> LivePane {
 }
 
 #[test]
-fn fr62_outside_herdr_is_outside_without_call() {
+fn outside_herdr_is_outside_without_call() {
     let fake = FakeRunner::new();
     let e = env(None, None, None, None);
     assert_eq!(locate(&w12_place(), &e, &fake), PaneStatus::OutsideHerdr);
@@ -184,7 +184,7 @@ fn fr62_outside_herdr_is_outside_without_call() {
 }
 
 #[test]
-fn nfr05_pane_variables_alone_do_not_enable_herdr() {
+fn pane_variables_alone_do_not_enable_herdr() {
     let fake = FakeRunner::new();
     let e = env(None, Some("w4V:p11"), None, None);
     assert_eq!(locate(&w12_place(), &e, &fake), PaneStatus::OutsideHerdr);
@@ -192,7 +192,7 @@ fn nfr05_pane_variables_alone_do_not_enable_herdr() {
 }
 
 #[test]
-fn fr62_note_without_pane_is_no_pane_without_call() {
+fn note_without_pane_is_no_pane_without_call() {
     let fake = FakeRunner::new();
     let place = Place {
         cwd: Some("/home/smilen/Work/private/brain-swap".into()),
@@ -203,7 +203,7 @@ fn fr62_note_without_pane_is_no_pane_without_call() {
 }
 
 #[test]
-fn fr40_live_pane_is_live() {
+fn live_pane_is_live() {
     let fake = FakeRunner::new().on("pane get w4V:p9", Answer::ok(AGENT));
     assert_eq!(
         locate(&w12_place(), &in_herdr(), &fake),
@@ -260,7 +260,7 @@ fn ts9_3_unreadable_live_answer_is_herdr_error() {
 }
 
 #[test]
-fn fr60_old_id_of_moved_pane_is_moved() {
+fn old_id_of_moved_pane_is_moved() {
     let answer = agent_with(|p| {
         p["pane_id"] = "w7Q:p2".into();
         p["tab_id"] = "w7Q:t1".into();
@@ -287,7 +287,7 @@ fn locate_failing(place: &Place, answer: Answer) -> (PaneStatus, Vec<String>) {
 }
 
 #[test]
-fn fr61_pane_not_found_without_session_is_closed() {
+fn pane_not_found_without_session_is_closed() {
     let place = Place {
         session: None,
         ..w12_place()
@@ -298,7 +298,7 @@ fn fr61_pane_not_found_without_session_is_closed() {
 }
 
 #[test]
-fn fr63_pane_get_timeout_is_not_responding() {
+fn pane_get_timeout_is_not_responding() {
     let (status, calls) = locate_failing(&w12_place(), Answer::Hang);
     assert_eq!(status, PaneStatus::NotResponding);
     assert_eq!(calls, ["pane get w4V:p9"]);
@@ -369,7 +369,7 @@ fn search(fake: &dyn Runner) -> PaneStatus {
 }
 
 #[test]
-fn fr60_moved_pane_found_by_session() {
+fn moved_pane_found_by_session() {
     let fake = moved();
     assert_eq!(
         search(&fake),
@@ -400,7 +400,7 @@ fn ts9_3_moved_search_stops_at_first_match() {
 }
 
 #[test]
-fn fr61_no_pane_with_the_session_is_closed() {
+fn no_pane_with_the_session_is_closed() {
     let shell = panes_with(PANES_W7Q, |panes| {
         panes[0] = serde_json::json!({
             "agent_status": "unknown",
@@ -496,7 +496,7 @@ fn ts9_3_spent_budget_times_out_without_calling() {
 }
 
 #[test]
-fn as11_locate_ends_the_moved_search_at_3_seconds() {
+fn locate_ends_the_moved_search_at_3_seconds() {
     let fake = FakeRunner::new()
         .on(
             "pane get w4V:p9",
@@ -560,14 +560,14 @@ const WS_FOCUS: &str = "workspace focus w4V";
 const TAB_FOCUS: &str = "tab focus w4V:t1";
 
 #[test]
-fn fr59_agent_pane_is_focused_with_agent_focus() {
+fn agent_pane_is_focused_with_agent_focus() {
     let fake = FakeRunner::new().on(AGENT_FOCUS, Answer::ok(""));
     assert_eq!(focus(&w4v_p9(true), &fake), Ok(Focused::Agent));
     assert_eq!(fake.calls(), [AGENT_FOCUS]);
 }
 
 #[test]
-fn fr59_pane_without_agent_focuses_workspace_then_tab() {
+fn pane_without_agent_focuses_workspace_then_tab() {
     let fake = FakeRunner::new()
         .on(WS_FOCUS, Answer::ok(""))
         .on(TAB_FOCUS, Answer::ok(""));
@@ -576,7 +576,7 @@ fn fr59_pane_without_agent_focuses_workspace_then_tab() {
 }
 
 #[test]
-fn fr59_failed_agent_focus_falls_back_to_tab() {
+fn failed_agent_focus_falls_back_to_tab() {
     let fake = FakeRunner::new()
         .on(AGENT_FOCUS, Answer::fail(1, "x"))
         .on(WS_FOCUS, Answer::ok(""))
@@ -636,7 +636,7 @@ fn ts9_3_tab_focus_timeout_is_not_responding() {
 }
 
 #[test]
-fn fr60_moved_pane_is_focused_by_its_new_id() {
+fn moved_pane_is_focused_by_its_new_id() {
     let fake = FakeRunner::new().on("agent focus w7Q:p2", Answer::ok(""));
     let p = LivePane {
         pane: "w7Q:p2".into(),

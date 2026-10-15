@@ -1,4 +1,4 @@
-//! The external editor on a copy of the card, merged back through `core::store` (TECHSPEC 7.6).
+//! The external editor on a copy of the card, merged back through `core::store`.
 
 use std::fs;
 use std::io::{self, ErrorKind};
@@ -29,7 +29,7 @@ pub fn copy_path(env: &Env, board: &str, id: CardId) -> PathBuf {
     env.edit_dir().join(format!("{board}-{id}.md"))
 }
 
-/// The editor command for `copy` (TECHSPEC 5.2).
+/// The editor command for `copy`.
 pub fn editor_argv(config_editor: &str, env: &Env, copy: &Path) -> Vec<String> {
     let editor = [
         Some(config_editor),
@@ -46,7 +46,7 @@ pub fn editor_argv(config_editor: &str, env: &Env, copy: &Path) -> Vec<String> {
 }
 
 /// Copies `C0`, runs the editor on the copy between `leave` and `enter`, merges a zero-exit save.
-/// Holds no lock: only `merge_edit` takes one (TECHSPEC 10).
+/// Holds no lock: only `merge_edit` takes one.
 pub fn edit_card(
     env: &Env,
     board: &Board,
@@ -78,7 +78,7 @@ fn edit(
     fs::write(&copy, &c0)?;
     let argv = editor_argv(config_editor, env, &copy);
     guard.leave()?;
-    // A non-zero exit or a launch error writes nothing and keeps the copy (7.6).
+    // A non-zero exit or a launch error writes nothing and keeps the copy.
     let failed = match launcher.launch(&argv) {
         Ok(s) if s.success() => None,
         Ok(s) => Some(s.to_string()),

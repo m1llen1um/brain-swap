@@ -1,4 +1,4 @@
-//! The `BRAIN_SWAP_LOG` sink (TECHSPEC 11, FR-05).
+//! The `BRAIN_SWAP_LOG` sink.
 
 use crate::core::env::Env;
 use crate::core::time::format_stamp;
@@ -19,7 +19,7 @@ pub fn event(env: &Env, kind: &str, text: &str) {
     }
 }
 
-/// Drops a log path that lies inside a board folder and returns the warning (FR-05).
+/// Drops a log path that lies inside a board folder and returns the warning.
 pub fn guard_board_folders(env: &mut Env, boards: &[(String, PathBuf)]) -> Option<String> {
     let log = lexical(&env.cwd.join(env.log.as_ref()?));
     let (name, _) = boards

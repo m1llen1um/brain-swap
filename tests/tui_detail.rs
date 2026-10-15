@@ -1,4 +1,4 @@
-//! TECHSPEC 5.2, 7.1 and 7.2: opening the detail view (FR-26, FR-27).
+//! Opening the detail view.
 
 mod common;
 
@@ -20,9 +20,9 @@ fn w12_detail() -> Mode {
     }
 }
 
-/// The `work_4_9` app with W-12 (Doing) selected.
+/// The `work_example` app with W-12 (Doing) selected.
 fn board_on_w12() -> App {
-    let mut app = TuiFixture::new(Some("work_4_9")).app();
+    let mut app = TuiFixture::new(Some("work_example")).app();
     app.sel = Selection {
         column: 1,
         card: Some(W12),
@@ -41,28 +41,28 @@ fn detail_rows() -> Vec<String> {
 }
 
 #[test]
-fn fr26_open_shows_newest_note() {
+fn open_shows_newest_note() {
     let mut app = board_on_w12();
     assert!(press(&mut app, &["o"]).is_empty());
     assert_eq!(app.mode, w12_detail());
 }
 
 #[test]
-fn fr26_open_without_selected_card_does_nothing() {
+fn open_without_selected_card_does_nothing() {
     let mut app = TuiFixture::new(None).app();
     assert!(press(&mut app, &["o"]).is_empty());
     assert_eq!(app.mode, Mode::Board);
 }
 
 #[test]
-fn fr27_detail_header_shows_id_title_column_and_board() {
+fn detail_header_shows_id_title_column_and_board() {
     let buf = render(&detail_on_w12(), 80, 24);
     assert_eq!(rows(&buf)[0], " W-12 migrate invoices to v13 (Doing, work)");
     assert_no_colour(&buf);
 }
 
 #[test]
-fn fr26_note_line_shows_indicator_stamp_and_age() {
+fn note_line_shows_indicator_stamp_and_age() {
     assert_eq!(
         detail_rows()[1],
         " note 2/2, 2026-10-08T11:12:40+03:00, 39 min ago"
@@ -70,7 +70,7 @@ fn fr26_note_line_shows_indicator_stamp_and_age() {
 }
 
 #[test]
-fn fr27_detail_shows_three_parts() {
+fn detail_shows_three_parts() {
     assert_eq!(
         detail_rows()[2..5],
         [
@@ -82,7 +82,7 @@ fn fr27_detail_shows_three_parts() {
 }
 
 #[test]
-fn fr27_where_line_shows_cwd_and_pane() {
+fn where_line_shows_cwd_and_pane() {
     assert_eq!(
         detail_rows()[5],
         " Where: /home/smilen/Work/ati.billing (pane w4V:p9)"
@@ -125,7 +125,7 @@ fn board_on_w5() -> App {
 }
 
 #[test]
-fn as1_j_shows_older_note_and_k_newest_again() {
+fn j_shows_older_note_and_k_newest_again() {
     let mut app = detail_on_w12();
     assert!(press(&mut app, &["j"]).is_empty());
     let rows = rows(&render(&app, 80, 24));
@@ -142,7 +142,7 @@ fn as1_j_shows_older_note_and_k_newest_again() {
 }
 
 #[test]
-fn fr26_note_navigation_clamps() {
+fn note_navigation_clamps() {
     let mut app = detail_on_w12();
     press(&mut app, &["k"]);
     assert!(note_row(&app).starts_with(" note 2/2,"));
@@ -151,7 +151,7 @@ fn fr26_note_navigation_clamps() {
 }
 
 #[test]
-fn fr26_indicator_counts_from_oldest() {
+fn indicator_counts_from_oldest() {
     let mut app = board_on_w5();
     for (k, want) in [
         ("o", " note 3/3,"),
@@ -175,7 +175,7 @@ fn ts5_2_rebound_detail_keys() {
 }
 
 #[test]
-fn fr26_detail_note_snapshots() {
+fn detail_note_snapshots() {
     let mut app = board_on_w5();
     press(&mut app, &["o"]);
     let mut frames = vec![("3_120x40".to_string(), render(&app, 120, 40))];
@@ -210,14 +210,14 @@ fn first_body_row(app: &App) -> String {
 }
 
 #[test]
-fn fr27_body_follows_separator() {
+fn body_follows_separator() {
     let rows = rows(&render(&detail_on_w5(), 80, 24));
     assert_eq!(rows[6], "-".repeat(80));
     assert_eq!(rows[7..9], [" ## Question", " line 1"]);
 }
 
 #[test]
-fn fr27_scroll_down_moves_body_by_step() {
+fn scroll_down_moves_body_by_step() {
     let mut app = detail_on_w5();
     assert!(press(&mut app, &["ctrl+d"]).is_empty());
     assert_eq!(scroll(&app), 10);
@@ -225,7 +225,7 @@ fn fr27_scroll_down_moves_body_by_step() {
 }
 
 #[test]
-fn fr27_scroll_up_clamps_at_top() {
+fn scroll_up_clamps_at_top() {
     let mut app = detail_on_w5();
     press(&mut app, &["ctrl+u"]);
     assert_eq!(scroll(&app), 0);
@@ -236,7 +236,7 @@ fn fr27_scroll_up_clamps_at_top() {
 }
 
 #[test]
-fn fr27_scroll_down_clamps_at_last_line() {
+fn scroll_down_clamps_at_last_line() {
     let mut app = detail_on_w5();
     press(&mut app, &["ctrl+d"; 6]);
     let body = app.selected_card().unwrap().body.trim_end().to_string();
@@ -247,7 +247,7 @@ fn fr27_scroll_down_clamps_at_last_line() {
 }
 
 #[test]
-fn fr27_scroll_kept_when_changing_note() {
+fn scroll_kept_when_changing_note() {
     let mut app = detail_on_w5();
     press(&mut app, &["ctrl+d", "j"]);
     assert_eq!(scroll(&app), 10);
@@ -266,7 +266,7 @@ fn ts7_2_hint_line_shows_current_keys() {
 }
 
 #[test]
-fn fr27_wide_body_line_cut_not_wrapped() {
+fn wide_body_line_cut_not_wrapped() {
     let fx = TuiFixture::new(Some("detail"));
     let wide = "界".repeat(60);
     let text = format!(
@@ -311,7 +311,7 @@ fn where_row(app: &App) -> String {
 }
 
 #[test]
-fn fr27_card_without_notes_shows_no_note_yet() {
+fn card_without_notes_shows_no_note_yet() {
     let mut app = TuiFixture::new(Some("detail")).app();
     app.sel = Selection {
         column: 0,
@@ -330,13 +330,13 @@ fn fr27_card_without_notes_shows_no_note_yet() {
 }
 
 #[test]
-fn fr27_note_without_place_shows_where_none() {
+fn note_without_place_shows_where_none() {
     let fx = TuiFixture::new(Some("detail"));
     assert_eq!(where_row(&detail_at(&fx, 5, 2)), " Where: none");
 }
 
 #[test]
-fn fr27_note_with_cwd_only_shows_cwd() {
+fn note_with_cwd_only_shows_cwd() {
     let fx = TuiFixture::new(Some("detail"));
     let app = detail_at(&fx, 5, 1);
     assert_eq!(where_row(&app), " Where: /w/latency");
@@ -351,7 +351,7 @@ fn fr27_note_with_cwd_only_shows_cwd() {
 }
 
 #[test]
-fn fr27_bad_stamp_shows_heading_text_and_question_mark() {
+fn bad_stamp_shows_heading_text_and_question_mark() {
     let fx = TuiFixture::new(Some("detail"));
     let app = detail_at(&fx, 6, 0);
     assert_eq!(rows(&render(&app, 80, 24))[1], " note 1/1, someday, ? ago");
@@ -359,7 +359,7 @@ fn fr27_bad_stamp_shows_heading_text_and_question_mark() {
 }
 
 #[test]
-fn fr32_help_from_detail_returns_to_detail() {
+fn help_from_detail_returns_to_detail() {
     let mut app = detail_on_w5();
     press(&mut app, &["ctrl+d", "j"]);
     let want = Mode::Detail {
@@ -380,7 +380,7 @@ fn fr32_help_from_detail_returns_to_detail() {
 }
 
 #[test]
-fn fr23_reload_in_detail_keeps_shown_note() {
+fn reload_in_detail_keeps_shown_note() {
     let fx = TuiFixture::new(Some("detail"));
     let mut app = detail_at(&fx, 5, 1);
     let mut f = std::fs::OpenOptions::new()
@@ -398,7 +398,7 @@ fn fr23_reload_in_detail_keeps_shown_note() {
 }
 
 #[test]
-fn fr23_reload_with_card_gone_returns_to_board() {
+fn reload_with_card_gone_returns_to_board() {
     let fx = TuiFixture::new(Some("detail"));
     let detail = detail_at(&fx, 5, 1);
     let mut help = detail.clone();

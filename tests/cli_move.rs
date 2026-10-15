@@ -1,4 +1,4 @@
-//! TECHSPEC 6.1 card IDs, 6.2 exit codes for `move`, 6.3 `move`, 6.7 `move`.
+//! `move`: card IDs, exit codes and its JSON.
 
 mod common;
 
@@ -40,7 +40,7 @@ fn files(s: &Sandbox) -> BTreeMap<String, Vec<u8>> {
 }
 
 #[test]
-fn fr39_move_changes_only_column_line() {
+fn move_changes_only_column_line() {
     let s = sandbox();
     let before = files(&s);
     let out = run(&s, &["move", "W-12", "Done"], 0);

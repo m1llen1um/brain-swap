@@ -1,4 +1,4 @@
-//! TECHSPEC 7.4: polling the board folder and reloading it (FR-23, 11).
+//! Polling the board folder and reloading it.
 
 mod common;
 
@@ -13,8 +13,8 @@ use std::io::Write;
 use std::os::unix::fs::PermissionsExt;
 use std::time::Duration;
 
-fn work_4_9() -> TuiFixture {
-    TuiFixture::new(Some("work_4_9"))
+fn work_example() -> TuiFixture {
+    TuiFixture::new(Some("work_example"))
 }
 
 fn sel(column: usize, card: Option<u32>) -> Selection {
@@ -67,15 +67,15 @@ fn edit(fx: &TuiFixture, file: &str, from: &str, to: &str) {
 
 #[test]
 fn ts7_1_tick_updates_now() {
-    let mut app = work_4_9().app();
+    let mut app = work_example().app();
     let later = app.now.checked_add(Duration::from_secs(300)).unwrap();
     assert_eq!(update(&mut app, Input::Tick(later.clone())), []);
     assert_eq!(app.now, later);
 }
 
 #[test]
-fn fr23_file_change_shows_after_one_tick() {
-    let fx = work_4_9();
+fn file_change_shows_after_one_tick() {
+    let fx = work_example();
     let (mut rt, _, _) = fx.runtime(80, 24);
     let mut f = fs::OpenOptions::new()
         .append(true)
@@ -91,8 +91,8 @@ fn fr23_file_change_shows_after_one_tick() {
 }
 
 #[test]
-fn fr23_reload_keeps_selection_by_card_id() {
-    let fx = work_4_9();
+fn reload_keeps_selection_by_card_id() {
+    let fx = work_example();
     let mut rt = runtime_at(&fx, sel(1, Some(12)));
     edit(
         &fx,
@@ -113,8 +113,8 @@ fn fr23_reload_keeps_selection_by_card_id() {
 }
 
 #[test]
-fn fr23_card_moved_by_hand_stays_selected() {
-    let fx = work_4_9();
+fn card_moved_by_hand_stays_selected() {
+    let fx = work_example();
     let mut rt = runtime_at(&fx, sel(1, Some(12)));
     edit(&fx, "W-12.md", "column: Doing", "column: Todo");
     rt.tick();
@@ -146,7 +146,7 @@ fn ts7_4_vanished_card_selects_nearest_in_column() {
 
 #[test]
 fn ts7_4_unchanged_folder_does_not_reload() {
-    let mut fx = work_4_9();
+    let mut fx = work_example();
     logged(&mut fx);
     let (mut rt, _, _) = fx.runtime(80, 24);
     rt.tick();
@@ -157,7 +157,7 @@ fn ts7_4_unchanged_folder_does_not_reload() {
 
 #[test]
 fn ts7_4_other_files_do_not_reload() {
-    let mut fx = work_4_9();
+    let mut fx = work_example();
     logged(&mut fx);
     let (mut rt, _, _) = fx.runtime(80, 24);
     fs::write(fx.board_dir.join("README.md"), "changed by hand\n").unwrap();
@@ -168,7 +168,7 @@ fn ts7_4_other_files_do_not_reload() {
 
 #[test]
 fn ts7_4_board_md_change_reloads() {
-    let fx = work_4_9();
+    let fx = work_example();
     let (mut rt, _, _) = fx.runtime(80, 24);
     fs::write(
         fx.board_dir.join("board.md"),
@@ -181,7 +181,7 @@ fn ts7_4_board_md_change_reloads() {
 
 #[test]
 fn ts7_4_same_length_change_with_new_mtime_reloads() {
-    let mut fx = work_4_9();
+    let mut fx = work_example();
     logged(&mut fx);
     let (mut rt, _, _) = fx.runtime(80, 24);
     let p = fx.board_dir.join("W-12.md");
@@ -199,7 +199,7 @@ fn ts7_4_same_length_change_with_new_mtime_reloads() {
 
 #[test]
 fn ts11_reload_is_logged_once_per_change() {
-    let mut fx = work_4_9();
+    let mut fx = work_example();
     logged(&mut fx);
     let (mut rt, _, _) = fx.runtime(80, 24);
     edit(&fx, "W-12.md", "column: Doing", "column: Todo");
@@ -209,8 +209,8 @@ fn ts11_reload_is_logged_once_per_change() {
 }
 
 #[test]
-fn nfr02_idle_runtime_scans_once_per_second() {
-    let mut fx = work_4_9();
+fn idle_runtime_scans_once_per_second() {
+    let mut fx = work_example();
     logged(&mut fx);
     let (mut rt, _, events) = fx.runtime(80, 24);
     events.push((0..8).map(|_| Ev::Timeout));
@@ -237,7 +237,7 @@ fn ts7_4_missing_folder_created_later_reloads() {
 
 #[test]
 fn ts7_4_reload_error_keeps_board() {
-    let fx = work_4_9();
+    let fx = work_example();
     let (mut rt, _, _) = fx.runtime(80, 24);
     let before = rt.app().board.clone();
     let dir = &fx.board_dir;

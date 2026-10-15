@@ -1,4 +1,4 @@
-//! Byte comparison for splices (TECHSPEC 4.8 R1).
+//! Byte comparison for splices.
 
 /// Asserts that `after` is `before` with one span of whole lines swapped for
 /// `expected_lines` (each with its line end), that span holding no more lines

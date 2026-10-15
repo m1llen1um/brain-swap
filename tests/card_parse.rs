@@ -1,4 +1,4 @@
-//! TECHSPEC 4.4 and 4.9: reading a card file into the model.
+//! Reading a card file into the model.
 
 use std::path::Path;
 
@@ -52,7 +52,7 @@ fn parts(n: &brain_swap::core::model::Note) -> [&str; 3] {
 const HEAD: &str = "# t\n## Timeline\n### 2026-10-08T10:31:05+03:00\n";
 
 #[test]
-fn fr07_parse_reads_title_column_template_created() {
+fn parse_reads_title_column_template_created() {
     let c = card(&fixture("w12_4_9.md"));
     assert_eq!(c.title, "migrate invoices to v13");
     assert_eq!(c.column, "Doing");
@@ -64,7 +64,7 @@ fn fr07_parse_reads_title_column_template_created() {
 }
 
 #[test]
-fn fr07_body_lies_between_title_and_timeline() {
+fn body_lies_between_title_and_timeline() {
     let body = card(&fixture("w12_4_9.md")).body;
     assert!(body.contains("## Goal"));
     assert!(body.contains("## Acceptance"));
@@ -74,7 +74,7 @@ fn fr07_body_lies_between_title_and_timeline() {
 }
 
 #[test]
-fn fr14_note_has_parts_stamp_auto_and_place() {
+fn note_has_parts_stamp_auto_and_place() {
     let n = &card(&fixture("w12_4_9.md")).notes[0];
     assert_eq!(
         format_stamp(n.at.as_ref().unwrap()),
@@ -105,14 +105,14 @@ fn fr14_note_has_parts_stamp_auto_and_place() {
 }
 
 #[test]
-fn fr14_note_without_auto_marker() {
+fn note_without_auto_marker() {
     let n = &card(&fixture("w12_4_9.md")).notes[1];
     assert!(!n.auto);
     assert_eq!(n.heading, "### 2026-10-08T11:12:40+03:00");
 }
 
 #[test]
-fn fr17_notes_keep_file_order_whatever_stamp() {
+fn notes_keep_file_order_whatever_stamp() {
     let notes = card(&fixture("order_by_file.md")).notes;
     assert_eq!(notes.len(), 2);
     assert_eq!(notes[1].heading, "### 2026-10-07T12:00:00+03:00");
@@ -120,7 +120,7 @@ fn fr17_notes_keep_file_order_whatever_stamp() {
 }
 
 #[test]
-fn fr01_id_comes_from_file_name_not_content() {
+fn id_comes_from_file_name_not_content() {
     let text = fixture("w12_4_9.md").replace("# migrate invoices to v13", "# W-7 migrate");
     assert_eq!(card(&text).id, CardId::parse("W-12").unwrap());
 }

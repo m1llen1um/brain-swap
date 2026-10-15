@@ -4,10 +4,9 @@ Keyboard-first terminal kanban in Rust whose real product is the per-card switch
 
 ## Documents
 
-- `idea.md`: the idea (problem, principles, user flows, scale, boundaries). It is the seed, not a contract.
-- `PRD.md` and `TECHSPEC.md`: the contracts. Where they disagree with `idea.md`, they win; neither may contradict the user flows in `idea.md` without the user's explicit decision.
-- `roadmap/`: feature candidates, none scheduled. A candidate becomes work by updating `idea.md`, `PRD.md` and `TECHSPEC.md`.
-- `docs/usage.md`: the user guide. `docs/metrics.md`: how the PRD success metrics are measured.
+- `README.md`: what brain-swap is, why it helps, install and cheat sheet.
+- `docs/usage.md`: the user guide.
+- `roadmap/`: feature candidates, none scheduled.
 
 ## Principles (resolve priority disputes with these)
 
@@ -23,7 +22,7 @@ Keyboard-first terminal kanban in Rust whose real product is the per-card switch
 
 ## Stack
 
-Rust, `ratatui` for the TUI, one binary serving as both TUI and CLI. Crates are fixed by TECHSPEC section 13; adding one means editing that document first.
+Rust, `ratatui` for the TUI, one binary serving as both TUI and CLI.
 
 ## Checking a change
 

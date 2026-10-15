@@ -1,4 +1,4 @@
-//! TECHSPEC 7.1 and 7.6: `e` runs the editor on a copy of the card and merges the save (FR-31, R6).
+//! `e` runs the editor on a copy of the card and merges the save.
 
 mod common;
 
@@ -26,8 +26,8 @@ const W12: CardId = CardId {
     number: 12,
 };
 
-fn work_4_9() -> TuiFixture {
-    TuiFixture::new(Some("work_4_9"))
+fn work_example() -> TuiFixture {
+    TuiFixture::new(Some("work_example"))
 }
 
 /// `W-12.md` with the title `migrate invoices to v14`.
@@ -37,7 +37,7 @@ fn edited(fx: &TuiFixture) -> String {
         .replace("# migrate invoices to v13", "# migrate invoices to v14")
 }
 
-/// The `work_4_9` app with W-12 (Doing) selected.
+/// The `work_example` app with W-12 (Doing) selected.
 fn app(fx: &TuiFixture) -> App {
     let mut app = fx.app();
     app.sel = Selection {
@@ -77,8 +77,8 @@ fn edit_title(fx: &TuiFixture) -> (Runtime<TestBackend>, FakeLauncher) {
 }
 
 #[test]
-fn fr31_edit_key_emits_edit_for_selected_card() {
-    let mut app = app(&work_4_9());
+fn edit_key_emits_edit_for_selected_card() {
+    let mut app = app(&work_example());
     assert_eq!(press(&mut app, &["e"]), [Effect::Edit(W12)]);
     app.mode = Mode::Detail {
         card: W12,
@@ -93,7 +93,7 @@ fn fr31_edit_key_emits_edit_for_selected_card() {
 
 #[test]
 fn ts7_6_card_bytes_are_copied_to_edit_folder() {
-    let fx = work_4_9();
+    let fx = work_example();
     let launcher = FakeLauncher::new(Some(0), |_| {});
     let mut rt = runtime(&fx, &launcher);
     rt.dispatch(Input::Key(key("e")));
@@ -106,8 +106,8 @@ fn ts7_6_card_bytes_are_copied_to_edit_folder() {
 }
 
 #[test]
-fn fr31_saved_edit_is_written_to_card() {
-    let fx = work_4_9();
+fn saved_edit_is_written_to_card() {
+    let fx = work_example();
     let e = edited(&fx);
     let (rt, _) = edit_title(&fx);
     assert_eq!(fs::read_to_string(fx.board_dir.join("W-12.md")).unwrap(), e);
@@ -135,7 +135,7 @@ fn fr31_saved_edit_is_written_to_card() {
 
 #[test]
 fn ts7_6_copy_deleted_after_successful_merge() {
-    let fx = work_4_9();
+    let fx = work_example();
     let (_, launcher) = edit_title(&fx);
     assert_eq!(launcher.calls.borrow().len(), 1);
     let copy = fx.home.join(".local/state/brain-swap/edit/work-W-12.md");
@@ -143,8 +143,8 @@ fn ts7_6_copy_deleted_after_successful_merge() {
 }
 
 #[test]
-fn r6_note_parked_in_process_during_edit_is_kept() {
-    let fx = work_4_9();
+fn note_parked_in_process_during_edit_is_kept() {
+    let fx = work_example();
     let e = edited(&fx);
     let note = NewNote {
         at: fx.env.now.clone(),
@@ -179,7 +179,7 @@ fn argv(config_editor: &str, visual: Option<&str>, editor: Option<&str>) -> Vec<
 }
 
 #[test]
-fn fr31_config_editor_wins() {
+fn config_editor_wins() {
     assert_eq!(
         argv("nvim", Some("code"), Some("nano")),
         ["nvim", "/s/c.md"]
@@ -187,7 +187,7 @@ fn fr31_config_editor_wins() {
 }
 
 #[test]
-fn fr31_visual_used_when_config_empty() {
+fn visual_used_when_config_empty() {
     assert_eq!(
         argv("", Some("code --wait"), None),
         ["code", "--wait", "/s/c.md"]
@@ -195,12 +195,12 @@ fn fr31_visual_used_when_config_empty() {
 }
 
 #[test]
-fn fr31_editor_variable_used_when_visual_unset() {
+fn editor_variable_used_when_visual_unset() {
     assert_eq!(argv("", None, Some("nano")), ["nano", "/s/c.md"]);
 }
 
 #[test]
-fn fr31_vi_when_nothing_set() {
+fn vi_when_nothing_set() {
     assert_eq!(argv("", None, None), ["vi", "/s/c.md"]);
 }
 
@@ -233,7 +233,7 @@ fn edit_exit_1(fx: &TuiFixture) -> Runtime<TestBackend> {
 
 #[test]
 fn ts7_6_nonzero_exit_writes_nothing_and_keeps_copy() {
-    let fx = work_4_9();
+    let fx = work_example();
     let before = fs::read(fx.board_dir.join("W-12.md")).unwrap();
     let rt = edit_exit_1(&fx);
     assert_eq!(fs::read(fx.board_dir.join("W-12.md")).unwrap(), before);
@@ -243,7 +243,7 @@ fn ts7_6_nonzero_exit_writes_nothing_and_keeps_copy() {
 
 #[test]
 fn ts7_6_kept_copy_is_overwritten_by_next_edit() {
-    let fx = work_4_9();
+    let fx = work_example();
     edit_exit_1(&fx);
     let launcher = FakeLauncher::new(Some(1), |_| {});
     let mut rt = runtime(&fx, &launcher);
@@ -254,7 +254,7 @@ fn ts7_6_kept_copy_is_overwritten_by_next_edit() {
 
 #[test]
 fn ts7_6_unchanged_copy_writes_nothing() {
-    let fx = work_4_9();
+    let fx = work_example();
     let card = fx.board_dir.join("W-12.md");
     let (bytes, mtime) = (
         fs::read(&card).unwrap(),
@@ -271,7 +271,7 @@ fn ts7_6_unchanged_copy_writes_nothing() {
 
 #[test]
 fn ts7_6_launch_error_sets_status_and_keeps_copy() {
-    let fx = work_4_9();
+    let fx = work_example();
     let before = fs::read(fx.board_dir.join("W-12.md")).unwrap();
     let launcher = FakeLauncher::new(None, |_| {});
     let mut rt = runtime(&fx, &launcher);
@@ -284,7 +284,7 @@ fn ts7_6_launch_error_sets_status_and_keeps_copy() {
 
 #[test]
 fn ts7_6_failed_merge_keeps_copy() {
-    let fx = work_4_9();
+    let fx = work_example();
     let e = edited(&fx).replace(
         "# migrate invoices to v14",
         "# migrate invoices to v14\n<<<<<<< HEAD",
@@ -321,7 +321,7 @@ fn ts7_6_failed_merge_keeps_copy() {
 
 #[test]
 fn ts7_6_missing_card_sets_status_without_launch() {
-    let fx = work_4_9();
+    let fx = work_example();
     let launcher = FakeLauncher::new(Some(0), |_| {});
     let mut rt = runtime(&fx, &launcher);
     fs::remove_file(fx.board_dir.join("W-12.md")).unwrap();
@@ -338,7 +338,7 @@ fn logging(guard: &FakeGuard, code: Option<i32>) -> FakeLauncher {
 
 #[test]
 fn ts7_5_terminal_left_before_editor_and_reentered_after() {
-    let fx = work_4_9();
+    let fx = work_example();
     let guard = FakeGuard::default();
     let mut rt = runtime_logged(&fx, &logging(&guard, Some(0)), guard.clone());
     rt.draw().unwrap();
@@ -353,7 +353,7 @@ fn ts7_5_terminal_left_before_editor_and_reentered_after() {
 
 #[test]
 fn ts7_5_terminal_reentered_after_failed_editor() {
-    let fx = work_4_9();
+    let fx = work_example();
     let guard = FakeGuard::default();
     runtime_logged(&fx, &logging(&guard, Some(1)), guard.clone()).dispatch(Input::Key(key("e")));
     assert_eq!(guard.0.borrow().as_slice(), ["leave", "launch", "enter"]);
@@ -365,7 +365,7 @@ fn ts7_5_terminal_reentered_after_failed_editor() {
 
 #[test]
 fn ts10_no_board_lock_held_while_editor_runs() {
-    let fx = work_4_9();
+    let fx = work_example();
     let (env, dir) = (fx.env.clone(), fx.board_dir.clone());
     let launcher = FakeLauncher::new(Some(0), move |_| {
         let start = Instant::now();
@@ -378,8 +378,8 @@ fn ts10_no_board_lock_held_while_editor_runs() {
 }
 
 #[test]
-fn fr31_edit_from_detail_returns_to_detail() {
-    let fx = work_4_9();
+fn edit_from_detail_returns_to_detail() {
+    let fx = work_example();
     let text = fs::read_to_string(fx.board_dir.join("W-12.md")).unwrap();
     let (old, new) = (
         text.find("### 2026-10-08T10:31:05").unwrap(),
@@ -430,8 +430,8 @@ fn scripted(fx: &TuiFixture, steps: &[&str], edited: &str) -> Runtime<TestBacken
 }
 
 #[test]
-fn fr31_note_parked_mid_edit_survives() {
-    let fx = work_4_9();
+fn note_parked_mid_edit_survives() {
+    let fx = work_example();
     let e = edited(&fx);
     let rt = scripted(&fx, &[PARK], &e);
     let text = fs::read_to_string(fx.board_dir.join("W-12.md")).unwrap();
@@ -452,8 +452,8 @@ fn fr31_note_parked_mid_edit_survives() {
 }
 
 #[test]
-fn r6_file_column_change_mid_edit_is_kept() {
-    let fx = work_4_9();
+fn file_column_change_mid_edit_is_kept() {
+    let fx = work_example();
     let e = fs::read_to_string(fx.board_dir.join("W-12.md"))
         .unwrap()
         .replace("the SQL only.", "the SQL and the deploy list.");
@@ -463,8 +463,8 @@ fn r6_file_column_change_mid_edit_is_kept() {
 }
 
 #[test]
-fn r6_user_column_change_wins_over_file() {
-    let fx = work_4_9();
+fn user_column_change_wins_over_file() {
+    let fx = work_example();
     let e = fs::read_to_string(fx.board_dir.join("W-12.md"))
         .unwrap()
         .replace("column: Doing", "column: Todo");
@@ -475,7 +475,7 @@ fn r6_user_column_change_wins_over_file() {
 
 #[test]
 fn ts12_1_scripted_editor_is_hermetic() {
-    let fx = work_4_9();
+    let fx = work_example();
     let tmp = fx.home.parent().unwrap();
     let out = tmp.join("env.txt");
     let e = fs::read_to_string(fx.board_dir.join("W-12.md")).unwrap();
@@ -554,8 +554,8 @@ fn parks(fx: &TuiFixture, jobs: &[(&str, &str, &str)]) -> Vec<String> {
     })
 }
 
-/// The `work_4_9` runtime with W-12 selected.
-fn as8_runtime(fx: &TuiFixture) -> Runtime<TestBackend> {
+/// The `work_example` runtime with W-12 selected.
+fn w12_runtime(fx: &TuiFixture) -> Runtime<TestBackend> {
     let (mut rt, _, _) = fx.runtime(80, 24);
     rt.dispatch(Input::Key(key("l")));
     assert_eq!(rt.app().sel.card, Some(W12));
@@ -567,12 +567,12 @@ fn notes(rt: &Runtime<TestBackend>, id: CardId) -> usize {
 }
 
 #[test]
-fn as8_parks_on_two_cards_in_one_second_show_after_one_tick() {
-    let fx = work_4_9();
+fn parks_on_two_cards_in_one_second_show_after_one_tick() {
+    let fx = work_example();
     let tmp = fx.home.parent().unwrap();
     let names = ["W-12.md", "W-11.md", "W-9.md", "board.md"];
     let before = names.map(|n| read(&fx, n));
-    let mut rt = as8_runtime(&fx);
+    let mut rt = w12_runtime(&fx);
     let out = parks(&fx, &[("W-12", "a", "twelve"), ("W-11", "b", "eleven")]);
     assert_eq!(
         out,
@@ -592,11 +592,11 @@ fn as8_parks_on_two_cards_in_one_second_show_after_one_tick() {
 }
 
 #[test]
-fn as8_two_parks_on_one_card_both_show() {
-    let fx = work_4_9();
+fn two_parks_on_one_card_both_show() {
+    let fx = work_example();
     let tmp = fx.home.parent().unwrap();
     let before = read(&fx, "W-12.md");
-    let mut rt = as8_runtime(&fx);
+    let mut rt = w12_runtime(&fx);
     parks(&fx, &[("W-12", "a", "one"), ("W-12", "b", "two")]);
     rt.tick();
     assert_eq!(notes(&rt, W12), 4);
@@ -609,8 +609,8 @@ fn as8_two_parks_on_one_card_both_show() {
 }
 
 #[test]
-fn as8_parks_while_tui_editor_open_survive_save() {
-    let fx = work_4_9();
+fn parks_while_tui_editor_open_survive_save() {
+    let fx = work_example();
     let tmp = fx.home.parent().unwrap();
     let e = edited(&fx);
     let w11 = read(&fx, "W-11.md");

@@ -1,4 +1,4 @@
-//! TECHSPEC 7.1 and 7.7: the jump key in Board and Detail (FR-25, FR-28).
+//! The jump key in Board and Detail.
 
 mod common;
 
@@ -24,7 +24,7 @@ fn id(number: u32) -> CardId {
     }
 }
 
-/// The `work_4_9` app with `card` selected in `column`.
+/// The `work_example` app with `card` selected in `column`.
 fn board_on(fx: &TuiFixture, column: usize, card: u32) -> App {
     let mut app = fx.app();
     app.sel = Selection {
@@ -35,7 +35,7 @@ fn board_on(fx: &TuiFixture, column: usize, card: u32) -> App {
 }
 
 fn work() -> TuiFixture {
-    TuiFixture::new(Some("work_4_9"))
+    TuiFixture::new(Some("work_example"))
 }
 
 const BILLING: &str = "/home/smilen/Work/ati.billing";
@@ -59,7 +59,7 @@ fn no_note_yet(back: Mode) -> Mode {
 }
 
 #[test]
-fn fr25_enter_on_board_emits_jump_to_the_jump_note() {
+fn enter_on_board_emits_jump_to_the_jump_note() {
     let mut app = board_on(&work(), 1, 12);
     assert_eq!(press(&mut app, &["enter"]), [Effect::Jump(id(12), 1)]);
     assert_eq!(app.status.as_deref(), Some("jumping..."));
@@ -69,7 +69,7 @@ fn fr25_enter_on_board_emits_jump_to_the_jump_note() {
 }
 
 #[test]
-fn fr25_jump_skips_a_newer_unplaced_note() {
+fn jump_skips_a_newer_unplaced_note() {
     let fx = work();
     let from = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/jump/W-14.md");
     std::fs::copy(from, fx.board_dir.join("W-14.md")).unwrap();
@@ -85,14 +85,14 @@ fn ts7_7_board_jump_without_jump_note_shows_no_note_yet() {
 }
 
 #[test]
-fn fr28_detail_jump_targets_the_shown_note() {
+fn detail_jump_targets_the_shown_note() {
     let mut app = board_on(&work(), 1, 12);
     press(&mut app, &["o", "j"]);
     assert_eq!(press(&mut app, &["enter"]), [Effect::Jump(id(12), 0)]);
 }
 
 #[test]
-fn fr28_detail_opens_on_the_newest_note_as_target() {
+fn detail_opens_on_the_newest_note_as_target() {
     let mut app = board_on(&work(), 1, 12);
     press(&mut app, &["o"]);
     assert_eq!(press(&mut app, &["enter"]), [Effect::Jump(id(12), 1)]);
@@ -109,7 +109,7 @@ fn ts7_7_detail_jump_without_notes_shows_no_note_yet() {
 }
 
 #[test]
-fn fr25_jump_follows_the_configured_key() {
+fn jump_follows_the_configured_key() {
     let mut app = board_on(&work(), 1, 12);
     app.keys = KeyMap::build(&[("jump".into(), vec!["g".into()])]).0;
     assert_eq!(press(&mut app, &["g"]), [Effect::Jump(id(12), 1)]);
@@ -128,7 +128,7 @@ fn ts7_7_board_jump_without_a_selected_card_does_nothing() {
 }
 
 #[test]
-fn fr59_jumped_outcome_quits() {
+fn jumped_outcome_quits() {
     let mut app = board_on(&work(), 1, 12);
     press(&mut app, &["enter"]);
     assert_eq!(
@@ -138,7 +138,7 @@ fn fr59_jumped_outcome_quits() {
 }
 
 #[test]
-fn fr61_closed_outcome_shows_pane_closed_cwd_and_link_hint() {
+fn closed_outcome_shows_pane_closed_cwd_and_link_hint() {
     let mut app = board_on(&work(), 1, 12);
     assert!(update(&mut app, not_jumped(PaneStatus::Closed, Some(BILLING))).is_empty());
     let text = format!("pane closed\n{BILLING}\nopen a session there and run /bs-link W-12");
@@ -149,7 +149,7 @@ fn fr61_closed_outcome_shows_pane_closed_cwd_and_link_hint() {
 }
 
 #[test]
-fn fr62_outside_outcome_shows_not_in_herdr_and_cwd() {
+fn outside_outcome_shows_not_in_herdr_and_cwd() {
     let mut app = board_on(&work(), 1, 12);
     update(
         &mut app,
@@ -160,7 +160,7 @@ fn fr62_outside_outcome_shows_not_in_herdr_and_cwd() {
 }
 
 #[test]
-fn fr62_no_pane_outcome_shows_no_pane_recorded_and_cwd() {
+fn no_pane_outcome_shows_no_pane_recorded_and_cwd() {
     let mut app = board_on(&work(), 2, 9);
     let cwd = "/home/smilen/Work/private/brain-swap";
     update(&mut app, not_jumped(PaneStatus::NoPane, Some(cwd)));
@@ -169,7 +169,7 @@ fn fr62_no_pane_outcome_shows_no_pane_recorded_and_cwd() {
 }
 
 #[test]
-fn fr63_not_responding_outcome_shows_message_and_cwd() {
+fn not_responding_outcome_shows_message_and_cwd() {
     let mut app = board_on(&work(), 1, 12);
     update(
         &mut app,
@@ -222,7 +222,7 @@ fn ts7_7_outcome_in_detail_returns_to_detail() {
 }
 
 #[test]
-fn fr63_tui_stays_usable_after_the_message() {
+fn tui_stays_usable_after_the_message() {
     let mut app = board_on(&work(), 1, 12);
     update(
         &mut app,
@@ -258,7 +258,7 @@ fn in_herdr(fx: &TuiFixture) -> Env {
     env
 }
 
-/// `run_jump` on `work_4_9`'s card `card`, note `note`, inside herdr when `herdr`.
+/// `run_jump` on `work_example`'s card `card`, note `note`, inside herdr when `herdr`.
 fn jump_on(fx: &TuiFixture, card: u32, note: usize, herdr: bool, fake: &FakeRunner) -> Outcome {
     let env = if herdr { in_herdr(fx) } else { fx.env.clone() };
     let board = fx.board();
@@ -275,14 +275,14 @@ fn billing() -> Option<std::path::PathBuf> {
 }
 
 #[test]
-fn fr59_live_agent_pane_is_jumped() {
+fn live_agent_pane_is_jumped() {
     let fake = agent_pane().on("agent focus w4V:p9", Answer::ok(""));
     assert_eq!(jump_on(&work(), 12, 1, true, &fake), Outcome::Jumped);
     assert_eq!(fake.calls(), ["pane get w4V:p9", "agent focus w4V:p9"]);
 }
 
 #[test]
-fn fr59_live_shell_pane_is_jumped_by_tab() {
+fn live_shell_pane_is_jumped_by_tab() {
     let shell = SHELL
         .replace("w4V:p3", "w4V:p9")
         .replace("w4V:t2", "w4V:t1");
@@ -298,7 +298,7 @@ fn fr59_live_shell_pane_is_jumped_by_tab() {
 }
 
 #[test]
-fn fr60_moved_pane_is_jumped() {
+fn moved_pane_is_jumped() {
     let fake = FakeRunner::new()
         .on("pane get w4V:p9", Answer::fail(1, NOT_FOUND))
         .on("workspace list", Answer::ok(WS_LIST))
@@ -330,7 +330,7 @@ fn ts7_7_timed_out_focus_is_not_responding() {
 }
 
 #[test]
-fn fr61_closed_pane_is_not_jumped_without_focus() {
+fn closed_pane_is_not_jumped_without_focus() {
     let fake = FakeRunner::new()
         .on("pane get w4V:p9", Answer::fail(1, NOT_FOUND))
         .on(
@@ -345,7 +345,7 @@ fn fr61_closed_pane_is_not_jumped_without_focus() {
 }
 
 #[test]
-fn fr62_outside_herdr_is_not_jumped_without_a_call() {
+fn outside_herdr_is_not_jumped_without_a_call() {
     let fake = FakeRunner::new();
     assert_eq!(
         jump_on(&work(), 12, 1, false, &fake),
@@ -355,7 +355,7 @@ fn fr62_outside_herdr_is_not_jumped_without_a_call() {
 }
 
 #[test]
-fn fr62_note_without_pane_is_not_jumped() {
+fn note_without_pane_is_not_jumped() {
     let cwd = "/home/smilen/Work/private/brain-swap";
     assert_eq!(
         jump_on(&work(), 9, 0, true, &FakeRunner::new()),
@@ -364,7 +364,7 @@ fn fr62_note_without_pane_is_not_jumped() {
 }
 
 #[test]
-fn as11_hang_is_not_jumped_within_3_seconds() {
+fn hang_is_not_jumped_within_3_seconds() {
     let slow = Answer::fail(1, NOT_FOUND).taking(Duration::from_millis(1500));
     let fake = FakeRunner::new()
         .on("pane get w4V:p9", slow)
@@ -389,7 +389,7 @@ fn ts9_3_locate_and_focus_share_one_budget() {
 }
 
 #[test]
-fn fr28_run_jump_uses_the_given_note() {
+fn run_jump_uses_the_given_note() {
     let fx = work();
     let from = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/jump/W-14.md");
     std::fs::copy(from, fx.board_dir.join("W-14.md")).unwrap();
@@ -401,7 +401,7 @@ fn fr28_run_jump_uses_the_given_note() {
     assert_eq!(fake.calls()[0], "pane get w4V:p3");
 }
 
-/// A runtime on `work_4_9` inside herdr with W-12 selected and `fake` as its runner.
+/// A runtime on `work_example` inside herdr with W-12 selected and `fake` as its runner.
 fn jump_runtime(
     fx: &TuiFixture,
     fake: FakeRunner,
@@ -429,7 +429,7 @@ fn jump_runtime(
 }
 
 #[test]
-fn fr59_jumped_outcome_ends_the_runtime_with_exit_0() {
+fn jumped_outcome_ends_the_runtime_with_exit_0() {
     let fake = agent_pane().on("agent focus w4V:p9", Answer::ok(""));
     let (mut rt, guard, events) = jump_runtime(&work(), fake);
     events.push([Ev::Key("enter")]);
@@ -439,7 +439,7 @@ fn fr59_jumped_outcome_ends_the_runtime_with_exit_0() {
 }
 
 #[test]
-fn fr63_tui_stays_open_after_not_responding() {
+fn tui_stays_open_after_not_responding() {
     let fake = FakeRunner::new().on("pane get w4V:p9", Answer::Hang);
     let (mut rt, _guard, _events) = jump_runtime(&work(), fake);
     assert_eq!(rt.dispatch(Input::Key(key("enter"))), None);

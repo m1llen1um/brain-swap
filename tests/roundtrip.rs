@@ -1,4 +1,4 @@
-//! TECHSPEC 4.8 R1, R2, R3 and 12.1 round trip: every fixture through both splices.
+//! Round trip: every fixture through both splices.
 
 mod common;
 
@@ -13,7 +13,7 @@ use jiff::tz::TimeZone;
 
 const FIXTURES: &str = concat!(env!("CARGO_MANIFEST_DIR"), "/tests/fixtures/cards");
 
-/// The fixtures 4.7 makes read only; every other fixture is writable.
+/// The read-only fixtures; every other fixture is writable.
 const READ_ONLY: [&str; 3] = [
     "conflict_markers.md",
     "invalid_frontmatter.md",
@@ -74,9 +74,9 @@ fn stem(name: &str) -> &str {
     name.trim_end_matches(".md")
 }
 
-/// R2: `after` is `before` with one line replaced or inserted, that line reading
+/// `after` is `before` with one line replaced or inserted, that line reading
 /// `column: Doing` (key spelling kept), or with the three-line frontmatter prepended.
-fn r2_holds(before: &[u8], after: &[u8]) -> bool {
+fn holds(before: &[u8], after: &[u8]) -> bool {
     let b: Vec<&[u8]> = before.split_inclusive(|&c| c == b'\n').collect();
     let a: Vec<&[u8]> = after.split_inclusive(|&c| c == b'\n').collect();
     let trim = |l: &[u8]| String::from_utf8_lossy(l.trim_ascii_end()).into_owned();
@@ -104,21 +104,21 @@ fn r2_holds(before: &[u8], after: &[u8]) -> bool {
 }
 
 #[test]
-fn r2_set_column_changes_one_line() {
+fn set_column_changes_one_line() {
     let before = fixture("w12_4_9.md");
     let after = set_column("w12_4_9.md", &before, "Done").unwrap();
     assert_only_lines_changed(&before, &after, &["column: Done\n"]);
 }
 
 #[test]
-fn r2_set_column_adds_frontmatter_to_card_without_one() {
+fn set_column_adds_frontmatter_to_card_without_one() {
     let before = fixture("no_frontmatter.md");
     let after = set_column("no_frontmatter.md", &before, "Doing").unwrap();
     assert_eq!(after, [&b"---\ncolumn: Doing\n---\n"[..], &before].concat());
 }
 
 #[test]
-fn r2_set_column_on_read_only_card_is_unreadable() {
+fn set_column_on_read_only_card_is_unreadable() {
     let r = set_column(
         "conflict_markers.md",
         &fixture("conflict_markers.md"),
@@ -128,7 +128,7 @@ fn r2_set_column_on_read_only_card_is_unreadable() {
 }
 
 #[test]
-fn r1_every_fixture_round_trips_append_byte_for_byte() {
+fn every_fixture_round_trips_append_byte_for_byte() {
     for name in fixtures() {
         let input = fixture(&name);
         let r = append_note(&name, &input, &note());
@@ -143,7 +143,7 @@ fn r1_every_fixture_round_trips_append_byte_for_byte() {
 }
 
 #[test]
-fn r1_every_fixture_round_trips_set_column_byte_for_byte() {
+fn every_fixture_round_trips_set_column_byte_for_byte() {
     for name in fixtures() {
         let input = fixture(&name);
         let r = set_column(&name, &input, "Doing");
@@ -152,7 +152,7 @@ fn r1_every_fixture_round_trips_set_column_byte_for_byte() {
             continue;
         }
         let out = r.unwrap();
-        assert!(r2_holds(&input, &out), "{name}");
+        assert!(holds(&input, &out), "{name}");
         insta::assert_snapshot!(
             format!("set_column_{}", stem(&name)),
             String::from_utf8_lossy(&out)
@@ -161,7 +161,7 @@ fn r1_every_fixture_round_trips_set_column_byte_for_byte() {
 }
 
 #[test]
-fn r3_append_snapshot_per_fixture() {
+fn append_snapshot_per_fixture() {
     for name in writable() {
         let a = append(&name);
         insta::assert_snapshot!(
@@ -172,7 +172,7 @@ fn r3_append_snapshot_per_fixture() {
 }
 
 #[test]
-fn fr16_append_never_changes_column() {
+fn append_never_changes_column() {
     for name in writable() {
         let input = fixture(&name);
         assert_eq!(column(&append(&name).bytes), column(&input), "{name}");

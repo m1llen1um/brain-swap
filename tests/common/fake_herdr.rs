@@ -1,4 +1,4 @@
-//! The fake herdr script's argv log and scenario names (TECHSPEC 12.1).
+//! The fake herdr script's argv log and scenario names.
 
 use std::fs;
 use std::path::Path;

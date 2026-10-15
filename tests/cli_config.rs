@@ -1,4 +1,4 @@
-//! TECHSPEC 6.2, 10 and 11: the config prelude every board subcommand runs first.
+//! The config prelude every board subcommand runs first.
 
 mod common;
 

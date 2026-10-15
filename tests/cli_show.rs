@@ -1,4 +1,4 @@
-//! TECHSPEC 6.1 card IDs, 6.2 exit 3 for a card, 6.3 `show`.
+//! `show`: card IDs and exit 3 for a card.
 
 mod common;
 

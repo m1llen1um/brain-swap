@@ -320,7 +320,7 @@ pub fn write_card(dir: &Path, id: &str, column: &str, created: &str, notes: &[(&
     fs::write(dir.join(format!("{id}.md")), text).unwrap();
 }
 
-/// The press event crossterm reports for a 5.3 binding; an upper-case `Char` carries SHIFT.
+/// The press event crossterm reports for a key binding; an upper-case `Char` carries SHIFT.
 pub fn key(spec: &str) -> KeyEvent {
     let b = parse_binding(spec).unwrap();
     let code = match b.key {
@@ -382,7 +382,7 @@ pub fn rows(buf: &Buffer) -> Vec<String> {
         .collect()
 }
 
-/// Every cell has fg and bg `Color::Reset` (NFR-10); every TUI snapshot test calls it.
+/// Every cell has fg and bg `Color::Reset`; every TUI snapshot test calls it.
 pub fn assert_no_colour(buf: &Buffer) {
     for (i, c) in buf.content.iter().enumerate() {
         assert_eq!((c.fg, c.bg), (Color::Reset, Color::Reset), "cell {i}");

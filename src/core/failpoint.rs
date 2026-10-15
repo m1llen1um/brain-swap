@@ -1,4 +1,4 @@
-//! Failpoints for crash tests (TECHSPEC 12.1), active only with feature `failpoints`.
+//! Failpoints for crash tests, active only with feature `failpoints`.
 
 use crate::core::env::Env;
 use crate::core::error::{Error, Result};

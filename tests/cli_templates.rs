@@ -1,4 +1,4 @@
-//! TECHSPEC 6.1 and 6.3 `templates`: the binary entry and its first subcommand.
+//! The binary entry and its first subcommand.
 
 mod common;
 
@@ -29,14 +29,14 @@ const HEADERS: [&str; 4] = [
 ];
 
 #[test]
-fn fr11_templates_prints_builtins() {
+fn templates_prints_builtins() {
     let s = Sandbox::new();
     let out = s.cmd(&["templates"]).assert().code(0).get_output().clone();
     insta::assert_snapshot!("builtins", s.redact(&stdout(&out)));
 }
 
 #[test]
-fn fr11_templates_reads_user_folder_from_xdg_config_home() {
+fn templates_reads_user_folder_from_xdg_config_home() {
     let s = Sandbox::new();
     spike(&s.root().join("config"));
     let out = s.cmd(&["templates"]).assert().code(0).get_output().clone();
@@ -76,7 +76,7 @@ fn ts6_3_templates_writes_no_config() {
 }
 
 #[test]
-fn fr33_help_lists_every_subcommand() {
+fn help_lists_every_subcommand() {
     let s = sandbox();
     let out = s.cmd(&["--help"]).assert().code(0).get_output().clone();
     let text = stdout(&out);
@@ -123,7 +123,7 @@ fn json_templates(s: &Sandbox, args: &[&str]) -> (String, Vec<serde_json::Value>
 }
 
 #[test]
-fn fr35_templates_json_is_one_object_v_first() {
+fn templates_json_is_one_object_v_first() {
     let s = Sandbox::new();
     let (text, ts) = json_templates(&s, &["--json", "templates"]);
     assert!(text.starts_with("{\"v\":1,"), "{text}");
@@ -137,7 +137,7 @@ fn fr35_templates_json_is_one_object_v_first() {
 }
 
 #[test]
-fn fr35_json_flag_after_subcommand() {
+fn json_flag_after_subcommand() {
     let s = Sandbox::new();
     let before = s.cmd(&["--json", "templates"]).output().unwrap().stdout;
     let after = s.cmd(&["templates", "--json"]).output().unwrap().stdout;
@@ -146,7 +146,7 @@ fn fr35_json_flag_after_subcommand() {
 }
 
 #[test]
-fn fr35_templates_json_null_key() {
+fn templates_json_null_key() {
     let s = Sandbox::new();
     spike(&s.root().join("config"));
     let (_, ts) = json_templates(&s, &["--json", "templates"]);

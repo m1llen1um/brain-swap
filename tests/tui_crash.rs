@@ -1,4 +1,4 @@
-//! TECHSPEC 12.1 (crash, process level), 4.6, I1 to I4: the TUI editor merge aborts at
+//! Crash at process level: the TUI editor merge aborts at
 //! `edit:after_tmp` in a re-run of this test binary.
 #![cfg(feature = "failpoints")]
 
@@ -56,11 +56,11 @@ fn tui_crash_child() {
     rt.run();
 }
 
-/// `work_4_9` with a scripted editor that parks on W-12 and saves the v14 title, then the child
+/// `work_example` with a scripted editor that parks on W-12 and saves the v14 title, then the child
 /// spawned with `BRAIN_SWAP_FAILPOINT=edit:after_tmp`; returns the fixture, W-12 before, the
 /// saved bytes and the child's pid.
 fn crash() -> (TuiFixture, String, String, u32) {
-    let fx = TuiFixture::new(Some("work_4_9"));
+    let fx = TuiFixture::new(Some("work_example"));
     let tmp = fx.home.parent().unwrap().to_path_buf();
     let before = fs::read_to_string(fx.board_dir.join("W-12.md")).unwrap();
     let edited = before.replace(V13, V14);

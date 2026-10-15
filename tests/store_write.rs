@@ -1,4 +1,4 @@
-//! TECHSPEC 4.8 R7 and 10: the verify-then-rename atomic write.
+//! The verify-then-rename atomic write.
 
 mod common;
 
@@ -42,7 +42,7 @@ fn ts10_temp_file_is_dot_name_bs_tmp_pid() {
 }
 
 #[test]
-fn r7_verify_failure_writes_nothing() {
+fn verify_failure_writes_nothing() {
     let tmp = tempfile::tempdir().unwrap();
     let env = core_env(tmp.path(), NOW);
     let target = setup(tmp.path());
@@ -55,7 +55,7 @@ fn r7_verify_failure_writes_nothing() {
 }
 
 #[test]
-fn r7_verify_failure_is_logged() {
+fn verify_failure_is_logged() {
     let tmp = tempfile::tempdir().unwrap();
     let mut env = core_env(tmp.path(), NOW);
     let log = tmp.path().join("bs.log");

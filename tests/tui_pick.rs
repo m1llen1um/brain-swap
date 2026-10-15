@@ -1,4 +1,4 @@
-//! TECHSPEC 5.2, 5.4, 7.1, 7.2 and 7.4: the template and board pickers (FR-24, FR-30, NFR-10).
+//! The template and board pickers.
 
 mod common;
 
@@ -16,19 +16,19 @@ use ratatui::style::Modifier;
 use std::fs;
 use std::os::unix::fs::PermissionsExt;
 
-fn work_4_9() -> App {
-    TuiFixture::new(Some("work_4_9")).app()
+fn work_example() -> App {
+    TuiFixture::new(Some("work_example")).app()
 }
 
 fn picker() -> App {
-    let mut app = work_4_9();
+    let mut app = work_example();
     press(&mut app, &["n"]);
     app
 }
 
-/// The `work_4_9` app through `tui::prepare`, with `file` holding `bytes` in the templates folder.
+/// The `work_example` app through `tui::prepare`, with `file` holding `bytes` in the templates folder.
 fn prepared_with(file: &str, bytes: &[u8]) -> App {
-    let mut fx = TuiFixture::new(Some("work_4_9"));
+    let mut fx = TuiFixture::new(Some("work_example"));
     let dir = fx.env.templates_dir();
     fs::create_dir_all(&dir).unwrap();
     fs::write(dir.join(file), bytes).unwrap();
@@ -54,14 +54,14 @@ fn title_input(template: &str) -> Mode {
 }
 
 #[test]
-fn fr30_new_key_opens_template_pick() {
-    let mut app = work_4_9();
+fn new_key_opens_template_pick() {
+    let mut app = work_example();
     assert!(press(&mut app, &["n"]).is_empty());
     assert_eq!(app.mode, Mode::TemplatePick { sel: 0 });
 }
 
 #[test]
-fn fr30_hotkey_opens_title_input_for_template() {
+fn hotkey_opens_title_input_for_template() {
     let mut app = picker();
     assert!(press(&mut app, &["b"]).is_empty());
     assert_eq!(app.mode, title_input("Bug"));
@@ -91,7 +91,7 @@ fn ts5_2_cancel_in_template_pick_returns_to_board() {
 }
 
 #[test]
-fn fr30_user_template_hotkey_works() {
+fn user_template_hotkey_works() {
     let mut app = spike("key: s\n");
     press(&mut app, &["n"]);
     let frame = rows(&render(&app, 80, 24));
@@ -130,8 +130,8 @@ fn ts5_2_board_keys_do_nothing_in_template_pick() {
 }
 
 #[test]
-fn fr30_template_pick_snapshots() {
-    let mut app = work_4_9();
+fn template_pick_snapshots() {
+    let mut app = work_example();
     app.sel.column = 0;
     app.sel.card = app.board.cards_in(0).first().map(|c| c.id);
     press(&mut app, &["n"]);
@@ -144,9 +144,9 @@ fn fr30_template_pick_snapshots() {
     }
 }
 
-/// The `work_4_9` app through `tui::prepare` with the default config, on `board`.
+/// The `work_example` app through `tui::prepare` with the default config, on `board`.
 fn prepared_on(board: Option<&str>) -> App {
-    let mut fx = TuiFixture::new(Some("work_4_9"));
+    let mut fx = TuiFixture::new(Some("work_example"));
     let start = TuiStart {
         config: load(&fx.env),
         board: board.map(String::from),
@@ -193,7 +193,7 @@ fn reload_lines(fx: &TuiFixture) -> usize {
 }
 
 #[test]
-fn fr24_switch_board_lists_configured_boards() {
+fn switch_board_lists_configured_boards() {
     let app = board_picker();
     assert_eq!(app.mode, Mode::BoardPick { sel: 0 });
     let frame = rows(&render(&app, 80, 24));
@@ -205,7 +205,7 @@ fn fr24_switch_board_lists_configured_boards() {
 }
 
 #[test]
-fn fr24_confirm_emits_load_board() {
+fn confirm_emits_load_board() {
     let mut app = board_picker();
     assert_eq!(
         press(&mut app, &["j", "enter"]),
@@ -222,15 +222,15 @@ fn ts5_2_cancel_in_board_pick_returns() {
 }
 
 #[test]
-fn fr24_pick_starts_on_current_board() {
+fn pick_starts_on_current_board() {
     let mut app = prepared_on(Some("home"));
     press(&mut app, &["b"]);
     assert_eq!(app.mode, Mode::BoardPick { sel: 1 });
 }
 
 #[test]
-fn fr24_switched_board_opens_with_initial_selection() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn switched_board_opens_with_initial_selection() {
+    let fx = TuiFixture::new(Some("work_example"));
     with_home(&fx);
     let (mut rt, _, _) = fx.runtime(80, 24);
     dispatch_keys(&mut rt, &["b", "j", "enter"]);
@@ -246,7 +246,7 @@ fn fr24_switched_board_opens_with_initial_selection() {
 
 #[test]
 fn ts7_4_polling_follows_switched_board() {
-    let mut fx = TuiFixture::new(Some("work_4_9"));
+    let mut fx = TuiFixture::new(Some("work_example"));
     fx.env.log = Some(fx.home.join("bs.log"));
     with_home(&fx);
     let (mut rt, _, _) = fx.runtime(80, 24);
@@ -268,8 +268,8 @@ fn ts7_4_polling_follows_switched_board() {
 }
 
 #[test]
-fn fr24_switch_failure_keeps_current_board() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn switch_failure_keeps_current_board() {
+    let fx = TuiFixture::new(Some("work_example"));
     with_home(&fx);
     let home = fx.env.default_board_dir("home");
     let (mut rt, _, _) = fx.runtime(80, 24);
@@ -287,8 +287,8 @@ fn fr24_switch_failure_keeps_current_board() {
 }
 
 #[test]
-fn fr24_board_pick_snapshots() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn board_pick_snapshots() {
+    let fx = TuiFixture::new(Some("work_example"));
     let mut env = fx.env.clone();
     let start = TuiStart {
         config: load(&env),
@@ -307,9 +307,9 @@ fn fr24_board_pick_snapshots() {
     }
 }
 
-/// The `work_4_9` app in TitleInput for Feature with `buf`.
+/// The `work_example` app in TitleInput for Feature with `buf`.
 fn titled(buf: &str) -> App {
-    let mut app = work_4_9();
+    let mut app = work_example();
     app.mode = Mode::TitleInput {
         template: "Feature".into(),
         buf: buf.into(),
@@ -333,8 +333,8 @@ fn create(title: &str, column: &str) -> Effect {
 }
 
 #[test]
-fn fr30_j_and_k_type_into_title() {
-    let mut app = work_4_9();
+fn j_and_k_type_into_title() {
+    let mut app = work_example();
     press(&mut app, &["n", "f", "j", "k"]);
     assert_eq!(
         app.mode,
@@ -372,8 +372,8 @@ fn ts5_2_confirm_ignored_while_title_blank() {
 }
 
 #[test]
-fn as6_creation_emits_one_create_in_focused_column() {
-    let mut app = work_4_9();
+fn creation_emits_one_create_in_focused_column() {
+    let mut app = work_example();
     app.sel.column = 0;
     let keys = [
         "n", "f", "f", "i", "x", "space", "l", "o", "g", "i", "n", "enter",
@@ -383,7 +383,7 @@ fn as6_creation_emits_one_create_in_focused_column() {
 }
 
 #[test]
-fn fr30_title_is_trimmed_and_column_is_focused_one() {
+fn title_is_trimmed_and_column_is_focused_one() {
     let mut app = titled("  spike  ");
     app.sel.column = 1;
     assert_eq!(press(&mut app, &["enter"]), [create("spike", "Doing")]);
@@ -414,8 +414,8 @@ fn ts5_2_ctrl_and_alt_keys_are_not_inserted() {
 }
 
 #[test]
-fn fr30_create_from_extra_column_uses_first_column() {
-    let mut app = TuiFixture::new(Some("as7")).app();
+fn create_from_extra_column_uses_first_column() {
+    let mut app = TuiFixture::new(Some("hand_edit")).app();
     app.sel.column = app
         .board
         .column_list()
@@ -427,7 +427,7 @@ fn fr30_create_from_extra_column_uses_first_column() {
 }
 
 #[test]
-fn fr30_title_input_snapshots() {
+fn title_input_snapshots() {
     let mut app = titled("fix login");
     app.sel.column = 0;
     for (w, h) in [(80, 24), (120, 40)] {
@@ -447,8 +447,8 @@ fn create_through_keys(rt: &mut Runtime<TestBackend>, title: &str) {
 }
 
 #[test]
-fn as6_created_card_appears_selected_in_focused_column() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn created_card_appears_selected_in_focused_column() {
+    let fx = TuiFixture::new(Some("work_example"));
     let (mut rt, _, _) = fx.runtime(80, 24);
     dispatch_keys(&mut rt, &["l"]);
     assert_eq!(rt.app().sel.column, 1);
@@ -472,8 +472,8 @@ fn as6_created_card_appears_selected_in_focused_column() {
 }
 
 #[test]
-fn as7_tui_creation_skips_past_hand_made_card() {
-    let fx = TuiFixture::new(Some("as7"));
+fn tui_creation_skips_past_hand_made_card() {
+    let fx = TuiFixture::new(Some("hand_edit"));
     let (mut rt, _, _) = fx.runtime(80, 24);
     create_through_keys(&mut rt, "x");
     assert!(fx.board_dir.join("W-21.md").exists());
@@ -481,8 +481,8 @@ fn as7_tui_creation_skips_past_hand_made_card() {
 }
 
 #[test]
-fn fr30_create_failure_sets_status_line() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn create_failure_sets_status_line() {
+    let fx = TuiFixture::new(Some("work_example"));
     let (mut rt, _, _) = fx.runtime(80, 24);
     fs::write(fx.board_dir.join("board.md"), "---\nletter W\n---\n").unwrap();
     let before = fs::read_dir(&fx.board_dir).unwrap().count();
@@ -493,7 +493,7 @@ fn fr30_create_failure_sets_status_line() {
 }
 
 #[test]
-fn fr30_create_on_missing_board_folder_creates_it() {
+fn create_on_missing_board_folder_creates_it() {
     let fx = TuiFixture::new(None);
     let (mut rt, _, _) = fx.runtime(80, 24);
     create_through_keys(&mut rt, "x");
@@ -502,8 +502,8 @@ fn fr30_create_on_missing_board_folder_creates_it() {
 }
 
 #[test]
-fn fr30_created_card_stamped_with_runtime_clock() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn created_card_stamped_with_runtime_clock() {
+    let fx = TuiFixture::new(Some("work_example"));
     let (mut rt, _, events) = fx.runtime(80, 24);
     let later = events
         .clock
@@ -518,8 +518,8 @@ fn fr30_created_card_stamped_with_runtime_clock() {
 }
 
 #[test]
-fn fr30_tui_create_with_subsecond_clock_succeeds() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn tui_create_with_subsecond_clock_succeeds() {
+    let fx = TuiFixture::new(Some("work_example"));
     let (mut rt, _, events) = fx.runtime(80, 24);
     let clock = parse_stamp("2026-10-08T10:52:00.5+00:00", &TimeZone::UTC).unwrap();
     *events.clock.0.borrow_mut() = clock;

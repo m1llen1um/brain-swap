@@ -1,4 +1,4 @@
-//! TECHSPEC 6.3 `context` with a reference (FR-37), its picker without one (FR-56, FR-57) and its 6.7 JSON.
+//! `context` with a reference, its picker without one and its JSON.
 
 mod common;
 
@@ -69,7 +69,7 @@ fn line(text: &str, n: usize) -> &str {
 }
 
 #[test]
-fn fr37_context_with_reference_and_note() {
+fn context_with_reference_and_note() {
     let mut s = sandbox();
     refer(&mut s, UUID, "W-12", "work");
     let out = context(&s, &["context", "--session", UUID]);
@@ -77,7 +77,7 @@ fn fr37_context_with_reference_and_note() {
 }
 
 #[test]
-fn fr37_context_note_by_another_session() {
+fn context_note_by_another_session() {
     let mut s = sandbox();
     refer(&mut s, "s1", "W-12", "work");
     let out = context(&s, &["context", "--session", "s1"]);
@@ -88,7 +88,7 @@ fn fr37_context_note_by_another_session() {
 }
 
 #[test]
-fn fr37_context_auto_note() {
+fn context_auto_note() {
     let mut s = sandbox();
     refer(&mut s, "s1", "W-7", "work");
     let out = context(&s, &["context", "--session", "s1"]);
@@ -99,7 +99,7 @@ fn fr37_context_auto_note() {
 }
 
 #[test]
-fn fr37_context_reference_without_notes() {
+fn context_reference_without_notes() {
     let mut s = sandbox();
     refer(&mut s, "s1", "W-11", "work");
     let out = context(&s, &["context", "--session", "s1"]);
@@ -108,7 +108,7 @@ fn fr37_context_reference_without_notes() {
 }
 
 #[test]
-fn fr37_context_note_without_session() {
+fn context_note_without_session() {
     let mut s = sandbox();
     refer(&mut s, "s1", "W-9", "work");
     let out = context(&s, &["context", "--session", "s1"]);
@@ -116,7 +116,7 @@ fn fr37_context_note_without_session() {
 }
 
 #[test]
-fn fr37_context_reference_on_another_board() {
+fn context_reference_on_another_board() {
     let mut s = sandbox();
     let home = s.root().join("boards/home");
     fs::create_dir_all(&home).unwrap();
@@ -177,7 +177,7 @@ fn ts6_7_context_json_note_without_session_is_null() {
 }
 
 #[test]
-fn fr56_context_without_reference_lists_picker() {
+fn context_without_reference_lists_picker() {
     let s = sandbox();
     let out = context(&s, &["context", "--session", "s9"]);
     let ls = context(&s, &["ls", "--open", "--guess"]);
@@ -190,7 +190,7 @@ fn fr56_context_without_reference_lists_picker() {
 }
 
 #[test]
-fn fr56_context_deleted_card_reference() {
+fn context_deleted_card_reference() {
     let mut s = sandbox();
     refer(&mut s, "s1", "W-12", "work");
     fs::remove_file(s.root().join("boards/work/W-12.md")).unwrap();
@@ -201,7 +201,7 @@ fn fr56_context_deleted_card_reference() {
 }
 
 #[test]
-fn fr56_context_reference_to_unconfigured_board() {
+fn context_reference_to_unconfigured_board() {
     let mut s = sandbox();
     refer(&mut s, "s1", "H-1", "home");
     let config = fs::read_to_string(s.config_file()).unwrap();
@@ -216,7 +216,7 @@ fn fr56_context_reference_to_unconfigured_board() {
 }
 
 #[test]
-fn fr57_new_session_in_same_pane_sees_linked_here() {
+fn new_session_in_same_pane_sees_linked_here() {
     let mut s = sandbox();
     let scenario = s.scenario_mut();
     *scenario = scenario.clone().herdr("w4V:p11", "w4V:t1", "w4V");
@@ -231,7 +231,7 @@ fn fr57_new_session_in_same_pane_sees_linked_here() {
 }
 
 #[test]
-fn fr56_context_board_flag_lists_named_board() {
+fn context_board_flag_lists_named_board() {
     let s = sandbox();
     let home = s.root().join("boards/home");
     fs::create_dir_all(&home).unwrap();
@@ -245,7 +245,7 @@ fn fr56_context_board_flag_lists_named_board() {
 }
 
 #[test]
-fn fr56_context_no_session_lists_picker_without_warning() {
+fn context_no_session_lists_picker_without_warning() {
     let s = sandbox();
     let out = s.cmd(&["context"]).assert().code(0).get_output().clone();
     let stdout = String::from_utf8(out.stdout).unwrap();
@@ -306,7 +306,7 @@ fn lines(text: &str) -> Vec<&str> {
 }
 
 #[test]
-fn fr37_context_first_run_without_config() {
+fn context_first_run_without_config() {
     let s = Sandbox::new();
     let (out, err) = run(&s, &["context", "--session", "s9"]);
     assert!(s.config_file().is_file());
@@ -327,7 +327,7 @@ fn fr37_context_first_run_without_config() {
 }
 
 #[test]
-fn fr37_context_broken_config_reports_error_line() {
+fn context_broken_config_reports_error_line() {
     let s = broken();
     let (out, err) = run(&s, &["context", "--session", "s9"]);
     assert_eq!(err, "");
@@ -348,7 +348,7 @@ fn fr37_context_broken_config_reports_error_line() {
 }
 
 #[test]
-fn fr37_context_unreadable_board_reports_error_line() {
+fn context_unreadable_board_reports_error_line() {
     let s = Sandbox::new();
     s.write_config();
     fs::create_dir_all(s.root().join("boards")).unwrap();
@@ -365,7 +365,7 @@ fn fr37_context_unreadable_board_reports_error_line() {
 }
 
 #[test]
-fn fr37_context_missing_board_folder_reads_empty() {
+fn context_missing_board_folder_reads_empty() {
     let s = Sandbox::new();
     s.write_config();
     let out = context(&s, &["context", "--session", "s9"]);
@@ -376,7 +376,7 @@ fn fr37_context_missing_board_folder_reads_empty() {
 }
 
 #[test]
-fn fr41_context_empty_session_warns_in_output() {
+fn context_empty_session_warns_in_output() {
     let s = sandbox();
     let (out, err) = run(&s, &["context", "--session", ""]);
     assert_eq!(line(&out, 2), "session: none");
@@ -388,7 +388,7 @@ fn fr41_context_empty_session_warns_in_output() {
 }
 
 #[test]
-fn fr41_context_placeholder_session_warns_in_output() {
+fn context_placeholder_session_warns_in_output() {
     let s = sandbox();
     let (out, _) = run(&s, &["context", "--session", "${CLAUDE_SESSION_ID}"]);
     assert_eq!(line(&out, 2), "session: none");
@@ -397,14 +397,14 @@ fn fr41_context_placeholder_session_warns_in_output() {
 }
 
 #[test]
-fn fr41_context_invalid_session_warns_in_output() {
+fn context_invalid_session_warns_in_output() {
     let s = sandbox();
     let (out, _) = run(&s, &["context", "--session", "a b"]);
     assert_eq!(line(&out, 3), "warning: invalid session id");
 }
 
 #[test]
-fn fr41_context_inside_herdr_uses_pane_session() {
+fn context_inside_herdr_uses_pane_session() {
     let mut s = sandbox();
     let sc = s.scenario_mut();
     *sc = sc
@@ -449,7 +449,7 @@ fn ts6_7_context_json_problem() {
 }
 
 #[test]
-fn fr37_context_unknown_board_reports_error_line() {
+fn context_unknown_board_reports_error_line() {
     let s = sandbox();
     let (out, err) = run(&s, &["--board", "work2", "context", "--session", "s9"]);
     assert_eq!(err, "");
@@ -485,7 +485,7 @@ fn ts11_context_log_inside_board_folder_warns_in_output() {
 }
 
 #[test]
-fn fr37_context_unreadable_reference_board_reports_error_line() {
+fn context_unreadable_reference_board_reports_error_line() {
     let mut s = sandbox();
     refer(&mut s, "s1", "H-1", "home");
     fs::write(s.root().join("boards/home"), "").unwrap();

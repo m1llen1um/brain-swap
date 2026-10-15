@@ -1,4 +1,4 @@
-//! One function per subcommand (TECHSPEC 2.1).
+//! One function per subcommand.
 
 use crate::adapters::claude::{self, InstallOpts};
 use crate::adapters::herdr;
@@ -56,8 +56,8 @@ pub struct Ctx {
 }
 
 impl Ctx {
-    /// Loads `config.toml` (a broken one is `Error::Config`, never defaults, section 10)
-    /// and drops a `BRAIN_SWAP_LOG` inside a board folder (section 11).
+    /// Loads `config.toml` (a broken one is `Error::Config`, never defaults)
+    /// and drops a `BRAIN_SWAP_LOG` inside a board folder.
     pub fn load(env: &mut Env) -> Result<Ctx, Error> {
         let loaded = config::load(env)?;
         let mut warnings = loaded.warnings;
@@ -73,7 +73,7 @@ impl Ctx {
         })
     }
 
-    /// Board `name`, else the default board; an unknown name is `NotFound` (6.2).
+    /// Board `name`, else the default board; an unknown name is `NotFound`.
     pub fn board(&self, name: Option<&str>) -> Result<Board, Error> {
         let (name, path) = self
             .config
@@ -82,24 +82,24 @@ impl Ctx {
     }
 }
 
-/// Template `name` among the built-ins and the user's templates (6.2); prints the
-/// template load warnings (5.4).
+/// Template `name` among the built-ins and the user's templates; prints the
+/// template load warnings.
 pub fn find_template(ctx: &Ctx, name: &str, out: &mut Out) -> Result<Template, Error> {
     let (ts, warnings) = template::load(&ctx.env.templates_dir());
     warnings.iter().for_each(|w| out.warn(w));
     template::find(&ts, name).cloned()
 }
 
-/// Card `id` and its board, found by letter over the configured boards (6.1);
-/// an unknown card is `NotFound("<ID> not found")` (6.2).
+/// Card `id` and its board, found by letter over the configured boards;
+/// an unknown card is `NotFound("<ID> not found")`.
 pub fn find_card(ctx: &Ctx, id: CardId) -> Result<(Board, Card), Error> {
     let board = crate::core::board::find_card(&ctx.config.boards, id, &ctx.env)?;
     let card = board.card(id).cloned().expect("find_card checked the card");
     Ok((board, card))
 }
 
-/// TECHSPEC 6.4: steps 1 and 2 with their warnings, then herdr's pane session (step 3) when
-/// it passes I8, else none; never fails.
+/// Steps 1 and 2 of `session::resolve` with their warnings, then herdr's pane session (step 3) when
+/// it passes the session ID check, else none; never fails.
 pub fn resolve_session(
     env: &Env,
     flag: Option<&str>,
@@ -113,7 +113,7 @@ pub fn resolve_session(
     (session, r.warnings)
 }
 
-/// Dispatches one subcommand and returns its 6.2 exit code.
+/// Dispatches one subcommand and returns its exit code.
 pub fn run(env: &mut Env, cli: Cli) -> i32 {
     let mut out = Out::new(cli.json);
     let mut ctx = None;
@@ -309,7 +309,7 @@ pub fn run(env: &mut Env, cli: Cli) -> i32 {
             let runner = ProcessRunner::new(env);
             let (session, warnings) = resolve_session(env, session.as_deref(), &runner);
             warnings.iter().for_each(|w| out.warn(w));
-            // I9: the reference counts while its board is configured and holds its card.
+            // The reference counts while its board is configured and holds its card.
             let target = match flag {
                 Some(id) => find_card(&ctx, id).map(|(board, _)| (board, id)),
                 None => session
@@ -391,8 +391,8 @@ pub fn run(env: &mut Env, cli: Cli) -> i32 {
     }
 }
 
-/// `install claude` (8.8): one `removed <path>` line per deleted entry, one `installed
-/// <folder>` line per skill, then the notices; with `--json` the 6.7 object on stdout and
+/// `install claude`: one `removed <path>` line per deleted entry, one `installed
+/// <folder>` line per skill, then the notices; with `--json` the JSON object on stdout and
 /// the notices as warnings on stderr. `remove` runs `claude::remove`, ignoring `opts`.
 pub fn install_claude(env: &Env, opts: &InstallOpts, remove: bool, out: &mut Out) -> i32 {
     let report = match remove {
@@ -426,8 +426,8 @@ pub fn install_claude(env: &Env, opts: &InstallOpts, remove: bool, out: &mut Out
     0
 }
 
-/// `install herdr` (9.4): prints the key binding for the canonical binary path; reads no
-/// config, writes no file and runs no herdr command (FR-64).
+/// `install herdr`: prints the key binding for the canonical binary path; reads no
+/// config, writes no file and runs no herdr command.
 pub fn install_herdr(env: &Env, out: &mut Out) -> i32 {
     let Some(exe) = &env.exe else {
         return out.error(&Error::Io(
@@ -442,7 +442,7 @@ pub fn install_herdr(env: &Env, out: &mut Out) -> i32 {
     0
 }
 
-/// The popup command of 9.4: the `env` prefix before the binary path.
+/// The popup command: the `env` prefix before the binary path.
 /// A path outside a plain character set is single-quoted, since herdr may run the command
 /// through a shell.
 pub fn herdr_command(env: &Env, exe: &Path) -> String {
@@ -463,7 +463,7 @@ pub fn herdr_command(env: &Env, exe: &Path) -> String {
     format!("env HERDR_ENV=1 HERDR_BIN_PATH={herdr} {}", word(exe))
 }
 
-/// The note `locate` and `jump` target (6.3): the jump note, or note `n` counted from the
+/// The note `locate` and `jump` target: the jump note, or note `n` counted from the
 /// oldest; `n` outside 1 to the note count is `NotFound`.
 pub fn target_note(card: &Card, note: Option<u32>) -> Result<Option<usize>, Error> {
     match note {
@@ -477,7 +477,7 @@ pub fn target_note(card: &Card, note: Option<u32>) -> Result<Option<usize>, Erro
     }
 }
 
-/// `locate` (6.3): the target note's pane status and its `Where:` line, or `no note yet`;
+/// `locate`: the target note's pane status and its `Where:` line, or `no note yet`;
 /// exit 0 for every status.
 pub fn locate(env: &Env, ctx: &Ctx, id: CardId, note: Option<u32>, out: &mut Out) -> i32 {
     let (board, card) = match find_card(ctx, id) {
@@ -505,7 +505,7 @@ pub fn locate(env: &Env, ctx: &Ctx, id: CardId, note: Option<u32>, out: &mut Out
     0
 }
 
-/// `jump` (6.3): `locate`, then `focus` a live or moved pane within one shared 3 second
+/// `jump`: `locate`, then `focus` a live or moved pane within one shared 3 second
 /// budget; exit 0 when focused, else the `locate` lines and exit 6.
 pub fn jump(env: &Env, ctx: &Ctx, id: CardId, note: Option<u32>, out: &mut Out) -> i32 {
     let (board, card) = match find_card(ctx, id) {
@@ -572,7 +572,7 @@ pub fn jump(env: &Env, ctx: &Ctx, id: CardId, note: Option<u32>, out: &mut Out) 
     }
 }
 
-/// `created config <path>` on stderr after the first run, a warning under `--json` (10).
+/// `created config <path>` on stderr after the first run, a warning under `--json`.
 fn first_run(ctx: &Ctx, out: &mut Out) {
     if let Some(p) = &ctx.created {
         let notice = format!("created config {}", p.display());
@@ -584,7 +584,7 @@ fn first_run(ctx: &Ctx, out: &mut Out) {
     }
 }
 
-/// The 6.7 `context` body.
+/// The JSON `context` body.
 #[derive(serde::Serialize)]
 struct ContextJson<'a> {
     session: Option<&'a str>,
@@ -615,7 +615,7 @@ fn context_head(session: Option<&str>, warnings: &[String]) -> String {
     text
 }
 
-/// `context` ending in `error:` and `hint:` lines (6.3), JSON `problem`; exit 0 (6.2).
+/// `context` ending in `error:` and `hint:` lines, JSON `problem`; exit 0.
 fn context_problem(
     out: &mut Out,
     session: Option<&str>,
@@ -644,7 +644,7 @@ fn context_problem(
     0
 }
 
-/// The `hint:` of a board that failed to load: an unknown name, else its folder (6.3).
+/// The `hint:` of a board that failed to load: an unknown name, else its folder.
 fn board_hint(ctx: &Ctx, name: &str, e: &Error) -> String {
     match e {
         Error::NotFound(_) => "use one of the listed boards".to_string(),
@@ -656,7 +656,7 @@ fn board_hint(ctx: &Ctx, name: &str, e: &Error) -> String {
     }
 }
 
-/// `context` (6.3, 6.7): the reference's card block, else the picker; config, session and
+/// `context`: the reference's card block, else the picker; config, session and
 /// board warnings become `warning:` lines and expected problems `error:` lines; exit 0.
 fn context(env: &mut Env, (name, flag): (Option<&str>, Option<&str>), out: &mut Out) -> i32 {
     let loaded = Ctx::load(env);
@@ -675,7 +675,7 @@ fn context(env: &mut Env, (name, flag): (Option<&str>, Option<&str>), out: &mut 
     first_run(&ctx, out);
     warnings.splice(0..0, ctx.warnings.iter().cloned());
     let reference = session.as_deref().and_then(|s| read_reference(env, s));
-    // An unconfigured reference board reads as a missing card (I9), an unreadable one is
+    // An unconfigured reference board reads as a missing card, an unreadable one is
     // a problem.
     let mut found = None;
     if let Some(r) = &reference {
@@ -749,8 +749,8 @@ fn context(env: &mut Env, (name, flag): (Option<&str>, Option<&str>), out: &mut 
     0
 }
 
-/// `open cards on <board>, best guess first:`, the 6.6 picker lines and the other boards
-/// line (6.3) with their 6.7 Candidates; shared by `ls --guess` and `context`.
+/// `open cards on <board>, best guess first:`, the picker lines and the other boards
+/// line with their JSON Candidates; shared by `ls --guess` and `context`.
 fn picker<'a>(env: &Env, ctx: &'a Ctx, board: &'a Board) -> (String, Vec<out::CandidateJson<'a>>) {
     let cands = guess::best_guess(board, &guess::GuessInput::from_env(env));
     let mut text = format!("open cards on {}, best guess first:\n", board.name);
@@ -770,7 +770,7 @@ fn picker<'a>(env: &Env, ctx: &'a Ctx, board: &'a Board) -> (String, Vec<out::Ca
     (text, json.collect())
 }
 
-/// `link` (6.3): an unknown card or no session changes nothing; otherwise the reference
+/// `link`: an unknown card or no session changes nothing; otherwise the reference
 /// is set and the block printed against the resolved session.
 fn link(env: &Env, ctx: &Ctx, id: CardId, flag: Option<&str>, out: &mut Out) -> i32 {
     let (board, card) = match find_card(ctx, id) {
@@ -800,7 +800,7 @@ fn link(env: &Env, ctx: &Ctx, id: CardId, flag: Option<&str>, out: &mut Out) -> 
     0
 }
 
-/// 6.3 and 6.4: with a session, writes its reference (and inside herdr the pane hint)
+/// With a session, writes its reference (and inside herdr the pane hint)
 /// through `core::session`; a failed write is a warning, the command already succeeded.
 fn set_reference(
     env: &Env,
@@ -823,7 +823,7 @@ fn set_reference(
     }
 }
 
-/// `new` (6.3): the board, template and column names default to the default board, `feature`
+/// `new`: the board, template and column names default to the default board, `feature`
 /// and the first column; `store::create` resolves the column (`Board::column`).
 fn new(
     env: &Env,
@@ -855,7 +855,7 @@ fn new(
     Ok((board, created))
 }
 
-/// `new --body -` (6.3): a first non-blank line starting with `# ` is the title and is
+/// `new --body -`: a first non-blank line starting with `# ` is the title and is
 /// removed; the rest, from its first non-blank line, is the body.
 pub fn split_body(text: &str) -> (Option<String>, String) {
     let skip_blank = |t: &str| {
@@ -870,7 +870,7 @@ pub fn split_body(text: &str) -> (Option<String>, String) {
     }
 }
 
-/// The three parts of a note read from stdin (6.5).
+/// The three parts of a note read from stdin.
 #[derive(Debug, Default)]
 pub struct NoteText {
     pub doing: String,
@@ -878,7 +878,7 @@ pub struct NoteText {
     pub watch_out: String,
 }
 
-/// The 6.5 grammar: a label line starts its part, other non-blank lines continue the
+/// The note grammar: a label line starts its part, other non-blank lines continue the
 /// current one (Doing before any label), a repeated label continues its part.
 pub fn parse_note(text: &str) -> NoteText {
     let mut parts = [String::new(), String::new(), String::new()];
@@ -908,7 +908,7 @@ pub fn parse_note(text: &str) -> NoteText {
     }
 }
 
-/// A note from `input`: the 6.5 grammar, or on a terminal one verbatim line per prompt
+/// A note from `input`: the note grammar, or on a terminal one verbatim line per prompt
 /// written to `prompts`, end of input leaving the rest empty.
 pub fn read_note(
     input: &mut dyn std::io::BufRead,
@@ -963,7 +963,7 @@ fn label(line: &str) -> Option<(usize, &str)> {
         })
 }
 
-/// `templates` (6.3): header line and skeleton per template, one blank line between;
+/// `templates`: header line and skeleton per template, one blank line between;
 /// never reads `config.toml`.
 pub fn templates(ts: &[Template]) -> String {
     ts.iter()
@@ -1049,33 +1049,33 @@ mod tests {
     }
 
     #[test]
-    fn fr34_terminal_prompts_for_each_part() {
+    fn terminal_prompts_for_each_part() {
         let (n, prompts) = read("a\nb\nc\n", true);
         assert_eq!(prompts, "Doing: Next: Watch out: ");
         assert_eq!(n.unwrap(), ["a", "b", "c"]);
     }
 
     #[test]
-    fn fr34_terminal_answer_taken_verbatim() {
+    fn terminal_answer_taken_verbatim() {
         let (n, _) = read("next: x\n\n\n", true);
         assert_eq!(n.unwrap(), ["next: x", "", ""]);
     }
 
     #[test]
-    fn fr34_terminal_end_of_input_stops_prompting() {
+    fn terminal_end_of_input_stops_prompting() {
         let (n, prompts) = read("a\n", true);
         assert_eq!(prompts, "Doing: Next: ");
         assert_eq!(n.unwrap(), ["a", "", ""]);
     }
 
     #[test]
-    fn fr18_terminal_three_empty_answers_rejected() {
+    fn terminal_three_empty_answers_rejected() {
         let (n, _) = read("\n\n\n", true);
         assert_eq!(n, Err(Error::InvalidInput("empty note".to_string())));
     }
 
     #[test]
-    fn fr34_non_terminal_parses_without_prompts() {
+    fn non_terminal_parses_without_prompts() {
         let (n, prompts) = read("Next: b\n", false);
         assert_eq!(prompts, "");
         assert_eq!(n.unwrap(), ["", "b", ""]);

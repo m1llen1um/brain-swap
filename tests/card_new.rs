@@ -1,4 +1,4 @@
-//! TECHSPEC 4.8 R4 and 5.4: rendering a new card file.
+//! Rendering a new card file.
 
 use std::path::Path;
 
@@ -25,7 +25,7 @@ fn text(card: &NewCard) -> (String, Vec<String>) {
 const BODY: &str = "## Goal\n\n## Acceptance\n\n## Context\n";
 
 #[test]
-fn r4_new_card_parses_back_to_rendered_values() {
+fn new_card_parses_back_to_rendered_values() {
     let new = input(BODY);
     let (bytes, _) = render_new(&new);
     let id = CardId::parse("W-12").unwrap();
@@ -42,7 +42,7 @@ fn r4_new_card_parses_back_to_rendered_values() {
 }
 
 #[test]
-fn r4_new_card_bytes_snapshot() {
+fn new_card_bytes_snapshot() {
     insta::assert_snapshot!("new_card", text(&input(BODY)).0);
 }
 
@@ -57,14 +57,14 @@ fn ts6_3_timeline_heading_in_body_dropped_with_warning() {
 }
 
 #[test]
-fn r4_empty_body_renders_title_then_timeline() {
+fn empty_body_renders_title_then_timeline() {
     let (t, _) = text(&input(""));
     let after = t.splitn(3, "---\n").nth(2).unwrap();
     assert_eq!(after, "# migrate invoices to v13\n\n## Timeline\n");
 }
 
 #[test]
-fn nfr06_new_card_is_utf8_markdown_with_one_title() {
+fn new_card_is_utf8_markdown_with_one_title() {
     let (bytes, _) = render_new(&input(BODY));
     let t = String::from_utf8(bytes).unwrap();
     assert_eq!(t.lines().filter(|l| l.starts_with("# ")).count(), 1);
@@ -72,7 +72,7 @@ fn nfr06_new_card_is_utf8_markdown_with_one_title() {
 }
 
 #[test]
-fn r4_unclosed_fence_in_body_is_closed_before_timeline() {
+fn unclosed_fence_in_body_is_closed_before_timeline() {
     let (bytes, _) = render_new(&input("## Repro\n\n```sh\ncargo test billing\n"));
     let id = CardId::parse("W-12").unwrap();
     let parsed = parse(id, Path::new("W-12.md"), &bytes, "Todo", &TimeZone::UTC);

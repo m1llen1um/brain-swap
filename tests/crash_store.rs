@@ -1,4 +1,4 @@
-//! TECHSPEC 3 (I1 to I4), 4.6 and 12.1: in-process crash tests through failpoints on `Env` (NFR-08).
+//! In-process crash tests through failpoints on `Env`.
 #![cfg(feature = "failpoints")]
 
 mod common;
@@ -24,11 +24,11 @@ use jiff::tz::TimeZone;
 const NOW: &str = "2026-10-08T11:52:00+03:00";
 const WORK_4_9: &str = concat!(
     env!("CARGO_MANIFEST_DIR"),
-    "/tests/fixtures/boards/work_4_9"
+    "/tests/fixtures/boards/work_example"
 );
 const USED: [u32; 3] = [9, 11, 12];
 
-/// A temp home holding a copy of `work_4_9` at `<home>/work`, its env and its board.
+/// A temp home holding a copy of `work_example` at `<home>/work`, its env and its board.
 fn copy() -> (tempfile::TempDir, Env, Board) {
     let tmp = tempfile::tempdir().unwrap();
     let dir = tmp.path().join("work");
@@ -103,7 +103,7 @@ fn crash_after_tmp() -> (tempfile::TempDir, Env, Board, PathBuf) {
 }
 
 #[test]
-fn nfr08_crash_after_next_only_skips_a_number() {
+fn crash_after_next_only_skips_a_number() {
     let (_tmp, env, board) = copy();
     assert_io(new(&failing(&env, "create:after_next"), &board));
     let md = fs::read_to_string(board.path.join("board.md")).unwrap();
@@ -116,7 +116,7 @@ fn nfr08_crash_after_next_only_skips_a_number() {
 }
 
 #[test]
-fn nfr08_crash_after_tmp_leaves_ignored_temp() {
+fn crash_after_tmp_leaves_ignored_temp() {
     let (_tmp, env, board, temp) = crash_after_tmp();
     assert!(temp.exists(), "{}", temp.display());
     let reloaded = load("work", &board.path, &env).unwrap();
@@ -129,7 +129,7 @@ fn nfr08_crash_after_tmp_leaves_ignored_temp() {
 }
 
 #[test]
-fn nfr08_crash_after_link_leaves_card_and_temp() {
+fn crash_after_link_leaves_card_and_temp() {
     let (_tmp, env, board) = copy();
     assert_io(new(&failing(&env, "create:after_link"), &board));
     let w13 = path(&board, "W-13");
@@ -142,7 +142,7 @@ fn nfr08_crash_after_link_leaves_card_and_temp() {
 }
 
 #[test]
-fn nfr08_crash_during_park_keeps_old_card() {
+fn crash_during_park_keeps_old_card() {
     let (_tmp, env, board) = copy();
     let p = path(&board, "W-12");
     let before = fs::read(&p).unwrap();
@@ -158,7 +158,7 @@ fn nfr08_crash_during_park_keeps_old_card() {
 }
 
 #[test]
-fn nfr08_crash_during_edit_merge_keeps_file() {
+fn crash_during_edit_merge_keeps_file() {
     let (_tmp, env, board) = copy();
     let p = path(&board, "W-12");
     let c0 = fs::read(&p).unwrap();
@@ -181,7 +181,7 @@ fn nfr08_crash_during_edit_merge_keeps_file() {
 }
 
 #[test]
-fn nfr08_crash_temp_removed_after_an_hour() {
+fn crash_temp_removed_after_an_hour() {
     let (_tmp, env, board, old) = crash_after_tmp();
     let stamp = SystemTime::from(env.now.timestamp());
     File::open(&old).unwrap().set_modified(stamp).unwrap();

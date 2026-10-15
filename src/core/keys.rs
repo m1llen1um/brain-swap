@@ -1,4 +1,4 @@
-//! Key binding syntax of TECHSPEC 5.3, terminal-free.
+//! Key binding syntax, terminal-free.
 
 use std::fmt;
 
@@ -186,7 +186,7 @@ impl Action {
         ACTIONS[self as usize].1
     }
 
-    /// Every action in 5.2 order.
+    /// Every action in default config order.
     pub fn all() -> impl Iterator<Item = Action> {
         ACTIONS.iter().map(|a| a.0)
     }
@@ -498,7 +498,7 @@ mod tests {
     }
 
     #[test]
-    fn fr43_user_entry_replaces_defaults() {
+    fn user_entry_replaces_defaults() {
         let (m, w) = KeyMap::build(&user(&[("open", &["x"])]));
         assert!(w.is_empty());
         assert_eq!(m.keys(Action::Open), bs(&["x"]));
@@ -506,21 +506,21 @@ mod tests {
     }
 
     #[test]
-    fn fr44_bad_binding_warns_and_keeps_default() {
+    fn bad_binding_warns_and_keeps_default() {
         let (m, w) = KeyMap::build(&user(&[("open", &["foo"])]));
         assert_eq!(m.keys(Action::Open), bs(&["o"]));
         assert_eq!(w, ["key config: open: unknown key 'foo'"]);
     }
 
     #[test]
-    fn fr44_unknown_action_warns() {
+    fn unknown_action_warns() {
         let (m, w) = KeyMap::build(&user(&[("jumpp", &["x"])]));
         assert_eq!(m, KeyMap::defaults());
         assert_eq!(w, ["key config: jumpp: unknown action"]);
     }
 
     #[test]
-    fn fr44_swap_of_two_keys_is_accepted() {
+    fn swap_of_two_keys_is_accepted() {
         let (m, w) = KeyMap::build(&user(&[("open", &["n"]), ("new", &["o"])]));
         assert!(w.is_empty(), "{w:?}");
         assert_eq!(m.action(KeyContext::Board, &p("n")), Some(Action::Open));
@@ -528,7 +528,7 @@ mod tests {
     }
 
     #[test]
-    fn fr44_user_binding_colliding_with_default_reverts_only_user_action() {
+    fn user_binding_colliding_with_default_reverts_only_user_action() {
         let (m, w) = KeyMap::build(&user(&[("new", &["j"])]));
         assert_eq!(m.keys(Action::New), bs(&["n"]));
         assert_eq!(m.keys(Action::Down), bs(&["j", "down"]));
@@ -536,7 +536,7 @@ mod tests {
     }
 
     #[test]
-    fn fr44_both_user_set_actions_revert_on_conflict() {
+    fn both_user_set_actions_revert_on_conflict() {
         let (m, w) = KeyMap::build(&user(&[("open", &["x"]), ("edit", &["x"])]));
         assert_eq!(m.keys(Action::Open), bs(&["o"]));
         assert_eq!(m.keys(Action::Edit), bs(&["e"]));
@@ -589,7 +589,7 @@ mod tests {
     }
 
     #[test]
-    fn fr43_action_lookup_by_context() {
+    fn action_lookup_by_context() {
         let m = KeyMap::defaults();
         assert_eq!(m.action(KeyContext::Detail, &p("j")), Some(Action::Down));
         assert_eq!(

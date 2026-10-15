@@ -1,4 +1,4 @@
-//! The template and board pickers (TECHSPEC 7.2).
+//! The template and board pickers.
 
 use ratatui::Frame;
 use ratatui::layout::Rect;

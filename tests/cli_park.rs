@@ -1,4 +1,4 @@
-//! TECHSPEC 6.2 exit codes for `park`, 6.3 `park --card` from stdin, 6.7 `park`, 10 lock.
+//! `park`: exit codes, `park --card` from stdin, its JSON and the lock.
 
 mod common;
 
@@ -58,7 +58,7 @@ fn files(s: &Sandbox) -> BTreeMap<String, Vec<u8>> {
 }
 
 #[test]
-fn fr16_park_appends_note_only_to_timeline() {
+fn park_appends_note_only_to_timeline() {
     let s = sandbox();
     let mut before = files(&s);
     let out = park(&s, &["park", "--card", "W-12"], NOTE, "ati.billing", 0);
@@ -79,7 +79,7 @@ fn fr16_park_appends_note_only_to_timeline() {
 }
 
 #[test]
-fn as6_park_from_stdin_writes_no_auto() {
+fn park_from_stdin_writes_no_auto() {
     let s = sandbox();
     park(&s, &["park", "--card", "W-12"], NOTE, "ati.billing", 0);
     let file = fs::read_to_string(card(&s, "W-12")).unwrap();
@@ -89,7 +89,7 @@ fn as6_park_from_stdin_writes_no_auto() {
 }
 
 #[test]
-fn fr15_park_outside_herdr_records_cwd_only() {
+fn park_outside_herdr_records_cwd_only() {
     let s = sandbox();
     park(&s, &["park", "--card", "W-11"], "Doing: a", "x", 0);
     let file = s.redact(&fs::read_to_string(card(&s, "W-11")).unwrap());
@@ -200,7 +200,7 @@ fn ts6_2_park_busy_exits_5() {
 }
 
 #[test]
-fn fr18_park_empty_note_exits_1() {
+fn park_empty_note_exits_1() {
     let s = sandbox();
     let before = fs::read(card(&s, "W-12")).unwrap();
     for (i, stdin) in ["Doing:\nNext:  \n", ""].into_iter().enumerate() {
@@ -225,7 +225,7 @@ fn ts6_5_continuation_written_indented() {
 }
 
 #[test]
-fn as6_park_from_terminal_prompts_and_writes_no_auto() {
+fn park_from_terminal_prompts_and_writes_no_auto() {
     let mut s = sandbox();
     let bin = env!("CARGO_BIN_EXE_brain-swap");
     let script = std::path::Path::new("/usr/bin/script");
@@ -266,9 +266,9 @@ fn as6_park_from_terminal_prompts_and_writes_no_auto() {
     assert_eq!(parts, ["- Doing: a", "- Next: b", "- Watch out: c"]);
 }
 
-/// Reloads W-12, checks I6 on its latest note (`at`, `place.cwd`, a non-empty part) and
+/// Reloads W-12, checks its latest note (`at`, `place.cwd`, a non-empty part) and
 /// returns the note's place line.
-fn i6_place_line(s: &Sandbox) -> String {
+fn place_line(s: &Sandbox) -> String {
     let path = card(s, "W-12");
     let id = brain_swap::core::model::CardId::parse("W-12").unwrap();
     let parsed = parse(id, &path, &fs::read(&path).unwrap(), "Todo", &TimeZone::UTC);
@@ -289,14 +289,14 @@ fn ts6_3_park_auto_flag_marks_heading() {
         "elsewhere",
         0,
     );
-    i6_place_line(&s);
+    place_line(&s);
     let file = fs::read_to_string(card(&s, "W-12")).unwrap();
     let heading = file.lines().rfind(|l| l.starts_with("### "));
     assert_eq!(heading, Some("### 2026-10-08T08:52:00+00:00 auto"));
 }
 
 #[test]
-fn fr15_park_inside_herdr_records_pane_tab_workspace() {
+fn park_inside_herdr_records_pane_tab_workspace() {
     let mut s = sandbox();
     let scenario = s.scenario_mut();
     *scenario = scenario
@@ -306,21 +306,21 @@ fn fr15_park_inside_herdr_records_pane_tab_workspace() {
     let args = ["park", "--card", "W-12", "--session", "s1"];
     park(&s, &args, "Doing: a", "elsewhere", 0);
     assert_eq!(
-        i6_place_line(&s),
+        place_line(&s),
         "<!-- where: cwd=<sandbox>/elsewhere pane=w4V:p9 tab=w4V:t1 workspace=w4V session=s1 -->"
     );
-    // TECHSPEC 9.1: no moved-pane check, so park calls no herdr.
+    // No moved-pane check, so park calls no herdr.
     assert!(common::fake_herdr::calls(&s.root().join("home")).is_empty());
 }
 
 #[test]
-fn fr15_park_records_env_session() {
+fn park_records_env_session() {
     let mut s = sandbox();
     let scenario = s.scenario_mut();
     *scenario = scenario.clone().session("s2");
     park(&s, &["park", "--card", "W-12"], "Doing: a", "elsewhere", 0);
     assert_eq!(
-        i6_place_line(&s),
+        place_line(&s),
         "<!-- where: cwd=<sandbox>/elsewhere session=s2 -->"
     );
 }
@@ -330,7 +330,7 @@ fn park_session(s: &Sandbox, args: &[&str]) -> (String, String) {
     let mut all = vec!["park", "--card", "W-12"];
     all.extend(args);
     let out = park(s, &all, "Doing: x", "elsewhere", 0);
-    (text(&out.stderr), i6_place_line(s))
+    (text(&out.stderr), place_line(s))
 }
 
 /// The fake herdr pane `w4V:p9` answering per `scenario`.
@@ -347,7 +347,7 @@ fn herdr_calls(s: &Sandbox) -> Vec<String> {
 }
 
 #[test]
-fn fr41_flag_session_wins_over_env() {
+fn flag_session_wins_over_env() {
     let mut s = sandbox();
     let sc = s.scenario_mut();
     *sc = sc.clone().session("b");
@@ -357,7 +357,7 @@ fn fr41_flag_session_wins_over_env() {
 }
 
 #[test]
-fn fr41_missing_flag_uses_env_without_warning() {
+fn missing_flag_uses_env_without_warning() {
     let mut s = sandbox();
     let sc = s.scenario_mut();
     *sc = sc.clone().session("b");
@@ -367,7 +367,7 @@ fn fr41_missing_flag_uses_env_without_warning() {
 }
 
 #[test]
-fn fr41_empty_flag_warns_and_falls_back() {
+fn empty_flag_warns_and_falls_back() {
     let mut s = sandbox();
     let sc = s.scenario_mut();
     *sc = sc.clone().session("b");
@@ -377,7 +377,7 @@ fn fr41_empty_flag_warns_and_falls_back() {
 }
 
 #[test]
-fn fr41_placeholder_flag_warns_and_degrades_to_none() {
+fn placeholder_flag_warns_and_degrades_to_none() {
     let s = sandbox();
     let (err, place) = park_session(&s, &["--session", "${CLAUDE_SESSION_ID}"]);
     assert_eq!(err, "warning: session id not substituted\n");
@@ -385,7 +385,7 @@ fn fr41_placeholder_flag_warns_and_degrades_to_none() {
 }
 
 #[test]
-fn fr41_invalid_flag_warns_invalid_session_id() {
+fn invalid_flag_warns_invalid_session_id() {
     let s = sandbox();
     let (err, place) = park_session(&s, &["--session", "a b"]);
     assert_eq!(err, "warning: invalid session id\n");
@@ -393,17 +393,17 @@ fn fr41_invalid_flag_warns_invalid_session_id() {
 }
 
 #[test]
-fn fr41_inside_herdr_falls_back_to_pane_session() {
+fn inside_herdr_falls_back_to_pane_session() {
     let mut s = sandbox();
     in_herdr(&mut s, "pane-session");
     let (_, place) = park_session(&s, &["--session", ""]);
     assert!(place.ends_with(" session=herdr-s1 -->"), "{place}");
-    // TECHSPEC 9.1: no moved-pane check, so only step 3 calls herdr.
+    // No moved-pane check, so only step 3 calls herdr.
     assert_eq!(herdr_calls(&s), ["pane get w4V:p9"]);
 }
 
 #[test]
-fn fr41_valid_env_session_never_calls_herdr() {
+fn valid_env_session_never_calls_herdr() {
     let mut s = sandbox();
     in_herdr(&mut s, "pane-session");
     let sc = s.scenario_mut();
@@ -413,7 +413,7 @@ fn fr41_valid_env_session_never_calls_herdr() {
 }
 
 #[test]
-fn fr41_pane_without_agent_session_resolves_none() {
+fn pane_without_agent_session_resolves_none() {
     let mut s = sandbox();
     in_herdr(&mut s, "pane-no-agent");
     let (_, place) = park_session(&s, &["--session", ""]);
@@ -489,7 +489,7 @@ fn park_sets_reference(s: &Sandbox) {
 }
 
 #[test]
-fn fr57_park_card_sets_reference() {
+fn park_card_sets_reference() {
     let mut s = sandbox();
     park_sets_reference(&s);
     let env = sandbox_env(&mut s);
@@ -503,7 +503,7 @@ fn fr57_park_card_sets_reference() {
 }
 
 #[test]
-fn fr57_park_by_reference_needs_no_card() {
+fn park_by_reference_needs_no_card() {
     let mut s = sandbox();
     let fixture = fs::read_to_string(card(&s, "W-12")).unwrap();
     park_sets_reference(&s);
@@ -544,7 +544,7 @@ fn ts6_2_park_without_any_session_exits_4() {
 }
 
 #[test]
-fn i9_reference_to_deleted_card_exits_4() {
+fn reference_to_deleted_card_exits_4() {
     let s = sandbox();
     park_sets_reference(&s);
     fs::remove_file(card(&s, "W-12")).unwrap();

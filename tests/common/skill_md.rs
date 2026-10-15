@@ -1,4 +1,4 @@
-//! Static reading of the pack's `SKILL.md` files (TECHSPEC 8, 12.1 Pack).
+//! Static reading of the pack's `SKILL.md` files.
 
 use std::collections::BTreeMap;
 

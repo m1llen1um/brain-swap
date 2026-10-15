@@ -1,4 +1,4 @@
-//! FR-29, TECHSPEC 4.7, 7.1 and 7.3: `H` and `L` move the selected card.
+//! `H` and `L` move the selected card.
 
 mod common;
 
@@ -30,32 +30,32 @@ fn fixture(name: &str, s: Selection) -> App {
 }
 
 #[test]
-fn fr29_l_emits_move_to_next_column() {
-    let mut app = fixture("work_4_9", sel(0, "W-11"));
+fn l_emits_move_to_next_column() {
+    let mut app = fixture("work_example", sel(0, "W-11"));
     assert_eq!(press(&mut app, &["L"]), [mv("W-11", "Doing")]);
 }
 
 #[test]
-fn fr29_h_emits_move_to_previous_column() {
-    let mut app = fixture("work_4_9", sel(1, "W-12"));
+fn h_emits_move_to_previous_column() {
+    let mut app = fixture("work_example", sel(1, "W-12"));
     assert_eq!(press(&mut app, &["H"]), [mv("W-12", "Todo")]);
 }
 
 #[test]
 fn ts7_3_h_on_first_column_does_nothing() {
-    let mut app = fixture("work_4_9", sel(0, "W-11"));
+    let mut app = fixture("work_example", sel(0, "W-11"));
     assert_eq!(press(&mut app, &["H"]), []);
 }
 
 #[test]
 fn ts7_3_l_on_last_configured_column_does_nothing() {
-    let mut app = fixture("work_4_9", sel(2, "W-9"));
+    let mut app = fixture("work_example", sel(2, "W-9"));
     assert_eq!(press(&mut app, &["L"]), []);
 }
 
 #[test]
 fn ts4_7_moves_from_extra_column_target_first_column() {
-    let mut app = TuiFixture::new(Some("as7")).app();
+    let mut app = TuiFixture::new(Some("hand_edit")).app();
     let extra = app
         .board
         .column_list()
@@ -68,15 +68,15 @@ fn ts4_7_moves_from_extra_column_target_first_column() {
 }
 
 #[test]
-fn fr29_move_without_selected_card_does_nothing() {
+fn move_without_selected_card_does_nothing() {
     let mut app = TuiFixture::new(None).app();
     assert_eq!(app.sel.card, None);
     assert_eq!(press(&mut app, &["L"]), []);
 }
 
 #[test]
-fn fr29_moved_card_stays_selected() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn moved_card_stays_selected() {
+    let fx = TuiFixture::new(Some("work_example"));
     let (mut rt, _, _) = fx.runtime(80, 24);
     assert_eq!(rt.app().sel, sel(0, "W-11"));
     assert_eq!(rt.dispatch(Input::Key(key("L"))), None);
@@ -88,8 +88,8 @@ fn fr29_moved_card_stays_selected() {
 }
 
 #[test]
-fn fr29_move_failure_sets_status_line() {
-    let fx = TuiFixture::new(Some("work_4_9"));
+fn move_failure_sets_status_line() {
+    let fx = TuiFixture::new(Some("work_example"));
     let (mut rt, _, _) = fx.runtime(80, 24);
     let path = fx.board_dir.join("W-11.md");
     let bytes = b"---\ncolumn: Todo\n---\n# x\n<<<<<<< ours\n".to_vec();
@@ -105,7 +105,7 @@ fn fr29_move_failure_sets_status_line() {
 
 #[test]
 fn ts5_2_rebound_move_keys() {
-    let mut app = fixture("work_4_9", sel(0, "W-11"));
+    let mut app = fixture("work_example", sel(0, "W-11"));
     app.keys = KeyMap::build(&[("move_right".into(), vec!["m".into()])]).0;
     assert_eq!(press(&mut app, &["m"]), [mv("W-11", "Doing")]);
     assert_eq!(press(&mut app, &["L"]), []);
